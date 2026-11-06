@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="Capitalism II city and market artwork">
+  <defs>
+    <linearGradient id="city" x2="0" y2="1">
+      <stop stop-color="#101923"/>
+      <stop offset="1" stop-color="#17130d"/>
+    </linearGradient>
+    <linearGradient id="gold" x2="0" y2="1">
+      <stop stop-color="#fff0b2"/>
+      <stop offset="1" stop-color="#cf9d45"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#city)"/>
+  <g fill="#202c31" stroke="#816d44" stroke-width="2">
+    <path d="M40 265h100v235H40zM160 205h118v295H160zM298 242h94v258h-94zM414 165h126v335H414zM559 220h101v280H559zM678 274h82v226h-82z"/>
+  </g>
+  <g fill="#e6c46f" opacity=".55">
+    <path d="M58 288h15v18H58zM90 288h15v18H90zM178 230h18v18h-18zM217 230h18v18h-18zM313 269h15v17h-15zM445 190h18v18h-18zM485 190h18v18h-18zM584 242h15v18h-15zM704 296h14v16h-14z"/>
+    <path d="M58 325h15v18H58zM90 325h15v18H90zM178 270h18v18h-18zM217 270h18v18h-18zM445 230h18v18h-18zM485 230h18v18h-18zM584 282h15v18h-15z"/>
+  </g>
+  <path d="M54 160l136-62 116 25 113-74 142 44 110-33" fill="none" stroke="#e8c66d" stroke-width="3"/>
+  <path d="M54 160l136-62 116 25 113-74 142 44 110-33" fill="none" stroke="#fff1bc" stroke-width="1" stroke-dasharray="3 11"/>
+  <g transform="translate(65 47)" font-family="ui-monospace, Menlo, Consolas, monospace">
+    <text fill="#d2af60" font-size="12" letter-spacing="5">BUILD THE EMPIRE</text>
+    <text y="62" fill="url(#gold)" font-size="49" font-weight="800" letter-spacing="2">CAPITALISM II</text>
+  </g>
+  <text x="746" y="475" fill="#bd9b5b" font-family="ui-monospace, Menlo, monospace" font-size="11" letter-spacing="3" text-anchor="end">OFFICIAL PC RELEASE</text>
+</svg>

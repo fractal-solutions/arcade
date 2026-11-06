@@ -31,11 +31,12 @@
 
   const grid = $('#cabinet-grid');
   const cards = grid ? $$('.cabinet', grid) : [];
+  const vaultDivider = grid && $('.vault-divider', grid);
   const total = cards.length;
   const byKind = (kind) => kind === 'all' ? total : cards.filter((c) => c.dataset.kind === kind).length;
 
   const countEl = $('#cabinet-count');
-  if (countEl) countEl.textContent = `${total} cabinet${total === 1 ? '' : 's'}`;
+  if (countEl) countEl.textContent = `${total} ${total === 1 ? 'entry' : 'entries'}`;
 
   const teleCount = $('#tele-cabinets');
   if (teleCount) teleCount.textContent = String(total);
@@ -95,7 +96,7 @@
   const filterButtons = $$('.selector-btn');
   const statusEl = $('#selector-status');
   const emptyEl = $('#selector-empty');
-  const KINDS = new Set(['all', 'wasm', 'emu', 'data']);
+  const KINDS = new Set(['all', 'wasm', 'emu', 'data', 'external']);
 
   function applyFilter(kind) {
     if (!KINDS.has(kind)) kind = 'all';
@@ -107,6 +108,7 @@
       if (show) visible++;
       if (!show) card.style.removeProperty('--rx'), card.style.removeProperty('--ry');
     }
+    if (vaultDivider) vaultDivider.hidden = kind !== 'all' && kind !== 'emu';
 
     for (const btn of filterButtons) {
       const active = btn.dataset.filter === kind;
@@ -116,9 +118,10 @@
     }
 
     if (statusEl) {
-      statusEl.textContent = `Showing ${visible} of ${total} cabinet${total === 1 ? '' : 's'}${kind === 'all' ? '' : ` · ${kind}`}`;
+      statusEl.textContent = `Showing ${visible} of ${total} library entr${total === 1 ? 'y' : 'ies'}${kind === 'all' ? '' : ` · ${kind}`}`;
     }
     if (emptyEl) emptyEl.hidden = visible !== 0;
+    if (grid) grid.scrollTo({ left: 0, behavior: reduced ? 'auto' : 'smooth' });
   }
 
   filterButtons.forEach((btn, index) => {
@@ -138,6 +141,312 @@
   });
 
   applyFilter('all');
+
+  /* ------------------------------------------------------------ library navigation */
+
+  const libraryPrev = $('#library-prev');
+  const libraryNext = $('#library-next');
+
+  function scrollLibrary(direction) {
+    if (!grid) return;
+    const firstCard = cards.find((card) => !card.classList.contains('is-filtered-out'));
+    const cardWidth = firstCard ? firstCard.getBoundingClientRect().width : 320;
+    grid.scrollBy({
+      left: direction * (cardWidth + 18) * 2,
+      behavior: reduced ? 'auto' : 'smooth',
+    });
+  }
+
+  if (libraryPrev) libraryPrev.addEventListener('click', () => scrollLibrary(-1));
+  if (libraryNext) libraryNext.addEventListener('click', () => scrollLibrary(1));
+
+  for (const card of cards) {
+    const link = $('.cabinet-link', card);
+    if (!link) continue;
+
+    link.addEventListener('focus', () => {
+      card.scrollIntoView({
+        block: 'nearest',
+        inline: 'center',
+        behavior: reduced ? 'auto' : 'smooth',
+      });
+    });
+
+    link.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      const visibleCards = cards.filter((item) => !item.classList.contains('is-filtered-out'));
+      const index = visibleCards.indexOf(card);
+      const next = visibleCards[index + (e.key === 'ArrowRight' ? 1 : -1)];
+      if (!next) return;
+      const nextLink = $('.cabinet-link', next);
+      if (!nextLink) return;
+      e.preventDefault();
+      nextLink.focus();
+    });
+  }
+
+  /* ------------------------------------------------------------ generated audio */
+
+  const soundButton = $('#sound-toggle');
+  const soundLabel = $('#sound-label');
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  let audioContext = null;
+  let masterGain = null;
+  let reverb = null;
+  let reverbGain = null;
+  let noiseBuffer = null;
+  let soundEnabled = false;
+  let musicTimer = 0;
+  let musicStep = 0;
+  let musicBar = 0;
+  let nextMusicTime = 0;
+
+  function setSoundButton(enabled, label) {
+    if (!soundButton) return;
+    soundButton.setAttribute('aria-pressed', String(enabled));
+    soundButton.setAttribute('aria-label', label);
+    if (soundLabel) soundLabel.textContent = enabled ? 'Sound on' : 'Sound off';
+  }
+
+  function prepareAudio() {
+    if (!AudioContextClass) {
+      setSoundButton(false, 'Audio unavailable');
+      if (soundButton) soundButton.disabled = true;
+      return false;
+    }
+    if (audioContext) return true;
+
+    audioContext = new AudioContextClass();
+    masterGain = audioContext.createGain();
+    masterGain.gain.value = 0;
+    masterGain.connect(audioContext.destination);
+
+    reverb = audioContext.createConvolver();
+    reverbGain = audioContext.createGain();
+    const impulseLength = Math.floor(audioContext.sampleRate * 2.8);
+    const impulse = audioContext.createBuffer(2, impulseLength, audioContext.sampleRate);
+    for (let channel = 0; channel < impulse.numberOfChannels; channel++) {
+      const samples = impulse.getChannelData(channel);
+      for (let i = 0; i < samples.length; i++) {
+        const tail = Math.pow(1 - i / samples.length, 2.8);
+        samples[i] = (Math.random() * 2 - 1) * tail;
+      }
+    }
+    reverb.buffer = impulse;
+    reverbGain.gain.value = 0.2;
+    masterGain.connect(reverb);
+    reverb.connect(reverbGain);
+    reverbGain.connect(audioContext.destination);
+
+    noiseBuffer = audioContext.createBuffer(1, audioContext.sampleRate, audioContext.sampleRate);
+    const noise = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < noise.length; i++) noise[i] = Math.random() * 2 - 1;
+    return true;
+  }
+
+  function playTone(frequency, duration, volume) {
+    if (!soundEnabled || !audioContext || audioContext.state !== 'running') return;
+    const oscillator = audioContext.createOscillator();
+    const envelope = audioContext.createGain();
+    const now = audioContext.currentTime;
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(frequency, now);
+    oscillator.frequency.exponentialRampToValueAtTime(frequency * 0.72, now + duration);
+    envelope.gain.setValueAtTime(volume, now);
+    envelope.gain.exponentialRampToValueAtTime(0.001, now + duration);
+    oscillator.connect(envelope);
+    envelope.connect(masterGain);
+    oscillator.start(now);
+    oscillator.stop(now + duration);
+  }
+
+  function playNoise(time, duration, cutoff, volume) {
+    const source = audioContext.createBufferSource();
+    const filter = audioContext.createBiquadFilter();
+    const envelope = audioContext.createGain();
+    source.buffer = noiseBuffer;
+    filter.type = 'highpass';
+    filter.frequency.value = cutoff;
+    envelope.gain.setValueAtTime(volume, time);
+    envelope.gain.exponentialRampToValueAtTime(0.001, time + duration);
+    source.connect(filter);
+    filter.connect(envelope);
+    envelope.connect(masterGain);
+    source.start(time);
+    source.stop(time + duration);
+  }
+
+  function scheduleChord(notes, time) {
+    const barDuration = (60 / 172) * 4;
+    const releaseTime = time + barDuration + 0.85;
+
+    for (let index = 0; index < notes.length; index++) {
+      const frequency = 440 * Math.pow(2, (notes[index] - 69) / 12);
+      const filter = audioContext.createBiquadFilter();
+      const envelope = audioContext.createGain();
+      const pan = audioContext.createStereoPanner();
+      const triangle = audioContext.createOscillator();
+      const shimmer = audioContext.createOscillator();
+
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(760, time);
+      filter.frequency.linearRampToValueAtTime(1450, time + barDuration);
+      envelope.gain.setValueAtTime(0.001, time);
+      envelope.gain.linearRampToValueAtTime(0.034, time + 0.55);
+      envelope.gain.setValueAtTime(0.034, time + barDuration * 0.68);
+      envelope.gain.setTargetAtTime(0.001, releaseTime, 0.38);
+      pan.pan.value = (index / Math.max(1, notes.length - 1) - 0.5) * 0.6;
+
+      triangle.type = 'triangle';
+      triangle.frequency.value = frequency;
+      shimmer.type = 'sine';
+      shimmer.frequency.value = frequency * 2;
+      shimmer.detune.value = index % 2 ? -4 : 4;
+      triangle.connect(filter);
+      shimmer.connect(filter);
+      filter.connect(envelope);
+      envelope.connect(pan);
+      pan.connect(masterGain);
+
+      triangle.start(time);
+      shimmer.start(time);
+      triangle.stop(releaseTime + 1.6);
+      shimmer.stop(releaseTime + 1.6);
+    }
+  }
+
+  function scheduleMusicStep(step, time) {
+    if (step === 0) {
+      const progression = [
+        [50, 53, 57, 60, 64],
+        [46, 50, 53, 57, 60],
+        [41, 45, 48, 52, 55],
+        [48, 52, 55, 59, 62],
+      ];
+      scheduleChord(progression[musicBar % progression.length], time);
+      musicBar++;
+    }
+
+    if (step === 0 || step === 7 || step === 10) {
+      const kick = audioContext.createOscillator();
+      const envelope = audioContext.createGain();
+      kick.type = 'sine';
+      kick.frequency.setValueAtTime(125, time);
+      kick.frequency.exponentialRampToValueAtTime(42, time + 0.12);
+      envelope.gain.setValueAtTime(0.22, time);
+      envelope.gain.exponentialRampToValueAtTime(0.001, time + 0.16);
+      kick.connect(envelope);
+      envelope.connect(masterGain);
+      kick.start(time);
+      kick.stop(time + 0.17);
+    }
+    if (step === 4 || step === 12) playNoise(time, 0.13, 1100, 0.12);
+    if (step % 2 === 0 || step === 11 || step === 15) playNoise(time, 0.035, 7600, 0.045);
+
+    const bassNotes = [55, 0, 0, 82, 0, 73, 0, 55, 49, 0, 65, 0, 55, 0, 73, 0];
+    const note = bassNotes[step];
+    if (note) {
+      const bass = audioContext.createOscillator();
+      const filter = audioContext.createBiquadFilter();
+      const envelope = audioContext.createGain();
+      bass.type = 'triangle';
+      bass.frequency.setValueAtTime(note, time);
+      filter.type = 'lowpass';
+      filter.frequency.value = 540;
+      envelope.gain.setValueAtTime(0.075, time);
+      envelope.gain.exponentialRampToValueAtTime(0.001, time + 0.12);
+      bass.connect(filter);
+      filter.connect(envelope);
+      envelope.connect(masterGain);
+      bass.start(time);
+      bass.stop(time + 0.13);
+    }
+  }
+
+  function startMusic() {
+    window.clearInterval(musicTimer);
+    musicStep = 0;
+    musicBar = 0;
+    nextMusicTime = audioContext.currentTime + 0.04;
+    const stepDuration = 60 / 172 / 4;
+    musicTimer = window.setInterval(() => {
+      while (nextMusicTime < audioContext.currentTime + 0.12) {
+        scheduleMusicStep(musicStep, nextMusicTime);
+        musicStep = (musicStep + 1) % 16;
+        nextMusicTime += stepDuration;
+      }
+    }, 25);
+  }
+
+  function pauseAudio() {
+    window.clearInterval(musicTimer);
+    musicTimer = 0;
+    if (audioContext && audioContext.state !== 'closed') {
+      audioContext.suspend().catch((error) => console.warn('Unable to suspend audio:', error));
+    }
+  }
+
+  function resumeAudio() {
+    if (!soundEnabled || document.hidden || !audioContext) return;
+    audioContext.resume().then(() => {
+      if (!soundEnabled || document.hidden) return;
+      masterGain.gain.setTargetAtTime(0.55, audioContext.currentTime, 0.08);
+      startMusic();
+    }).catch((error) => console.error('Unable to resume arcade audio:', error));
+  }
+
+  if (soundButton) {
+    soundButton.addEventListener('click', () => {
+      if (soundEnabled) {
+        soundEnabled = false;
+        pauseAudio();
+        setSoundButton(false, 'Enable music and interface sounds');
+        return;
+      }
+
+      try {
+        if (!prepareAudio()) return;
+      } catch (error) {
+        console.error('Unable to prepare arcade audio:', error);
+        setSoundButton(false, 'Audio could not start');
+        return;
+      }
+
+      audioContext.resume().then(() => {
+        soundEnabled = true;
+        masterGain.gain.setTargetAtTime(0.55, audioContext.currentTime, 0.08);
+        startMusic();
+        setSoundButton(true, 'Turn music and interface sounds off');
+        playTone(920, 0.09, 0.04);
+      }).catch((error) => {
+        console.error('Unable to start arcade audio:', error);
+        setSoundButton(false, 'Audio could not start');
+      });
+    });
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) pauseAudio();
+    else resumeAudio();
+  });
+
+  window.addEventListener('pagehide', pauseAudio);
+  window.addEventListener('pageshow', resumeAudio);
+
+  document.addEventListener('pointerover', (e) => {
+    if (!(e.target instanceof Element)) return;
+    const control = e.target.closest('a, button');
+    const previous = e.relatedTarget instanceof Element ? e.relatedTarget.closest('a, button') : null;
+    if (control && control !== previous) playTone(720, 0.045, 0.018);
+  });
+
+  document.addEventListener('focusin', (e) => {
+    if (e.target instanceof Element && e.target.matches('a, button')) playTone(820, 0.055, 0.025);
+  });
+
+  document.addEventListener('click', (e) => {
+    if (e.target instanceof Element && e.target.closest('a, button')) playTone(520, 0.075, 0.03);
+  });
 
   /* ------------------------------------------------------------ dialogs */
 
@@ -159,8 +468,8 @@
 
   const logEl = $('#tele-log');
   const messages = [
-    '> cabinets online: ' + total,
-    '> wasm engines: dave, 2048, quake',
+    '> library entries: ' + total,
+    '> local wasm: dave, 2048, quake',
     '> dosbox layer: keen4, duke2, custom',
     '> local saves: synced',
     '> awaiting player input',

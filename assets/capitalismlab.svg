@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="Capitalism Lab digital commerce artwork">
+  <defs>
+    <linearGradient id="lab" x2="1" y2="1">
+      <stop stop-color="#07171a"/>
+      <stop offset=".55" stop-color="#102a2a"/>
+      <stop offset="1" stop-color="#0b1015"/>
+    </linearGradient>
+    <radialGradient id="glow">
+      <stop stop-color="#9bf2c8" stop-opacity=".48"/>
+      <stop offset="1" stop-color="#36c8a4" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#lab)"/>
+  <circle cx="610" cy="225" r="245" fill="url(#glow)"/>
+  <g fill="none" stroke="#80e0bd" opacity=".5">
+    <path d="M40 405h720M90 355h620M140 305h520M190 255h420"/>
+    <path d="M160 430V190l83 42v198M280 430V133l82 51v246M405 430V90l82 46v294M530 430V165l83-36v301M654 430V218l78-46v258"/>
+    <path d="M85 135l157-50 120 33 122-62 102 44 119-68" stroke-width="3"/>
+  </g>
+  <g fill="#b6f4d0">
+    <circle cx="85" cy="135" r="4"/><circle cx="242" cy="85" r="4"/>
+    <circle cx="362" cy="118" r="4"/><circle cx="484" cy="56" r="4"/>
+    <circle cx="586" cy="100" r="4"/><circle cx="705" cy="32" r="4"/>
+  </g>
+  <g transform="translate(58 45)" font-family="ui-monospace, Menlo, Consolas, monospace">
+    <text fill="#72d7ba" font-size="12" letter-spacing="5">THE WORLD'S BUSINESS SIMULATION</text>
+    <text y="67" fill="#d3ffe4" font-size="53" font-weight="800" letter-spacing="2">CAPITALISM</text>
+    <text y="118" fill="#72d7ba" font-size="42" font-weight="700" letter-spacing="9">LAB</text>
+  </g>
+  <text x="746" y="475" fill="#65b99f" font-family="ui-monospace, Menlo, monospace" font-size="11" letter-spacing="3" text-anchor="end">OFFICIAL SITE</text>
+</svg>

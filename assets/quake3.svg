@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="Quake III Arena arena combat artwork">
+  <defs>
+    <linearGradient id="arena" x2="0" y2="1">
+      <stop stop-color="#161018"/>
+      <stop offset=".55" stop-color="#34202a"/>
+      <stop offset="1" stop-color="#09090e"/>
+    </linearGradient>
+    <radialGradient id="core">
+      <stop stop-color="#fff3c9"/>
+      <stop offset=".18" stop-color="#ff995e"/>
+      <stop offset="1" stop-color="#df3940" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#arena)"/>
+  <circle cx="595" cy="205" r="205" fill="url(#core)" opacity=".72"/>
+  <g fill="none" stroke="#ff9a72" opacity=".52">
+    <path d="M0 370h800M0 420h800M95 500l145-130M705 500L560 370"/>
+    <path d="M90 0v370M175 0v370M625 0v370M710 0v370"/>
+    <circle cx="595" cy="205" r="118" stroke-width="2"/>
+    <circle cx="595" cy="205" r="88" stroke-width="1" stroke-dasharray="5 9"/>
+    <path d="M595 58v294M448 205h294M491 101l208 208M699 101L491 309" stroke-width="2"/>
+  </g>
+  <path d="M0 389l130-25 79 15 88-38 114 42 100-31 99 24 96-36 94 18v142H0z" fill="#08090e"/>
+  <g fill="#ffc8a4">
+    <circle cx="104" cy="77" r="2"/><circle cx="297" cy="53" r="1.5"/>
+    <circle cx="416" cy="122" r="1.8"/><circle cx="743" cy="61" r="1.4"/>
+  </g>
+  <g transform="translate(62 145)" font-family="ui-monospace, Menlo, Consolas, monospace">
+    <text fill="#ff9a72" font-size="14" letter-spacing="7">ID SOFTWARE · 1999</text>
+    <text y="100" fill="#ffe1c9" font-size="76" font-weight="800" letter-spacing="3">QUAKE III</text>
+    <text y="145" fill="#ff9a72" font-size="17" letter-spacing="7">ARENA</text>
+    <path d="M0 178h252" stroke="#ff745e" stroke-width="3" opacity=".7"/>
+    <text y="209" fill="#bd7868" font-size="12" letter-spacing="4">OFFICIAL PC RELEASE</text>
+  </g>
+  <text x="750" y="476" fill="#b46d61" font-family="ui-monospace, Menlo, monospace" font-size="11" letter-spacing="3" text-anchor="end">EXTERNAL RELEASE</text>
+</svg>

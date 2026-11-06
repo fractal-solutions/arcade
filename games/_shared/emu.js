@@ -48,6 +48,54 @@
     fail(String(e && e.message ? e.message : e));
   }
 
+  /* Match js-dos's input overlay to the aspect-fitted game canvas, not the
+     full cabinet. This keeps pointer coordinates aligned around letterboxing. */
+  if (typeof ResizeObserver === 'function' && typeof MutationObserver === 'function') {
+    let observedCanvas = null;
+    let alignFrame = 0;
+
+    function alignMouseOverlay() {
+      const root = el.querySelector('.emulator-root');
+      const canvas = root && root.querySelector('.emulator-canvas');
+      const overlay = root && root.querySelector('.emulator-mouse-overlay');
+      if (!root || !canvas || !overlay) return;
+
+      if (canvas !== observedCanvas) {
+        observedCanvas = canvas;
+        resizeObserver.observe(canvas);
+      }
+
+      const rootRect = root.getBoundingClientRect();
+      const canvasRect = canvas.getBoundingClientRect();
+      overlay.style.left = `${canvasRect.left - rootRect.left}px`;
+      overlay.style.top = `${canvasRect.top - rootRect.top}px`;
+      overlay.style.right = 'auto';
+      overlay.style.bottom = 'auto';
+      overlay.style.width = `${canvasRect.width}px`;
+      overlay.style.height = `${canvasRect.height}px`;
+    }
+
+    function scheduleAlignment() {
+      if (alignFrame) return;
+      alignFrame = requestAnimationFrame(() => {
+        alignFrame = 0;
+        alignMouseOverlay();
+      });
+    }
+
+    const resizeObserver = new ResizeObserver(scheduleAlignment);
+    resizeObserver.observe(el);
+    const mutationObserver = new MutationObserver(scheduleAlignment);
+    mutationObserver.observe(el, { childList: true, subtree: true });
+    scheduleAlignment();
+
+    window.addEventListener('pagehide', () => {
+      resizeObserver.disconnect();
+      mutationObserver.disconnect();
+      if (alignFrame) cancelAnimationFrame(alignFrame);
+    }, { once: true });
+  }
+
   /* ---------------------------------------------------------- fullscreen */
   const requestFs = document.documentElement.requestFullscreen ||
     document.documentElement.webkitRequestFullscreen;

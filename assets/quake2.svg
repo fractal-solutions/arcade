@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="Quake II industrial sci-fi poster">
+  <defs>
+    <linearGradient id="space" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#080c12"/>
+      <stop offset=".52" stop-color="#171c23"/>
+      <stop offset="1" stop-color="#07080d"/>
+    </linearGradient>
+    <linearGradient id="steel" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#ffe2c8"/>
+      <stop offset=".48" stop-color="#ff8858"/>
+      <stop offset="1" stop-color="#9f3628"/>
+    </linearGradient>
+    <radialGradient id="flare">
+      <stop stop-color="#ffb57d" stop-opacity=".85"/>
+      <stop offset=".35" stop-color="#df452b" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#df452b" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#space)"/>
+  <circle cx="605" cy="197" r="220" fill="url(#flare)"/>
+  <g fill="none" stroke="#ff8458" opacity=".23">
+    <path d="M400 0v500M0 250h800M0 90h800M0 410h800"/>
+    <path d="M80 0v500M160 0v500M240 0v500M320 0v500M480 0v500M560 0v500M640 0v500M720 0v500"/>
+  </g>
+  <g fill="none" stroke="#ffb18a" opacity=".72">
+    <circle cx="604" cy="190" r="115" stroke-width="2"/>
+    <circle cx="604" cy="190" r="92" stroke-width="1" stroke-dasharray="7 9"/>
+    <path d="M604 52v276M466 190h276M506 92l196 196M702 92L506 288" stroke-width="2"/>
+    <path d="M550 136h108v108H550zM578 164h52v52h-52z" stroke-width="3"/>
+  </g>
+  <g fill="#ffc59d">
+    <circle cx="604" cy="190" r="4"/>
+    <circle cx="110" cy="72" r="2"/><circle cx="272" cy="98" r="1.5"/>
+    <circle cx="398" cy="51" r="1.8"/><circle cx="744" cy="62" r="1.4"/>
+    <circle cx="719" cy="345" r="1.6"/><circle cx="96" cy="334" r="1.5"/>
+  </g>
+  <g transform="translate(66 140)" font-family="ui-monospace, Menlo, Consolas, monospace">
+    <text fill="#ff8758" font-size="14" letter-spacing="7">STROGGOS // 1997</text>
+    <text y="102" fill="url(#steel)" font-size="102" font-weight="800" letter-spacing="2">QUAKE</text>
+    <text y="155" fill="#ffc59d" font-size="45" font-weight="700" letter-spacing="12">II</text>
+    <path d="M0 195h230" stroke="#ff8758" stroke-width="3" opacity=".7"/>
+    <text y="226" fill="#ab7566" font-size="12" letter-spacing="4">WEBASSEMBLY DEMO</text>
+  </g>
+  <path d="M0 430l112-30 98 18 105-35 132 28 117-43 104 22 132-32v142H0z" fill="#08090e" stroke="#1b1515" stroke-width="8"/>
+  <text x="754" y="476" fill="#9f6254" font-family="ui-monospace, Menlo, monospace" font-size="11" letter-spacing="3" text-anchor="end">QWASM2 · EXTERNAL</text>
+</svg>

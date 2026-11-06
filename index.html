@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#05060a">
-  <meta name="description" content="A futuristic arcade of authentic classics running in your browser: Quake, Dangerous Dave, Prince of Persia 2, Commander Keen 4, Duke Nukem II, 2048 and your own DOS games — all through WebAssembly.">
+  <meta name="description" content="A browser arcade of DOS and PC classics: 32 local games, Quake II's browser demo, plus links to Quake III Arena and the Capitalism series.">
   <title>WASM Arcade — authentic classics in the browser</title>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
@@ -25,7 +25,11 @@
     <div class="hud" aria-label="Arcade status">
       <span class="hud-item"><i class="led" aria-hidden="true"></i> SYS.ONLINE</span>
       <span class="hud-item hud-clock" id="clock">--:--:--</span>
-      <span class="hud-item hud-cabinets" id="cabinet-count">32 cabinets</span>
+      <span class="hud-item hud-cabinets" id="cabinet-count">36 entries</span>
+      <button type="button" class="sound-toggle" id="sound-toggle" aria-pressed="false" aria-label="Enable music and interface sounds">
+        <span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span id="sound-label">Sound off</span>
+      </button>
     </div>
   </header>
 
@@ -37,14 +41,14 @@
       <span>LOCAL-FIRST SAVES</span><span>◆</span>
       <span>ZERO UPLOADS</span><span>◆</span>
       <span>LIBREQUAKE BUNDLED</span><span>◆</span>
-      <span>32 CABINETS ONLINE</span><span>◆</span>
+      <span>36 LIBRARY ENTRIES</span><span>◆</span>
       <span>WASM32 ENGINE</span><span>◆</span>
       <span>SDL + C</span><span>◆</span>
       <span>DOSBOX IN THE BROWSER</span><span>◆</span>
       <span>LOCAL-FIRST SAVES</span><span>◆</span>
       <span>ZERO UPLOADS</span><span>◆</span>
       <span>LIBREQUAKE BUNDLED</span><span>◆</span>
-      <span>32 CABINETS ONLINE</span><span>◆</span>
+      <span>36 LIBRARY ENTRIES</span><span>◆</span>
     </div>
   </div>
 
@@ -52,18 +56,18 @@
     <section class="intro" aria-labelledby="intro-heading">
       <div class="hero-copy">
         <p class="eyebrow"><span class="eyebrow-line" aria-hidden="true"></span> INSERT COIN // NEURAL LINK READY</p>
-        <h1 id="intro-heading" class="glitch" data-text="Thirty-two cabinets,">
-          Thirty-two cabinets,<br><em data-text="running native.">running native.</em>
+        <h1 id="intro-heading" class="glitch" data-text="Thirty-six classics,">
+          Thirty-six classics,<br><em data-text="one living room.">one living room.</em>
         </h1>
         <p class="lede">
-          Original game logic, original art where we can ship it, and everything compiled
-          to WebAssembly. Quake with LibreQuake data, Dangerous Dave, 2048, Commander Keen 4, Duke Nukem II,
-          Prince of Persia 2, a bring-your-own DOS cabinet and a 25-game DOS vault of shareware,
-          freeware and demos. Progress never leaves this device.
+          Pick a title, skim the shelf and jump straight in. Thirty-two games run right here;
+          Quake II's browser demo and official Quake III and Capitalism releases are one click
+          away. The local library includes Quake, Dangerous Dave, 2048, Commander Keen 4,
+          Duke Nukem II, Prince of Persia 2 and a DOS vault of shareware, freeware and demos.
         </p>
         <div class="hero-cta">
-          <a class="button primary big" href="#cabinets">Enter the arcade <span aria-hidden="true">→</span></a>
-          <span class="hero-note">32 cabinets · 5 engines · 0 installs</span>
+          <a class="button primary big" href="#cabinets">Browse games <span aria-hidden="true">→</span></a>
+          <span class="hero-note">32 local games · 4 external launches</span>
         </div>
         <div class="intro-meta">
           <span><b>1990–2014</b> era</span>
@@ -80,9 +84,9 @@
         <dl class="telemetry-grid">
           <div><dt>uplink</dt><dd>local</dd></div>
           <div><dt>engine</dt><dd>wasm32</dd></div>
-          <div><dt>cabinets</dt><dd id="tele-cabinets">32</dd></div>
+          <div><dt>games</dt><dd id="tele-cabinets">36</dd></div>
           <div><dt>save state</dt><dd id="tele-save">empty</dd></div>
-          <div><dt>render</dt><dd>canvas 2d</dd></div>
+          <div><dt>render</dt><dd>WASM + DOSBox</dd></div>
           <div><dt>clock</dt><dd id="tele-clock">00:00:00</dd></div>
         </dl>
         <div class="telemetry-log" id="tele-log" aria-live="off">
@@ -96,12 +100,12 @@
     <section class="selector-section" id="cabinets" aria-labelledby="selector-heading">
       <div class="selector-head">
         <div>
-          <p class="eyebrow" id="selector-heading">// select cabinet</p>
-          <h2 class="selector-title">Game selector</h2>
+          <p class="eyebrow" id="selector-heading">// XMB library · select a title</p>
+          <h2 class="selector-title">Game library</h2>
         </div>
         <div class="selector" role="tablist" aria-label="Filter games">
           <button type="button" class="selector-btn is-active" role="tab" aria-selected="true" data-filter="all">
-            All <b data-count-for="all">32</b>
+            All <b data-count-for="all">36</b>
           </button>
           <button type="button" class="selector-btn" role="tab" aria-selected="false" data-filter="wasm">
             WASM <b data-count-for="wasm">3</b>
@@ -112,10 +116,21 @@
           <button type="button" class="selector-btn" role="tab" aria-selected="false" data-filter="data">
             Your data <b data-count-for="data">1</b>
           </button>
+          <button type="button" class="selector-btn" role="tab" aria-selected="false" data-filter="external">
+            External <b data-count-for="external">4</b>
+          </button>
           <span class="selector-glint" aria-hidden="true"></span>
         </div>
       </div>
-      <p class="selector-status" id="selector-status" aria-live="polite">Showing 32 of 32 cabinets</p>
+      <p class="selector-status" id="selector-status" aria-live="polite">Showing 36 of 36 entries</p>
+
+      <div class="library-controls">
+        <span>Use <kbd>←</kbd> <kbd>→</kbd> or swipe to browse</span>
+        <div class="library-arrows">
+          <button type="button" class="rail-arrow" id="library-prev" aria-label="Previous games">←</button>
+          <button type="button" class="rail-arrow" id="library-next" aria-label="Next games">→</button>
+        </div>
+      </div>
 
       <div class="cabinets" id="cabinet-grid">
 
@@ -193,6 +208,32 @@
           <button type="button" class="data-help" data-open="quake-help">
             Bundled data, or bring your own PAKs
           </button>
+        </article>
+
+        <!-- Quake II browser demo -->
+        <article class="cabinet quake2" data-game="quake2" data-kind="external" style="--i:3; --accent:#ff6b4a">
+          <a class="cabinet-link" href="https://qwasm2.m-h.org.uk/" target="_blank" rel="noopener noreferrer"
+             aria-label="Play the Quake II demo in Qwasm2 (opens a new tab)">
+            <div class="art">
+              <img src="assets/quake2.svg" alt="Quake II industrial sci-fi poster" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">03+</span>
+              <span class="art-tag">PC &middot; 1997</span>
+              <span class="play-badge" aria-hidden="true">↗</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Quake II</h2>
+                <span class="chip external">Browser demo</span>
+              </div>
+              <p>Play the first three levels in Qwasm2, a WebAssembly port of Yamagi Quake II.
+                The engine and demo run on the project's site; full-game PAKs are optional
+                and must come from your own copy.</p>
+              <div class="card-foot">
+                <span class="progress">External browser launch</span>
+                <span class="cta">Play online <span aria-hidden="true">↗</span></span>
+              </div>
+            </div>
+          </a>
         </article>
 
         <!-- Commander Keen 4 -->
@@ -303,7 +344,7 @@
 
         <div class="vault-divider" role="presentation">
           <span class="vault-kicker">// THE DOS VAULT</span>
-          <h3>25 more cabinets, already installed.</h3>
+          <h3>25 more games, already installed.</h3>
           <p>Shareware episodes, freeware releases and playable demos — each one bundled as a
             <code>.jsdos</code> image and booted by DOSBox in WebAssembly. No file picker, no setup.</p>
         </div>
@@ -833,6 +874,75 @@
             </div>
           </a>
         </article>
+        <article class="cabinet quake3" data-game="quake3" data-kind="external" style="--i:32; --accent:#ff745e">
+          <a class="cabinet-link" href="https://store.steampowered.com/app/2200/Quake_III_Arena/" target="_blank" rel="noopener noreferrer"
+             aria-label="View the official Quake III Arena release on Steam (opens a new tab)">
+            <div class="art">
+              <img src="assets/quake3.svg" alt="Quake III Arena arena combat artwork" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">33</span>
+              <span class="art-tag">PC &middot; 1999</span>
+              <span class="play-badge" aria-hidden="true">↗</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Quake III Arena</h2>
+                <span class="chip external">Official PC release</span>
+              </div>
+              <p>Find the official PC release. This arcade does not yet include a Quake III
+                WebAssembly engine or game data, so this opens Steam rather than launching locally.</p>
+              <div class="card-foot">
+                <span class="progress">Not playable in this arcade</span>
+                <span class="cta">View release <span aria-hidden="true">↗</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet capitalism2" data-game="capitalism2" data-kind="external" style="--i:33; --accent:#e7c56e">
+          <a class="cabinet-link" href="https://store.steampowered.com/app/638200/Capitalism_2/" target="_blank" rel="noopener noreferrer"
+             aria-label="View Capitalism II on Steam (opens a new tab)">
+            <div class="art">
+              <img src="assets/capitalism2.svg" alt="Capitalism II abstract city and market artwork" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">34</span>
+              <span class="art-tag">PC &middot; 2001</span>
+              <span class="play-badge" aria-hidden="true">↗</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Capitalism II</h2>
+                <span class="chip external">Official PC release</span>
+              </div>
+              <p>The standalone business sim you asked for. Its official PC release is linked
+                here; this is not a DOS game and does not run in the current browser cabinet.</p>
+              <div class="card-foot">
+                <span class="progress">Not playable in this arcade</span>
+                <span class="cta">View release <span aria-hidden="true">↗</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet capitalismlab" data-game="capitalismlab" data-kind="external" style="--i:34; --accent:#72d7ba">
+          <a class="cabinet-link" href="https://www.capitalismlab.com/" target="_blank" rel="noopener noreferrer"
+             aria-label="View Capitalism Lab official site (opens a new tab)">
+            <div class="art">
+              <img src="assets/capitalismlab.svg" alt="Capitalism Lab abstract digital commerce artwork" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">35</span>
+              <span class="art-tag">PC &middot; Modern</span>
+              <span class="play-badge" aria-hidden="true">↗</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Capitalism Lab</h2>
+                <span class="chip external">Official site</span>
+              </div>
+              <p>The official successor to Capitalism II. It is a commercial Windows game;
+                the official site has product and download information, but it does not run here.</p>
+              <div class="card-foot">
+                <span class="progress">Not playable in this arcade</span>
+                <span class="cta">Official site <span aria-hidden="true">↗</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
       <p class="selector-empty" id="selector-empty" hidden>No cabinets in this class. Try another filter.</p>
     </section>
 
@@ -851,10 +961,11 @@
           <code>PAK0.PAK</code> / <code>PAK1.PAK</code> and play that instead.</p>
       </div>
       <div class="note">
-        <h2>PSP-style touch controls</h2>
-        <p>Quake ships with a landscape pad made for phones: a movement stick, a look pad,
-          fire/jump/menu/status face buttons and shoulder weapon switches. Tap
-          <em>Fullscreen</em> and rotate for the full arcade view.</p>
+        <h2>More classics, done right</h2>
+        <p>Quake II's demo now opens in Qwasm2; Quake III Arena and Capitalism II/Lab link to
+          their official PC releases because they need separate engines or Windows installs.
+          The free Carmageddon demo still fails to boot in this DOSBox build, so it is not
+          marked as playable.</p>
       </div>
       <div class="note">
         <h2>Saves that stay put</h2>

@@ -227,6 +227,63 @@ footer {
 .hud-clock { color: var(--cyan); }
 .hud-cabinets { color: var(--mint); border-color: rgba(124, 247, 196, .2); }
 
+.sound-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+  padding: 6px 10px;
+  border: 1px solid var(--edge);
+  border-radius: 2px;
+  background: rgba(10, 13, 20, .72);
+  color: var(--muted);
+  font: 700 9px/1 var(--mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color .18s ease, border-color .18s ease, background .18s ease;
+}
+
+.sound-toggle:hover,
+.sound-toggle:focus-visible,
+.sound-toggle[aria-pressed="true"] {
+  border-color: rgba(89, 243, 255, .55);
+  background: rgba(89, 243, 255, .08);
+  color: var(--cyan);
+  outline: none;
+}
+
+.sound-toggle:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+.sound-bars {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 12px;
+}
+
+.sound-bars i {
+  width: 2px;
+  height: 4px;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+.sound-toggle[aria-pressed="true"] .sound-bars i {
+  animation: equalize .55s ease-in-out infinite alternate;
+}
+
+.sound-bars i:nth-child(2) { animation-delay: -.3s; }
+.sound-bars i:nth-child(3) { animation-delay: -.12s; }
+.sound-bars i:nth-child(4) { animation-delay: -.42s; }
+
+@keyframes equalize {
+  to { height: 11px; }
+}
+
 .led {
   display: inline-block;
   width: 6px;
@@ -664,22 +721,76 @@ footer {
   text-transform: uppercase;
 }
 
+.library-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: -8px 0 4px;
+  color: var(--dim);
+  font: 600 9px/1.4 var(--mono);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.library-controls kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  margin-inline: 2px;
+  border: 1px solid var(--edge);
+  border-radius: 2px;
+  color: var(--cyan);
+  font: inherit;
+}
+
+.library-arrows { display: flex; gap: 6px; }
+
+.rail-arrow {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 30px;
+  border: 1px solid var(--edge);
+  border-radius: 2px;
+  background: rgba(10, 13, 20, .72);
+  color: var(--ink);
+  font-size: 15px;
+  cursor: pointer;
+  transition: border-color .18s ease, color .18s ease, background .18s ease;
+}
+
+.rail-arrow:hover,
+.rail-arrow:focus-visible {
+  border-color: var(--cyan);
+  background: rgba(89, 243, 255, .08);
+  color: var(--cyan);
+  outline: none;
+}
+
 /* ---------- DOS vault divider ---------- */
 
 .vault-divider {
-  grid-column: 1 / -1;
-  margin: 30px 0 2px;
-  padding: 24px 0 6px;
-  border-top: 1px solid var(--edge);
+  flex: 0 0 250px;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0 8px;
+  padding: 24px 18px;
+  border: 1px solid var(--edge);
+  background: linear-gradient(160deg, rgba(12, 18, 30, .86), rgba(7, 10, 17, .9));
   position: relative;
+  scroll-snap-align: center;
 }
 
 .vault-divider::before {
   content: "";
   position: absolute;
-  top: -1px;
+  top: 0;
   left: 0;
-  width: min(260px, 42%);
+  width: min(180px, 72%);
   height: 1px;
   background: linear-gradient(90deg, var(--mint), transparent);
   box-shadow: 0 0 12px rgba(124, 247, 196, .55);
@@ -717,9 +828,18 @@ footer {
 /* ---------- cabinets ---------- */
 
 .cabinets {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(268px, 1fr));
-  gap: 20px;
+  display: flex;
+  align-items: stretch;
+  gap: 18px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 18px 10px 24px;
+  margin-inline: -10px;
+  scroll-padding-inline: 10px;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-color: rgba(89, 243, 255, .35) rgba(255, 255, 255, .04);
+  scrollbar-width: thin;
 }
 
 .cabinet {
@@ -731,6 +851,7 @@ footer {
   position: relative;
   display: flex;
   flex-direction: column;
+  flex: 0 0 min(78vw, 330px);
   min-width: 0;
   border: 1px solid var(--edge);
   background: linear-gradient(165deg, rgba(14, 18, 28, .82), rgba(7, 9, 15, .9));
@@ -738,6 +859,7 @@ footer {
   clip-path: polygon(0 14px, 14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
   transform: perspective(1000px) rotateX(var(--rx)) rotateY(var(--ry)) translateY(0);
   transform-style: preserve-3d;
+  scroll-snap-align: center;
   transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease, background .25s ease;
   overflow: hidden;
   animation: card-in .7s cubic-bezier(.2, .8, .2, 1) backwards;
@@ -780,8 +902,10 @@ footer {
 
 .cabinet:hover,
 .cabinet:focus-within {
+  z-index: 1;
   border-color: color-mix(in srgb, var(--accent) 55%, transparent);
   box-shadow: inset 0 0 60px color-mix(in srgb, var(--accent) 5%, transparent), 0 34px 90px -40px #000;
+  transform: perspective(1000px) rotateX(var(--rx)) rotateY(var(--ry)) translateY(-4px) scale(1.015);
 }
 
 .cabinet:hover::after,
@@ -943,6 +1067,7 @@ footer {
 .chip.wasm { color: var(--mint); border-color: rgba(124, 247, 196, .28); background: rgba(124, 247, 196, .07); }
 .chip.data { color: var(--red); border-color: rgba(255, 106, 90, .3); background: rgba(255, 106, 90, .07); }
 .chip.emu { color: var(--green); border-color: rgba(139, 212, 80, .3); background: rgba(139, 212, 80, .07); }
+.chip.external { color: #b7c8ff; border-color: rgba(155, 140, 255, .3); background: rgba(155, 140, 255, .08); }
 
 .body p {
   margin: 0;
@@ -1262,8 +1387,9 @@ footer .fine { color: #4d5a6b; font-size: 11px; }
   .selector { width: 100%; }
   .selector-btn { flex: 1 0 auto; justify-content: center; padding: 10px 10px; }
 
-  .cabinets { grid-template-columns: 1fr; gap: 16px; }
+  .cabinets { gap: 14px; }
   .cabinet { transform: none !important; }
+  .cabinet { flex-basis: min(84vw, 330px); }
   .body { padding: 16px; }
   .data-help { margin: 0 16px 14px; }
 
@@ -1272,6 +1398,10 @@ footer .fine { color: #4d5a6b; font-size: 11px; }
 
   .footer-bar { gap: 8px 16px; font-size: 8.5px; }
   .sheet { padding: 26px 20px 22px; }
+
+  .library-controls { font-size: 8px; }
+  .library-controls > span { max-width: 70%; }
+  .vault-divider { flex-basis: 210px; padding-inline: 14px; }
 }
 
 @media (hover: none) {
