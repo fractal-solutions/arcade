@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#05060a">
+<title>DOS Cabinet — WASM Arcade</title>
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../vendor/js-dos/js-dos.css">
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #05060a;
+    --ink: #eef4ff;
+    --muted: #93a2b8;
+    --dim: #66758b;
+    --cyan: #59f3ff;
+    --mint: #7cf7c4;
+    --edge: rgba(150, 210, 255, .16);
+    --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background:
+      radial-gradient(900px 500px at 20% -10%, rgba(89, 243, 255, .08), transparent 60%),
+      linear-gradient(180deg, #05060a, #080b12);
+    color: var(--ink);
+    font-family: ui-sans-serif, -apple-system, "Segoe UI", Inter, Roboto, sans-serif;
+    overflow: hidden;
+  }
+  .wrap {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding: max(10px, env(safe-area-inset-top)) 16px 10px;
+    border-bottom: 1px solid var(--edge);
+    background: rgba(6, 9, 15, .72);
+    backdrop-filter: blur(10px);
+    flex: none;
+  }
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border: 1px solid rgba(89, 243, 255, .35);
+    border-radius: 2px;
+    background: rgba(10, 14, 22, .8);
+    color: var(--ink);
+    font: 700 10.5px/1 var(--mono);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: border-color .15s ease, color .15s ease, box-shadow .15s ease;
+  }
+  .back:hover, .back:focus-visible {
+    border-color: rgba(124, 247, 196, .7);
+    color: var(--mint);
+    box-shadow: 0 0 22px rgba(89, 243, 255, .18);
+    outline: none;
+  }
+  .title {
+    margin: 0;
+    font-size: 14px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .title b { color: var(--cyan); }
+  .note {
+    margin: 0;
+    color: var(--dim);
+    font: 600 10px/1.4 var(--mono);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .harness { margin-left: auto; }
+  .fs-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border: 1px solid rgba(89, 243, 255, .3);
+    border-radius: 2px;
+    background: rgba(10, 14, 22, .8);
+    color: var(--muted);
+    font: 700 10px/1 var(--mono);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: color .15s ease, border-color .15s ease, box-shadow .15s ease;
+  }
+  .fs-btn:hover, .fs-btn:focus-visible {
+    color: var(--mint);
+    border-color: rgba(124, 247, 196, .6);
+    box-shadow: 0 0 18px rgba(89, 243, 255, .15);
+    outline: none;
+  }
+  body.is-fullscreen .bar { display: none; }
+  body.is-fullscreen .frame { height: 100dvh; }
+  .jsdos-rso:fullscreen,
+  .jsdos-rso:-webkit-full-screen,
+  #dos:fullscreen,
+  #dos:-webkit-full-screen {
+    width: 100vw !important;
+    height: 100dvh !important;
+    background: #000;
+  }
+  .rotate-hint {
+    position: fixed;
+    left: 50%;
+    bottom: max(14px, env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    z-index: 9999;
+    padding: 9px 14px;
+    border: 1px solid rgba(124, 247, 196, .4);
+    border-radius: 999px;
+    background: rgba(6, 10, 16, .92);
+    color: var(--mint);
+    font: 600 11px/1.3 var(--mono);
+    letter-spacing: .06em;
+    pointer-events: none;
+  }
+  .harness a {
+    color: var(--dim);
+    font: 600 10px/1.4 var(--mono);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+  .harness a:hover { color: var(--mint); }
+  .frame {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    background: #000;
+  }
+  #dos {
+    width: 100%;
+    height: 100%;
+  }
+  .boot-error {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    color: var(--muted);
+    font: 500 13px/1.6 var(--mono);
+    text-align: center;
+    background: #05060a;
+  }
+  .boot-error[hidden] { display: none; }
+  .boot-error b { display: block; margin-bottom: 8px; color: #ff8a7a; }
+  @media (max-width: 640px) {
+    .bar { gap: 8px 12px; padding-inline: 12px; }
+    .note { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="bar">
+    <a class="back" href="../../" aria-label="Back to the arcade">← Arcade</a>
+    <h1 class="title">DOS <b>Cabinet</b></h1>
+    <p class="note">DOSBox · WebAssembly · bring your own .jsdos bundle</p>
+    <p class="harness"><a href="../../test-keen.html">Test harness ↗</a></p>
+    <button class="fs-btn" id="fs" type="button" aria-pressed="false" aria-label="Toggle fullscreen">
+      <span aria-hidden="true">⛶</span><span>Fullscreen</span>
+    </button>
+  </header>
+
+  <div class="frame">
+    <div id="dos"></div>
+    <div class="boot-error" id="boot-error" hidden>
+      <div>
+        <b>The DOS layer did not start.</b>
+        Check that <code>vendor/js-dos/</code> is being served next to the arcade,
+        then reload. The cabinet needs an HTTP server — <code>file://</code> will not work.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../../vendor/js-dos/js-dos.js"></script>
+<script>
+  (() => {
+    'use strict';
+
+    const el = document.getElementById('dos');
+    const err = document.getElementById('boot-error');
+    const params = new URLSearchParams(location.search);
+    const preset = params.get('url');
+
+    function fail(message) {
+      if (!err) return;
+      if (message) {
+        const line = err.querySelector('div');
+        if (line) line.insertAdjacentHTML('afterbegin', `<b>${message}</b>`);
+      }
+      err.hidden = false;
+    }
+
+    if (typeof window.Dos !== 'function') {
+      fail('js-dos failed to load.');
+      return;
+    }
+
+    try {
+      window.dos = window.Dos(el, {
+        pathPrefix: '../../vendor/js-dos/emulators/',
+        theme: 'dark',
+        renderBackend: 'canvas',
+        workerThread: false,
+        autoSave: true,
+        kiosk: false,
+        ...(preset ? { url: preset } : {}),
+        onEvent: (name, data) => {
+          if (name === 'ws-err' || name === 'emu-error') {
+            console.error('js-dos', name, data);
+          }
+        },
+      });
+    } catch (e) {
+      console.error(e);
+      fail(String(e && e.message ? e.message : e));
+    }
+
+    /* ---------------------------------------------------------- fullscreen */
+    const fsBtn = document.getElementById('fs');
+    const requestFs = document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen;
+    const exitFs = document.exitFullscreen || document.webkitExitFullscreen;
+    const fsElement = () => document.fullscreenElement || document.webkitFullscreenElement;
+
+    function syncFs() {
+      const on = Boolean(fsElement()) || document.body.classList.contains('is-fullscreen');
+      document.body.classList.toggle('is-fullscreen', on);
+      if (fsBtn) fsBtn.setAttribute('aria-pressed', String(on));
+      const label = fsBtn && fsBtn.querySelector('span:last-child');
+      if (label) label.textContent = on ? 'Exit' : 'Fullscreen';
+      requestAnimationFrame(() => window.dispatchEvent(new Event('resize')));
+    }
+
+    if (fsBtn) {
+      fsBtn.addEventListener('click', async () => {
+        try {
+          if (requestFs) {
+            if (!fsElement()) {
+              try {
+                await requestFs.call(document.documentElement, { navigationUI: 'hide' });
+              } catch (_) {
+                await requestFs.call(document.documentElement);
+              }
+              try { await screen.orientation?.lock?.('landscape'); } catch (_) { /* optional */ }
+              if (window.innerHeight > window.innerWidth) showRotateHint();
+            } else {
+              await exitFs.call(document);
+            }
+          } else {
+            document.body.classList.toggle('is-fullscreen');
+            syncFs();
+          }
+        } catch (e) {
+          console.warn('Fullscreen unavailable:', e);
+        }
+      });
+
+      document.addEventListener('fullscreenchange', syncFs);
+      document.addEventListener('webkitfullscreenchange', syncFs);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !requestFs) {
+          document.body.classList.remove('is-fullscreen');
+          syncFs();
+        }
+      });
+    }
+
+    function showRotateHint() {
+      if (document.querySelector('.rotate-hint')) return;
+      const hint = document.createElement('div');
+      hint.className = 'rotate-hint';
+      hint.textContent = '↻ Rotate your phone for the big screen';
+      document.body.appendChild(hint);
+      setTimeout(() => hint.remove(), 2800);
+    }
+
+    // js-dos builds its UI asynchronously. If nothing appeared after a while,
+    // point the player at the most common cause (wrong path / file://).
+    setTimeout(() => {
+      if (!el || !el.firstElementChild) fail('The DOS window never appeared.');
+    }, 6000);
+  })();
+</script>
+</body>
+</html>

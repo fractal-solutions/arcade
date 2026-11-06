@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Dangerous Dave">
+  <rect width="64" height="64" rx="12" fill="#0b0b0d"/>
+  <rect x="4" y="4" width="56" height="56" rx="9" fill="none" stroke="#ffb13b" stroke-width="2" opacity="0.55"/>
+  <path d="M16 12h15c13 0 22 7 22 20S44 52 31 52H16V12zm11 10v20h4c7 0 11-4 11-10s-4-10-11-10h-4z" fill="#ffb13b"/>
+  <rect x="31" y="22" width="4" height="4" fill="#0b0b0d"/>
+  <rect x="31" y="38" width="4" height="4" fill="#0b0b0d"/>
+</svg>

@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#05060a">
+<title>2048 — WASM Arcade</title>
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+<style>
+  .arcade-back {
+    position: fixed;
+    top: max(12px, env(safe-area-inset-top));
+    left: max(12px, env(safe-area-inset-left));
+    z-index: 9999;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 13px;
+    border: 1px solid rgba(89, 243, 255, .35);
+    border-radius: 2px;
+    background: rgba(6, 10, 16, .78);
+    color: var(--text);
+    font: 700 10.5px/1 ui-monospace, Menlo, monospace;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    backdrop-filter: blur(10px);
+    transition: border-color .15s ease, color .15s ease, box-shadow .15s ease;
+  }
+  .arcade-back:hover,
+  .arcade-back:focus-visible {
+    border-color: rgba(124, 247, 196, .7);
+    color: #7cf7c4;
+    box-shadow: 0 0 22px rgba(89, 243, 255, .18);
+    outline: none;
+  }
+  .panel .credit {
+    margin: 14px 0 0;
+    color: var(--dim);
+    font-size: 12px;
+    line-height: 1.6;
+  }
+  .panel .credit a { color: var(--accent); }
+  .foot a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="bg-grid" aria-hidden="true"></div>
+<div class="glow" aria-hidden="true"></div>
+
+<div class="app">
+  <header class="top">
+    <a class="brand" href="../../">
+      <span class="brand-mark">▚</span>
+      <span>WASM<span class="brand-dim">/</span>ARCADE</span>
+    </a>
+    <div class="top-chips">
+      <span class="chip">freestanding C</span>
+      <span class="arrow">→</span>
+      <span class="chip chip-accent">wasm32</span>
+      <span class="chip chip-ghost" id="wasm-size">3.5 KB</span>
+      <button class="fs-btn" id="fullscreen" type="button" aria-pressed="false" aria-label="Toggle fullscreen">
+        <span aria-hidden="true">⛶</span><b>Fullscreen</b>
+      </button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="intro">
+      <div class="eyebrow"><span class="live"></span> cabinet 03 · live in your browser</div>
+      <h1>2048<span class="dot">.</span></h1>
+      <p class="lede">
+        A real 2048 clone recovered from a <strong>69 KB stripped aarch64 binary</strong>,
+        rebuilt as freestanding C, and compiled to a <strong>3.5 KB WebAssembly</strong> module.
+      </p>
+      <p class="fine">
+        No game source was used. Rules were recovered from disassembly and verified
+        against the original core with a differential harness.
+      </p>
+    </section>
+
+    <section class="game" aria-label="2048 game">
+      <div class="hud">
+        <div class="scorebox">
+          <span class="score-label">SCORE</span>
+          <span class="score-value" id="score" aria-live="polite">0</span>
+          <span class="score-delta" id="score-delta" aria-hidden="true"></span>
+        </div>
+        <div class="scorebox best">
+          <span class="score-label">BEST</span>
+          <span class="score-value" id="best">0</span>
+        </div>
+        <button class="btn btn-primary" id="newgame" type="button">New game</button>
+      </div>
+
+      <div class="board" id="board">
+        <div class="grid-bg" id="grid-bg" aria-hidden="true"></div>
+        <div class="tiles" id="tiles" aria-hidden="true"></div>
+        <div class="overlay" id="overlay" hidden>
+          <div class="overlay-card">
+            <div class="overlay-kicker" id="overlay-kicker">state</div>
+            <h2 id="overlay-title">Game over</h2>
+            <p id="overlay-text">No moves left.</p>
+            <div class="overlay-actions">
+              <button class="btn btn-ghost" id="keepgoing" type="button" hidden>Keep going</button>
+              <button class="btn btn-primary" id="again" type="button">Try again</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="hint">Arrow keys or WASD · swipe the board · or use the pad</p>
+
+      <div class="pad" aria-label="Directional pad">
+        <button class="pad-btn up" data-dir="0" aria-label="Up">↑</button>
+        <button class="pad-btn left" data-dir="3" aria-label="Left">←</button>
+        <button class="pad-btn down" data-dir="2" aria-label="Down">↓</button>
+        <button class="pad-btn right" data-dir="1" aria-label="Right">→</button>
+        <span class="pad-core" aria-hidden="true">◈</span>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <div class="panel-head">
+        <h2>Under the hood</h2>
+        <span class="panel-tag">WASM / 2048</span>
+      </div>
+
+      <dl class="facts">
+        <div><dt>engine</dt><dd>freestanding C</dd></div>
+        <div><dt>target</dt><dd>wasm32-freestanding</dd></div>
+        <div><dt>module</dt><dd class="mono" id="wasm-fact">3,547 bytes</dd></div>
+        <div><dt>render</dt><dd>DOM + CSS</dd></div>
+        <div><dt>saves</dt><dd>localStorage</dd></div>
+        <div><dt>network</dt><dd>none required</dd></div>
+      </dl>
+
+      <details open>
+        <summary>Rules recovered from the binary</summary>
+        <ul class="rules">
+          <li>Tiles are stored as <b>exponents</b>: 1 → 2, 2 → 4 … 11 → 2048.</li>
+          <li>Spawn: <code>rand() % empty_count</code> chooses the cell.</li>
+          <li>Spawn value: <code>(rand() == 0x7fffffff) ? 2 : 1</code> — a 4 is roughly a 1-in-2³¹ event.</li>
+          <li>A tile merges at most once per move; merged exponent increases by one.</li>
+          <li><b>Score is doubled:</b> <code>score += 2 &lt;&lt; newExponent</code>, not the usual <code>1 &lt;&lt; n</code>.</li>
+          <li>Win when a merged tile reaches exponent 11 (2048).</li>
+          <li>Game over when the board is full and no orthogonal neighbours match.</li>
+        </ul>
+      </details>
+
+      <details>
+        <summary>Differential verification</summary>
+        <p class="small">
+          The original aarch64 core was loaded with a tiny C harness
+          (<code>dlopen</code> + libretro callbacks). Its <code>rand()</code> was
+          interposed with musl's LCG so both engines saw the same seed and spawn
+          stream. <b>20 seeds × 300 moves</b> produced byte-identical boards,
+          scores and state transitions.
+        </p>
+      </details>
+
+      <p class="credit">
+        Ported from <b>rea-lab</b>: an aarch64 libretro core → WebAssembly reverse-engineering
+        lab. Original 2048 by Gabriele Cirulli; this engine is an independent reconstruction.
+      </p>
+    </aside>
+  </main>
+
+  <footer class="foot">
+    <span>engine: freestanding C → wasm32-freestanding</span>
+    <span class="foot-dot">·</span>
+    <span>rendering: DOM + CSS, no game framework</span>
+    <span class="foot-dot">·</span>
+    <a href="../../">← back to the arcade</a>
+  </footer>
+</div>
+
+<a class="arcade-back" href="../../" aria-label="Back to the arcade">← Arcade</a>
+<script src="app.js"></script>
+<script>
+  (() => {
+    'use strict';
+
+    const btn = document.getElementById('fullscreen');
+    if (!btn) return;
+
+    const label = btn.querySelector('b');
+    const request = document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen;
+    const exit = document.exitFullscreen || document.webkitExitFullscreen;
+    const active = () => document.fullscreenElement || document.webkitFullscreenElement;
+
+    function setPressed(on) {
+      btn.setAttribute('aria-pressed', String(on));
+      if (label) label.textContent = on ? 'Exit' : 'Fullscreen';
+      document.body.classList.toggle('is-fullscreen', on);
+      requestAnimationFrame(() => window.dispatchEvent(new Event('resize')));
+    }
+
+    function sync() {
+      const on = Boolean(active());
+      setPressed(on);
+      if (!on) {
+        try { screen.orientation?.unlock?.(); } catch (_) { /* optional */ }
+      }
+    }
+
+    if (request) {
+      document.addEventListener('fullscreenchange', sync);
+      document.addEventListener('webkitfullscreenchange', sync);
+    } else {
+      // iOS Safari: no element fullscreen, but an immersive layout still helps.
+      btn.title = 'Immersive mode (browser fullscreen is unavailable here)';
+    }
+
+    btn.addEventListener('click', async () => {
+      try {
+        if (request) {
+          if (!active()) {
+            try {
+              await request.call(document.documentElement, { navigationUI: 'hide' });
+            } catch (_) {
+              await request.call(document.documentElement);
+            }
+            try { await screen.orientation?.lock?.('landscape'); } catch (_) { /* optional */ }
+            setTimeout(() => {
+              if (window.innerHeight > window.innerWidth) showRotateHint();
+            }, 500);
+          } else {
+            await exit.call(document);
+          }
+        } else {
+          const on = !document.body.classList.contains('is-fullscreen');
+          setPressed(on);
+          if (on && window.innerHeight > window.innerWidth) showRotateHint();
+        }
+      } catch (err) {
+        console.warn('Fullscreen unavailable:', err);
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !request && document.body.classList.contains('is-fullscreen')) {
+        setPressed(false);
+      }
+    });
+
+    function showRotateHint() {
+      if (document.querySelector('.rotate-hint')) return;
+      const hint = document.createElement('div');
+      hint.className = 'rotate-hint';
+      hint.textContent = '↻ Rotate your phone for the big screen';
+      document.body.appendChild(hint);
+      setTimeout(() => hint.remove(), 2800);
+    }
+  })();
+</script>
+
+</body>
+</html>

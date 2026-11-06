@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="Quake poster with a glowing rune, crosshair and a dark wasteland">
+  <defs>
+    <linearGradient id="qbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a0705"/>
+      <stop offset=".48" stop-color="#1a0e08"/>
+      <stop offset="1" stop-color="#08080b"/>
+    </linearGradient>
+    <radialGradient id="qrune" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#ffd9a0" stop-opacity=".9"/>
+      <stop offset=".28" stop-color="#ff8a3c" stop-opacity=".7"/>
+      <stop offset=".62" stop-color="#c92f17" stop-opacity=".28"/>
+      <stop offset="1" stop-color="#c92f17" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="qtitle" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe9c4"/>
+      <stop offset=".48" stop-color="#ffb13b"/>
+      <stop offset="1" stop-color="#a3391d"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#qbg)"/>
+  <g opacity=".2" stroke="#ff8a3c" stroke-width="1">
+    <path d="M0 60h800M0 120h800M0 180h800M0 240h800M0 300h800M0 360h800M0 420h800"/>
+    <path d="M80 0v500M160 0v500M240 0v500M320 0v500M400 0v500M480 0v500M560 0v500M640 0v500M720 0v500"/>
+  </g>
+  <circle cx="638" cy="176" r="188" fill="url(#qrune)"/>
+  <g fill="none" stroke="#ffc27a" opacity=".72">
+    <circle cx="638" cy="176" r="104" stroke-width="3"/>
+    <circle cx="638" cy="176" r="88" stroke-width="1.5" stroke-dasharray="9 9"/>
+    <path d="M638 52v62M638 238v62M514 176h62M700 176h62" stroke-width="3"/>
+    <path d="M638 96l40 40-40 40-40-40z" stroke-width="3"/>
+    <path d="M566 104l144 144M710 104L566 248" stroke-width="1.5" opacity=".7"/>
+  </g>
+  <g fill="#ffcf8a">
+    <circle cx="638" cy="176" r="5"/>
+    <circle cx="132" cy="82" r="2"/><circle cx="218" cy="140" r="1.4"/><circle cx="300" cy="62" r="1.8"/>
+    <circle cx="434" cy="110" r="1.2"/><circle cx="728" cy="64" r="1.7"/><circle cx="704" cy="286" r="1.5"/>
+    <circle cx="76" cy="286" r="1.3"/><circle cx="186" cy="320" r="1.6"/><circle cx="410" cy="336" r="1.2"/>
+  </g>
+  <g transform="translate(68 130)">
+    <text font-family="ui-monospace, Menlo, Consolas, monospace" font-size="15" letter-spacing="8" fill="#ff8a3c">ID SOFTWARE · 1996</text>
+    <text y="94" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="94" font-weight="700" letter-spacing="6" fill="url(#qtitle)">QUAKE</text>
+    <text y="140" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="17" letter-spacing="8" fill="#ffd9a0">SHADOW OVER WASM</text>
+  </g>
+  <g transform="translate(70 332)">
+    <rect width="250" height="3" fill="#ff8a3c" opacity=".5"/>
+    <text y="32" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="12" letter-spacing="4" fill="#b8704a">LIBREQUAKE DATA BUNDLED</text>
+  </g>
+  <g transform="translate(566 356)" fill="none" stroke="#ffd9a0">
+    <circle cx="36" cy="36" r="18" stroke-width="2"/>
+    <path d="M36 0v20M36 52v20M0 36h20M52 36h20" stroke-width="2"/>
+    <circle cx="36" cy="36" r="2.5" fill="#ffd9a0" stroke="none"/>
+  </g>
+  <g stroke="#0a0705" stroke-width="9" opacity=".9">
+    <path d="M0 466l132-38 112 16 118-28 126 12 96-24 110 22 106-14v88H0z" fill="#0b0807"/>
+  </g>
+  <text x="740" y="482" font-family="ui-monospace, Menlo, monospace" font-size="12" letter-spacing="4" fill="#8a4f34" text-anchor="end">WASM · FPS</text>
+</svg>

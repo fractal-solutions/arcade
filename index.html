@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#05060a">
+  <meta name="description" content="A futuristic arcade of authentic classics running in your browser: Quake, Dangerous Dave, Prince of Persia 2, Commander Keen 4, Duke Nukem II, 2048 and your own DOS games — all through WebAssembly.">
+  <title>WASM Arcade — authentic classics in the browser</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="field" class="field" aria-hidden="true"></canvas>
+  <div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="scanlines" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="reticle" id="reticle" aria-hidden="true"><span></span></div>
+
+  <header class="masthead">
+    <a class="brand" href="./" aria-label="WASM Arcade home">
+      <span class="brand-mark" aria-hidden="true">▚</span>
+      <span class="brand-name">WASM&nbsp;ARCADE</span>
+    </a>
+    <p class="brand-note">Real game code &middot; real pixels &middot; no plugins</p>
+    <div class="hud" aria-label="Arcade status">
+      <span class="hud-item"><i class="led" aria-hidden="true"></i> SYS.ONLINE</span>
+      <span class="hud-item hud-clock" id="clock">--:--:--</span>
+      <span class="hud-item hud-cabinets" id="cabinet-count">32 cabinets</span>
+    </div>
+  </header>
+
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track">
+      <span>WASM32 ENGINE</span><span>◆</span>
+      <span>SDL + C</span><span>◆</span>
+      <span>DOSBOX IN THE BROWSER</span><span>◆</span>
+      <span>LOCAL-FIRST SAVES</span><span>◆</span>
+      <span>ZERO UPLOADS</span><span>◆</span>
+      <span>LIBREQUAKE BUNDLED</span><span>◆</span>
+      <span>32 CABINETS ONLINE</span><span>◆</span>
+      <span>WASM32 ENGINE</span><span>◆</span>
+      <span>SDL + C</span><span>◆</span>
+      <span>DOSBOX IN THE BROWSER</span><span>◆</span>
+      <span>LOCAL-FIRST SAVES</span><span>◆</span>
+      <span>ZERO UPLOADS</span><span>◆</span>
+      <span>LIBREQUAKE BUNDLED</span><span>◆</span>
+      <span>32 CABINETS ONLINE</span><span>◆</span>
+    </div>
+  </div>
+
+  <main>
+    <section class="intro" aria-labelledby="intro-heading">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="eyebrow-line" aria-hidden="true"></span> INSERT COIN // NEURAL LINK READY</p>
+        <h1 id="intro-heading" class="glitch" data-text="Thirty-two cabinets,">
+          Thirty-two cabinets,<br><em data-text="running native.">running native.</em>
+        </h1>
+        <p class="lede">
+          Original game logic, original art where we can ship it, and everything compiled
+          to WebAssembly. Quake with LibreQuake data, Dangerous Dave, 2048, Commander Keen 4, Duke Nukem II,
+          Prince of Persia 2, a bring-your-own DOS cabinet and a 25-game DOS vault of shareware,
+          freeware and demos. Progress never leaves this device.
+        </p>
+        <div class="hero-cta">
+          <a class="button primary big" href="#cabinets">Enter the arcade <span aria-hidden="true">→</span></a>
+          <span class="hero-note">32 cabinets · 5 engines · 0 installs</span>
+        </div>
+        <div class="intro-meta">
+          <span><b>1990–2014</b> era</span>
+          <span><b>Keyboard</b> or touch</span>
+          <span><b>Offline</b> after first load</span>
+        </div>
+      </div>
+
+      <aside class="telemetry" aria-label="Arcade telemetry">
+        <div class="telemetry-head">
+          <span>ARCADE.SYS</span>
+          <span class="telemetry-led" aria-hidden="true"></span>
+        </div>
+        <dl class="telemetry-grid">
+          <div><dt>uplink</dt><dd>local</dd></div>
+          <div><dt>engine</dt><dd>wasm32</dd></div>
+          <div><dt>cabinets</dt><dd id="tele-cabinets">32</dd></div>
+          <div><dt>save state</dt><dd id="tele-save">empty</dd></div>
+          <div><dt>render</dt><dd>canvas 2d</dd></div>
+          <div><dt>clock</dt><dd id="tele-clock">00:00:00</dd></div>
+        </dl>
+        <div class="telemetry-log" id="tele-log" aria-live="off">
+          <p>&gt; boot wasm arcade</p>
+          <p>&gt; link established</p>
+          <p>&gt; awaiting player input<span class="cursor">_</span></p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="selector-section" id="cabinets" aria-labelledby="selector-heading">
+      <div class="selector-head">
+        <div>
+          <p class="eyebrow" id="selector-heading">// select cabinet</p>
+          <h2 class="selector-title">Game selector</h2>
+        </div>
+        <div class="selector" role="tablist" aria-label="Filter games">
+          <button type="button" class="selector-btn is-active" role="tab" aria-selected="true" data-filter="all">
+            All <b data-count-for="all">32</b>
+          </button>
+          <button type="button" class="selector-btn" role="tab" aria-selected="false" data-filter="wasm">
+            WASM <b data-count-for="wasm">3</b>
+          </button>
+          <button type="button" class="selector-btn" role="tab" aria-selected="false" data-filter="emu">
+            Emulated <b data-count-for="emu">28</b>
+          </button>
+          <button type="button" class="selector-btn" role="tab" aria-selected="false" data-filter="data">
+            Your data <b data-count-for="data">1</b>
+          </button>
+          <span class="selector-glint" aria-hidden="true"></span>
+        </div>
+      </div>
+      <p class="selector-status" id="selector-status" aria-live="polite">Showing 32 of 32 cabinets</p>
+
+      <div class="cabinets" id="cabinet-grid">
+
+        <!-- Dangerous Dave -->
+        <article class="cabinet dave" data-game="dave" data-kind="wasm" style="--i:0">
+          <a class="cabinet-link" href="games/dave/" aria-label="Play Dangerous Dave">
+            <div class="art">
+              <img src="assets/dave.png" alt="Dangerous Dave standing in a brick-walled level" width="320" height="200" loading="lazy">
+              <span class="art-index" aria-hidden="true">01</span>
+              <span class="art-tag">DOS &middot; 1990</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Dangerous Dave</h2>
+                <span class="chip wasm">WASM port</span>
+              </div>
+              <p>John Romero's 1990 shareware classic. Twelve levels of jetpacks, spiders,
+                treasure and very unfair jumps — the original C game logic, compiled.</p>
+              <div class="card-foot">
+                <span class="progress" id="dave-progress">New run</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+
+        <!-- 2048 -->
+        <article class="cabinet game2048" data-game="2048" data-kind="wasm" style="--i:1">
+          <a class="cabinet-link" href="games/2048/" aria-label="Play 2048">
+            <div class="art">
+              <img src="assets/2048.svg" alt="A 2048 board with exponent tiles" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">02</span>
+              <span class="art-tag">Browser &middot; 2014</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>2048</h2>
+                <span class="chip wasm">WASM engine</span>
+              </div>
+              <p>Gabriele Cirulli's sliding-tile puzzle, rebuilt as freestanding C and compiled
+                to a 3.5&nbsp;KB module. Every slide, merge and spawn happens inside WASM.</p>
+              <div class="card-foot">
+                <span class="progress" id="2048-progress">New board</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+
+        <!-- Quake -->
+        <article class="cabinet quake" data-game="quake" data-kind="wasm" style="--i:2">
+          <a class="cabinet-link" href="games/quake/" aria-label="Play Quake">
+            <div class="art">
+              <img src="assets/quake.svg" alt="Quake poster with a glowing rune and crosshair" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">03</span>
+              <span class="art-tag">PC &middot; 1996</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Quake</h2>
+                <span class="chip wasm">WASM + LibreQuake</span>
+              </div>
+              <p>The original Quake engine compiled to WebAssembly. LibreQuake's free data set
+                is bundled, so it launches immediately — with PSP-style touch controls for
+                landscape fullscreen.</p>
+              <div class="card-foot">
+                <span class="progress" id="quake-progress">LibreQuake ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+          <button type="button" class="data-help" data-open="quake-help">
+            Bundled data, or bring your own PAKs
+          </button>
+        </article>
+
+        <!-- Commander Keen 4 -->
+        <article class="cabinet keen4" data-game="keen4" data-kind="emu" style="--i:3">
+          <a class="cabinet-link" href="games/keen4/" aria-label="Play Commander Keen 4">
+            <div class="art">
+              <img src="assets/keen4.svg" alt="Commander Keen 4 poster with an alien planet and a pixel hero" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">04</span>
+              <span class="art-tag">DOS &middot; 1991</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Commander Keen 4</h2>
+                <span class="chip emu">DOSBox</span>
+              </div>
+              <p><em>Goodbye Galaxy</em>, the shareware episode, running in a real DOSBox
+                compiled to WebAssembly. The bundle is already installed — no file picker,
+                no setup.</p>
+              <div class="card-foot">
+                <span class="progress" id="keen4-progress">Episode ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+
+        <!-- Duke Nukem II -->
+        <article class="cabinet duke2" data-game="duke2" data-kind="emu" style="--i:4">
+          <a class="cabinet-link" href="games/duke2/" aria-label="Play Duke Nukem II">
+            <div class="art">
+              <img src="assets/duke2.svg" alt="Duke Nukem II poster with a red alert skyline and an action hero" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">05</span>
+              <span class="art-tag">DOS &middot; 1993</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Duke Nukem II</h2>
+                <span class="chip emu">DOSBox</span>
+              </div>
+              <p>The shareware episode of Apogee's side-scrolling action sequel, with its
+                original VGA art and sound. Boots straight into the game inside the
+                in-browser DOS machine.</p>
+              <div class="card-foot">
+                <span class="progress" id="duke2-progress">Episode ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+
+        <!-- Prince of Persia 2 -->
+        <article class="cabinet pop2" data-game="pop2" data-kind="data" style="--i:5">
+          <a class="cabinet-link" href="games/pop2/" aria-label="Open Prince of Persia 2">
+            <div class="art">
+              <img src="assets/pop2.png" alt="Prince of Persia 2 key art" width="1200" height="630" loading="lazy">
+              <span class="art-index" aria-hidden="true">06</span>
+              <span class="art-tag">Macintosh &middot; 1995</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Prince of Persia 2</h2>
+                <span class="chip data">Your data</span>
+              </div>
+              <p><em>The Shadow and the Flame</em>, statically recompiled from the 68k Mac
+                original. Fourteen levels, the horse chase, the duel — full 512×384 artwork.
+                Play the bundled DOS demo now, or add your own full data archive once.</p>
+              <div class="card-foot">
+                <span class="progress" id="pop2-progress">DOS demo + your data</span>
+                <span class="cta">Open <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+          <button type="button" class="data-help" data-open="pop2-help">
+            How do I add the game data?
+          </button>
+        </article>
+
+        <!-- DOS cabinet -->
+        <article class="cabinet dos" data-game="dos" data-kind="emu" style="--i:6">
+          <a class="cabinet-link" href="games/dos/" aria-label="Open the DOS cabinet">
+            <div class="art">
+              <img src="assets/dos.svg" alt="A DOS prompt on a CRT monitor" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">07</span>
+              <span class="art-tag">DOS &middot; 1990s</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>DOS Cabinet</h2>
+                <span class="chip emu">In-browser PC</span>
+              </div>
+              <p>A full DOSBox machine compiled to WebAssembly. Drop in a <code>.jsdos</code>
+                bundle you built from your own copy of a game and it runs here, offline.</p>
+              <div class="card-foot">
+                <span class="progress" id="dos-progress">Bring your own bundle</span>
+                <span class="cta">Open <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+          <button type="button" class="data-help" data-open="dos-help">
+            How do I add a DOS game?
+          </button>
+        </article>
+
+
+        <div class="vault-divider" role="presentation">
+          <span class="vault-kicker">// THE DOS VAULT</span>
+          <h3>25 more cabinets, already installed.</h3>
+          <p>Shareware episodes, freeware releases and playable demos — each one bundled as a
+            <code>.jsdos</code> image and booted by DOSBox in WebAssembly. No file picker, no setup.</p>
+        </div>
+
+        <article class="cabinet wolf3d" data-game="wolf3d" data-kind="emu" style="--i:7; --accent:#ff5c5c">
+          <a class="cabinet-link" href="games/wolf3d/" aria-label="Play Wolfenstein 3D">
+            <div class="art">
+              <img src="assets/shots/wolf3d.jpg" alt="Wolfenstein 3D running in the arcade" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">08</span>
+              <span class="art-tag">DOS &middot; 1992</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Wolfenstein <b>3D</b></h2>
+                <span class="chip emu">DOSBox</span>
+              </div>
+              <p>id Software's original first-person shooter — all three shareware episodes, straight into the bunker.</p>
+              <div class="card-foot">
+                <span class="progress">Shareware ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet doom" data-game="doom" data-kind="emu" style="--i:8; --accent:#ff7a3d">
+          <a class="cabinet-link" href="games/doom/" aria-label="Play DOOM">
+            <div class="art">
+              <img src="assets/shots/doom.jpg" alt="DOOM running in the arcade" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">09</span>
+              <span class="art-tag">DOS &middot; 1993</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>DOOM</h2>
+                <span class="chip emu">DOSBox</span>
+              </div>
+              <p>Knee-deep in the dead. The 1993 shareware episode, running on the real DOS engine.</p>
+              <div class="card-foot">
+                <span class="progress">Shareware ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet heretic" data-game="heretic" data-kind="emu" style="--i:9; --accent:#8dff9e">
+          <a class="cabinet-link" href="games/heretic/" aria-label="Play Heretic">
+            <div class="art">
+              <img src="assets/shots/heretic.jpg" alt="Heretic running in the arcade" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">10</span>
+              <span class="art-tag">DOS &middot; 1994</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Heretic</h2>
+                <span class="chip emu">DOSBox</span>
+              </div>
+              <p>Raven's dark-fantasy shooter — the City of the Damned shareware episode with its original sound.</p>
+              <div class="card-foot">
+                <span class="progress">Shareware ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet jazz" data-game="jazz" data-kind="emu" style="--i:10; --accent:#59f36f">
+          <a class="cabinet-link" href="games/jazz/" aria-label="Play Jazz Jackrabbit">
+            <div class="art">
+              <img src="assets/shots/jazz.jpg" alt="Jazz Jackrabbit running in the arcade" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">11</span>
+              <span class="art-tag">DOS &middot; 1994</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Jazz Jackrabbit</h2>
+                <span class="chip emu">DOSBox</span>
+              </div>
+              <p>The Christmas shareware episode of Epic's turbo-charged platformer.</p>
+              <div class="card-foot">
+                <span class="progress">Holiday Hare ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet cosmo" data-game="cosmo" data-kind="emu" style="--i:11; --accent:#62d6ff">
+          <a class="cabinet-link" href="games/cosmo/" aria-label="Play Cosmo's Cosmic Adventure">
+            <div class="art">
+              <img src="assets/shots/cosmo.jpg" alt="Cosmo's Cosmic Adventure running in the arcade" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">12</span>
+              <span class="art-tag">DOS &middot; 1992</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Cosmo's Cosmic Adventure</h2>
+                <span class="chip emu">DOSBox</span>
+              </div>
+              <p>Apogee's alien-boy platformer — the Forbidden Planet shareware episode.</p>
+              <div class="card-foot">
+                <span class="progress">Shareware ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet crystal" data-game="crystal" data-kind="emu" style="--i:12; --accent:#63e6ff">
+          <a class="cabinet-link" href="games/crystal/" aria-label="Play Crystal Caves">
+            <div class="art">
+              <img src="assets/shots/crystal.jpg" alt="Crystal Caves running in the arcade" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">13</span>
+              <span class="art-tag">DOS &middot; 1991</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Crystal Caves</h2>
+                <span class="chip emu">DOSBox</span>
+              </div>
+              <p>Apogee's puzzle-platformer with three shareware episodes of cave-crawling.</p>
+              <div class="card-foot">
+                <span class="progress">Shareware ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet biomenace" data-game="biomenace" data-kind="emu" style="--i:13; --accent:#8dff9e">
+          <a class="cabinet-link" href="games/biomenace/" aria-label="Play Bio Menace">
+            <div class="art">
+              <img src="assets/shots/biomenace.jpg" alt="Bio Menace running in the arcade" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">14</span>
+              <span class="art-tag">DOS &middot; 1993</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Bio Menace</h2>
+                <span class="chip emu">DOSBox</span>
+              </div>
+              <p>Apogee's run-and-gun with a muscle-bound hero and a city full of mutants.</p>
+              <div class="card-foot">
+                <span class="progress">Shareware ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet jill" data-game="jill" data-kind="emu" style="--i:14; --accent:#59f36f">
+          <a class="cabinet-link" href="games/jill/" aria-label="Play Jill of the Jungle">
+            <div class="art">
+              <img src="assets/shots/jill.jpg" alt="Jill of the Jungle running in the arcade" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">15</span>
+              <span class="art-tag">DOS &middot; 1992</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Jill of the Jungle</h2>
+                <span class="chip emu">DOSBox</span>
+              </div>
+              <p>Epic's jungle platformer — the first shareware episode, complete with its original VGA art.</p>
+              <div class="card-foot">
+                <span class="progress">Shareware ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet xargon" data-game="xargon" data-kind="emu" style="--i:15; --accent:#c7a6ff">
+          <a class="cabinet-link" href="games/xargon/" aria-label="Play Xargon">
+            <div class="art">
+              <img src="assets/shots/xargon.jpg" alt="Xargon running in the arcade" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">16</span>
+              <span class="art-tag">DOS &middot; 1993</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Xargon</h2>
+                <span class="chip emu">DOSBox</span>
+              </div>
+              <p>Epic's sprawling shareware platformer through the strange world of Xargon.</p>
+              <div class="card-foot">
+                <span class="progress">Shareware ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet raptor" data-game="raptor" data-kind="emu" style="--i:16; --accent:#ff7a3d">
+          <a class="cabinet-link" href="games/raptor/" aria-label="Play Raptor: Call of the Shadows">
+            <div class="art">
+              <img src="assets/shots/raptor.jpg" alt="Raptor: Call of the Shadows running in the arcade" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">17</span>
+              <span class="art-tag">DOS &middot; 1994</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Raptor: Call of the Shadows</h2>
+                <span class="chip emu">DOSBox</span>
+              </div>
+              <p>Apogee's vertical shooter — buy upgrades, dodge bullets, and rain fire on the alien fleet.</p>
+              <div class="card-foot">
+                <span class="progress">Shareware ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet blakestone" data-game="blakestone" data-kind="emu" style="--i:17; --accent:#62d6ff">
+          <a class="cabinet-link" href="games/blakestone/" aria-label="Play Blake Stone: Aliens of Gold">
+            <div class="art">
+              <img src="assets/shots/blakestone.jpg" alt="Blake Stone: Aliens of Gold running in the arcade" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">18</span>
+              <span class="art-tag">DOS &middot; 1993</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Blake Stone: Aliens of Gold</h2>
+                <span class="chip emu">DOSBox</span>
+              </div>
+              <p>The shareware episode of Apogee's sci-fi shooter, built on the Wolfenstein 3D engine.</p>
+              <div class="card-foot">
+                <span class="progress">Shareware ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet kenslabyrinth" data-game="kenslabyrinth" data-kind="emu" style="--i:18; --accent:#ffd166">
+          <a class="cabinet-link" href="games/kenslabyrinth/" aria-label="Play Ken's Labyrinth">
+            <div class="art">
+              <img src="assets/shots/kenslabyrinth.jpg" alt="Ken's Labyrinth running in the arcade" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">19</span>
+              <span class="art-tag">DOS &middot; 1993</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Ken's Labyrinth</h2>
+                <span class="chip emu">DOSBox</span>
+              </div>
+              <p>Ken Silverman's first-person maze crawler, before he built the Build engine.</p>
+              <div class="card-foot">
+                <span class="progress">Shareware ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet supaplex" data-game="supaplex" data-kind="emu" style="--i:19; --accent:#63e6ff">
+          <a class="cabinet-link" href="games/supaplex/" aria-label="Play Supaplex">
+            <div class="art">
+              <img src="assets/shots/supaplex.jpg" alt="Supaplex running in the arcade" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">20</span>
+              <span class="art-tag">DOS &middot; 1991</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Supaplex</h2>
+                <span class="chip emu">DOSBox</span>
+              </div>
+              <p>The fiendish Boulder Dash-style puzzler with 111 levels and a very hungry hero.</p>
+              <div class="card-foot">
+                <span class="progress">Freeware ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet zzt" data-game="zzt" data-kind="emu" style="--i:20; --accent:#c7a6ff">
+          <a class="cabinet-link" href="games/zzt/" aria-label="Play ZZT">
+            <div class="art">
+              <img src="assets/shots/zzt.jpg" alt="ZZT running in the arcade" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">21</span>
+              <span class="art-tag">DOS &middot; 1991</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>ZZT</h2>
+                <span class="chip emu">DOSBox</span>
+              </div>
+              <p>Tim Sweeney's ASCII adventure engine, with the classic Town of ZZT and its built-in world editor.</p>
+              <div class="card-foot">
+                <span class="progress">Shareware ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet scorched" data-game="scorched" data-kind="emu" style="--i:21; --accent:#ff9e3d">
+          <a class="cabinet-link" href="games/scorched/" aria-label="Play Scorched Earth">
+            <div class="art">
+              <img src="assets/shots/scorched.jpg" alt="Scorched Earth running in the arcade" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">22</span>
+              <span class="art-tag">DOS &middot; 1991</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Scorched Earth</h2>
+                <span class="chip emu">DOSBox</span>
+              </div>
+              <p>The mother of all artillery games — tanks, wind, and a truly unfair arsenal.</p>
+              <div class="card-foot">
+                <span class="progress">Shareware ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet sopwith" data-game="sopwith" data-kind="emu" style="--i:22; --accent:#8dff9e">
+          <a class="cabinet-link" href="games/sopwith/" aria-label="Play Sopwith">
+            <div class="art">
+              <img src="assets/shots/sopwith.jpg" alt="Sopwith running in the arcade" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">23</span>
+              <span class="art-tag">DOS &middot; 1985</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Sopwith</h2>
+                <span class="chip emu">DOSBox</span>
+              </div>
+              <p>The CGA biplane classic: bomb the buildings, dodge the flak, land before you stall.</p>
+              <div class="card-foot">
+                <span class="progress">Freeware ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet harry" data-game="harry" data-kind="emu" style="--i:23; --accent:#ff7a3d">
+          <a class="cabinet-link" href="games/harry/" aria-label="Play Halloween Harry">
+            <div class="art">
+              <img src="assets/shots/harry.jpg" alt="Halloween Harry running in the arcade" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">24</span>
+              <span class="art-tag">DOS &middot; 1993</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Halloween Harry</h2>
+                <span class="chip emu">DOSBox</span>
+              </div>
+              <p>Apogee's alien-invasion platformer starring a very loud hero with a jetpack.</p>
+              <div class="card-foot">
+                <span class="progress">Shareware ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet solarwinds" data-game="solarwinds" data-kind="emu" style="--i:24; --accent:#63e6ff">
+          <a class="cabinet-link" href="games/solarwinds/" aria-label="Play Solar Winds">
+            <div class="art">
+              <img src="assets/shots/solarwinds.jpg" alt="Solar Winds running in the arcade" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">25</span>
+              <span class="art-tag">DOS &middot; 1993</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Solar Winds</h2>
+                <span class="chip emu">DOSBox</span>
+              </div>
+              <p>Epic's open-space adventure — trade, upgrade, and fight across the solar system.</p>
+              <div class="card-foot">
+                <span class="progress">Shareware ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet tyrian" data-game="tyrian" data-kind="emu" style="--i:25; --accent:#c7a6ff">
+          <a class="cabinet-link" href="games/tyrian/" aria-label="Play Tyrian 2000">
+            <div class="art">
+              <img src="assets/shots/tyrian.jpg" alt="Tyrian 2000 running in the arcade" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">26</span>
+              <span class="art-tag">DOS &middot; 1999</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Tyrian <b>2</b>000</h2>
+                <span class="chip emu">DOSBox</span>
+              </div>
+              <p>The definitive version of Epic's vertical shooter — a full campaign, dozens of ships, and a lot of firepower.</p>
+              <div class="card-foot">
+                <span class="progress">Freeware ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet omf" data-game="omf" data-kind="emu" style="--i:26; --accent:#ff5c5c">
+          <a class="cabinet-link" href="games/omf/" aria-label="Play One Must Fall: 2097">
+            <div class="art">
+              <img src="assets/shots/omf.jpg" alt="One Must Fall: 2097 running in the arcade" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">27</span>
+              <span class="art-tag">DOS &middot; 1994</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>One Must Fall: <b>2</b>097</h2>
+                <span class="chip emu">DOSBox</span>
+              </div>
+              <p>Epic's mech fighting game — tournament mode, upgradeable robots, and a killer soundtrack.</p>
+              <div class="card-foot">
+                <span class="progress">Freeware ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet epicpinball" data-game="epicpinball" data-kind="emu" style="--i:27; --accent:#ffd166">
+          <a class="cabinet-link" href="games/epicpinball/" aria-label="Play Epic Pinball">
+            <div class="art">
+              <img src="assets/shots/epicpinball.jpg" alt="Epic Pinball running in the arcade" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">28</span>
+              <span class="art-tag">DOS &middot; 1993</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Epic Pinball</h2>
+                <span class="chip emu">DOSBox</span>
+              </div>
+              <p>Epic's pinball classic with the shareware table set and silky VGA ball physics.</p>
+              <div class="card-foot">
+                <span class="progress">Shareware tables</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet hocus" data-game="hocus" data-kind="emu" style="--i:28; --accent:#c7a6ff">
+          <a class="cabinet-link" href="games/hocus/" aria-label="Play Hocus Pocus">
+            <div class="art">
+              <img src="assets/shots/hocus.jpg" alt="Hocus Pocus running in the arcade" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">29</span>
+              <span class="art-tag">DOS &middot; 1994</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Hocus Pocus</h2>
+                <span class="chip emu">DOSBox</span>
+              </div>
+              <p>Apogee's spell-slinging platformer — the first shareware episode, restored and ready to run.</p>
+              <div class="card-foot">
+                <span class="progress">Shareware ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet majorstryker" data-game="majorstryker" data-kind="emu" style="--i:29; --accent:#ff5c5c">
+          <a class="cabinet-link" href="games/majorstryker/" aria-label="Play Major Stryker">
+            <div class="art">
+              <img src="assets/shots/majorstryker.jpg" alt="Major Stryker running in the arcade" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">30</span>
+              <span class="art-tag">DOS &middot; 1993</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Major Stryker</h2>
+                <span class="chip emu">DOSBox</span>
+              </div>
+              <p>Apogee's sci-fi shooter, re-released as freeware with all three episodes.</p>
+              <div class="card-foot">
+                <span class="progress">Freeware ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet capitalism" data-game="capitalism" data-kind="emu" style="--i:30; --accent:#ffd166">
+          <a class="cabinet-link" href="games/capitalism/" aria-label="Play Capitalism">
+            <div class="art">
+              <img src="assets/shots/capitalism.jpg" alt="Capitalism running in the arcade" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">31</span>
+              <span class="art-tag">DOS &middot; 1995</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Capitalism</h2>
+                <span class="chip emu">DOSBox</span>
+              </div>
+              <p>The DOS business simulation demo — build a retail empire, one store at a time.</p>
+              <div class="card-foot">
+                <span class="progress">Demo ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet pop2demo" data-game="pop2demo" data-kind="emu" style="--i:31; --accent:#ffd166">
+          <a class="cabinet-link" href="games/pop2demo/" aria-label="Play Prince of Persia 2">
+            <div class="art">
+              <img src="assets/shots/pop2demo.jpg" alt="Prince of Persia 2 running in the arcade" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">32</span>
+              <span class="art-tag">DOS &middot; 1993</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Prince of Persia <b>2</b></h2>
+                <span class="chip emu">DOSBox</span>
+              </div>
+              <p>The freely distributable DOS demo of The Shadow and the Flame — the rooftops chapter, playable immediately.</p>
+              <div class="card-foot">
+                <span class="progress">DOS demo ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+      <p class="selector-empty" id="selector-empty" hidden>No cabinets in this class. Try another filter.</p>
+    </section>
+
+    <section class="notes" aria-label="About the arcade">
+      <div class="note">
+        <h2>Authentic, not remastered</h2>
+        <p>Quake runs the original engine compiled to WebAssembly. Dangerous Dave runs an
+          open-source C reimplementation; Prince of Persia 2 is a static recompilation of the
+          Macintosh binary; 2048 is a reverse-engineered WASM engine; Keen 4, Duke Nukem II, the DOS vault and the bring-your-own
+          DOS cabinet run real DOSBox in WebAssembly. No ROM hacks, no redrawn sprites.</p>
+      </div>
+      <div class="note">
+        <h2>Quake, ready to go</h2>
+        <p>No data hunt required: the cabinet bundles <b>LibreQuake</b>, a free and open data
+          set with maps, bots and a campaign. Own the original? Load your own
+          <code>PAK0.PAK</code> / <code>PAK1.PAK</code> and play that instead.</p>
+      </div>
+      <div class="note">
+        <h2>PSP-style touch controls</h2>
+        <p>Quake ships with a landscape pad made for phones: a movement stick, a look pad,
+          fire/jump/menu/status face buttons and shoulder weapon switches. Tap
+          <em>Fullscreen</em> and rotate for the full arcade view.</p>
+      </div>
+      <div class="note">
+        <h2>Saves that stay put</h2>
+        <p>High scores, unlocked levels and in-game save slots live in your browser's
+          storage. Nothing is uploaded. Clear site data and the arcade forgets you.</p>
+      </div>
+      <div class="note">
+        <h2>Bring your own Prince</h2>
+        <p>The Mac recompilation still ships without the copyrighted game data. Point it at a
+          <code>pop2-data.tar.gz</code> prepared from your own copy once, and it stays cached in
+          this browser — or jump straight into the bundled DOS demo, no data hunt required.</p>
+      </div>
+      <div class="note">
+        <h2>Bring your own DOS</h2>
+        <p>Keen 4 and Duke Nukem II arrive with their freely distributable shareware
+          episodes. For everything else the DOS cabinet takes a <code>.jsdos</code> bundle
+          you build from a game you own.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-bar">
+      <span><i class="led" aria-hidden="true"></i> ALL SYSTEMS NOMINAL</span>
+      <span>WASM32 · SDL · DOSBOX</span>
+      <span id="footer-clock">LOCAL / --:--:--</span>
+    </div>
+    <p>
+      Built with gratitude to id Software, John Romero, Jordan Mechner, Gabriele Cirulli,
+      Apogee, Tommy Visic, Gregory Maynard-Hoare, the LibreQuake team and the preservation
+      projects that keep their work runnable.
+    </p>
+    <p class="fine">
+      Game names and artwork belong to their respective owners. This arcade hosts engines,
+      freely distributable shareware episodes and open data. Prince of Persia 2 and the
+      generic DOS cabinet run data you supply yourself.
+    </p>
+  </footer>
+
+  <!-- PoP2 data instructions -->
+  <dialog id="pop2-help" class="sheet" aria-labelledby="pop2-help-title">
+    <form method="dialog" class="sheet-close-form">
+      <button class="sheet-close" aria-label="Close">×</button>
+    </form>
+    <p class="eyebrow">One-time setup</p>
+    <h2 id="pop2-help-title">Add your Prince of Persia 2 data</h2>
+    <p class="sheet-lede">
+      The web engine contains no game files. You need a legally owned copy of the
+      Macintosh release and a desktop with <code>unar</code> and <code>python3</code>.
+    </p>
+    <ol class="steps">
+      <li>
+        <b>Prepare the archive</b>
+        <pre><code>git clone https://github.com/mac-recomp/pop2
+cd pop2
+tools/prep-web-data.sh "Prince_Of_Persia2.sit" /tmp/pop2
+mv /tmp/pop2/vol /tmp/pop2/pop2
+tar --format=ustar -czhf pop2-data.tar.gz -C /tmp/pop2 app data pop2</code></pre>
+      </li>
+      <li>
+        <b>Open the game</b>
+        <p>Launch the cabinet and drop <code>pop2-data.tar.gz</code> onto the page, or
+          paste a direct link to it.</p>
+      </li>
+      <li>
+        <b>Play offline later</b>
+        <p>The archive is cached in IndexedDB. Next visit starts instantly. Use
+          <em>Forget data</em> inside the game to remove it.</p>
+      </li>
+    </ol>
+    <p class="sheet-note">
+      Already built the archive? <a href="games/pop2/">Open the cabinet</a> and drop it in.
+      Hosting the data yourself? Append <code>?data=pop2-data.tar.gz</code> to the game URL.
+    </p>
+    <div class="sheet-actions">
+      <a class="button primary" href="games/pop2/">Open Prince of Persia 2</a>
+      <a class="button" href="https://github.com/mac-recomp/pop2" target="_blank" rel="noopener">Prep tools on GitHub</a>
+    </div>
+  </dialog>
+
+  <!-- DOS instructions -->
+  <dialog id="dos-help" class="sheet" aria-labelledby="dos-help-title">
+    <form method="dialog" class="sheet-close-form">
+      <button class="sheet-close" aria-label="Close">×</button>
+    </form>
+    <p class="eyebrow">One-time setup</p>
+    <h2 id="dos-help-title">Add a DOS game</h2>
+    <p class="sheet-lede">
+      Commander Keen 4 and Duke Nukem II already ship with their freely distributable
+      shareware episodes. The generic DOS cabinet is a DOSBox build running in WebAssembly;
+      for anything else you supply a <code>.jsdos</code> bundle made from a game you own.
+    </p>
+    <ol class="steps">
+      <li>
+        <b>Gather the game files</b>
+        <p>Put the game's folder somewhere convenient. The main executable and its data
+          files must sit together.</p>
+      </li>
+      <li>
+        <b>Add a DOSBox config</b>
+        <p>Create <code>.jsdos/dosbox.conf</code> inside the folder with a
+          <code>[autoexec]</code> section that mounts <code>C:</code> and starts the game:</p>
+        <pre><code>[autoexec]
+mount c .
+c:
+GAME.EXE</code></pre>
+      </li>
+      <li>
+        <b>Zip it as .jsdos</b>
+        <p>Zip the folder contents (not the folder itself) and rename the archive to
+          <code>mygame.jsdos</code>. Then open the cabinet and choose the file.</p>
+      </li>
+    </ol>
+    <p class="sheet-note">
+      Saves made inside the game are kept in this browser's storage. Use the js-dos
+      menu to export a save bundle if you want a portable copy.
+    </p>
+    <div class="sheet-actions">
+      <a class="button primary" href="games/dos/">Open the DOS cabinet</a>
+      <a class="button" href="test-keen.html">Open DOS test harness</a>
+    </div>
+  </dialog>
+
+  <!-- Quake data / controls -->
+  <dialog id="quake-help" class="sheet" aria-labelledby="quake-help-title">
+    <form method="dialog" class="sheet-close-form">
+      <button class="sheet-close" aria-label="Close">×</button>
+    </form>
+    <p class="eyebrow">Bundled data · optional PAKs</p>
+    <h2 id="quake-help-title">Play Quake your way</h2>
+    <p class="sheet-lede">
+      The cabinet contains Quake's WebAssembly engine and the free
+      <b>LibreQuake</b> data set. It starts with no downloads and no file picker.
+      If you own the original game, you can load its PAK files instead.
+    </p>
+    <ol class="steps">
+      <li>
+        <b>Launch LibreQuake</b>
+        <p>Open the cabinet and press <em>Launch LibreQuake</em>. The bundled maps,
+          bots and campaign run entirely in the browser.</p>
+      </li>
+      <li>
+        <b>Or use your own PAKs</b>
+        <p>Choose <em>Load PAK files</em>, pick <code>PAK0.PAK</code> (shareware) or
+          <code>PAK0.PAK</code> + <code>PAK1.PAK</code> (full game), then press
+          <em>Play supplied PAKs</em>. Nothing is uploaded.</p>
+      </li>
+      <li>
+        <b>Phone in landscape</b>
+        <p>Start the game, tap <em>Fullscreen</em> and rotate. The PSP-style overlay gives
+          you a left movement stick, a right look pad, fire / jump / menu / status buttons
+          and shoulder weapon switches. The <em>Pad</em> button toggles it on desktop.</p>
+      </li>
+    </ol>
+    <p class="sheet-note">
+      Shareware Quake data is not redistributed by this arcade; supply it from your own
+      copy. LibreQuake is an independent free data project. Engine by
+      <a href="https://github.com/GMH-Code/Qwasm" target="_blank" rel="noopener">Qwasm</a>.
+    </p>
+    <div class="sheet-actions">
+      <a class="button primary" href="games/quake/">Open Quake</a>
+      <a class="button" href="https://github.com/GMH-Code/Qwasm" target="_blank" rel="noopener">Qwasm on GitHub</a>
+    </div>
+  </dialog>
+
+  <script src="arcade.js"></script>
+</body>
+</html>

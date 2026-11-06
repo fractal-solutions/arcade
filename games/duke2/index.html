@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#140607">
+<title>Duke Nukem 2 — WASM Arcade</title>
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../vendor/js-dos/js-dos.css">
+<link rel="stylesheet" href="../_shared/emu.css">
+<style>
+  :root { --accent: #ff8a5c; --accent-2: #ffd166; }
+  body {
+    background:
+      radial-gradient(900px 500px at 15% -10%, rgba(255, 138, 92, .13), transparent 60%),
+      radial-gradient(700px 400px at 100% 110%, rgba(255, 95, 86, .08), transparent 60%),
+      linear-gradient(180deg, #140607, #09080b);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="bar">
+    <a class="back" href="../../" aria-label="Back to the arcade">← Arcade</a>
+    <h1 class="title">Duke Nukem <b>II</b></h1>
+    <p class="note">Shareware episode · DOSBox · WebAssembly</p>
+    <span class="spacer"></span>
+    <button class="fs-btn" id="fs" type="button" aria-pressed="false" aria-label="Toggle fullscreen">
+      <span aria-hidden="true">⛶</span><span>Fullscreen</span>
+    </button>
+  </header>
+
+  <div class="frame">
+    <div id="dos" data-bundle="duke2.jsdos"></div>
+    <div class="boot-error" id="boot-error" hidden>
+      <div>
+        <b>The DOS layer did not start.</b>
+        Check that <code>vendor/js-dos/</code> and <code>games/duke2/duke2.jsdos</code> are
+        being served next to the arcade, then reload. The cabinet needs an HTTP server —
+        <code>file://</code> will not work.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../../vendor/js-dos/js-dos.js"></script>
+<script src="../_shared/emu.js"></script>
+</body>
+</html>

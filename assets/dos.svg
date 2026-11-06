@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="A DOS prompt on a CRT monitor">
+  <defs>
+    <linearGradient id="crt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0d1a12"/>
+      <stop offset="1" stop-color="#07120b"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".5" cy=".45" r=".7">
+      <stop offset="0" stop-color="#8bd450" stop-opacity=".20"/>
+      <stop offset="1" stop-color="#8bd450" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="500" fill="#07070b"/>
+  <rect x="90" y="46" width="620" height="380" rx="26" fill="#1a1a21" stroke="#2e2e39" stroke-width="4"/>
+  <rect x="118" y="74" width="564" height="318" rx="14" fill="url(#crt)" stroke="#0a0a0d" stroke-width="8"/>
+  <rect x="118" y="74" width="564" height="318" rx="14" fill="url(#glow)"/>
+  <g opacity=".22" stroke="#8bd450" stroke-width="1">
+    <path d="M126 92h548M126 108h548M126 124h548M126 140h548M126 156h548M126 172h548M126 188h548M126 204h548M126 220h548M126 236h548M126 252h548M126 268h548M126 284h548M126 300h548M126 316h548M126 332h548M126 348h548M126 364h548M126 380h548"/>
+  </g>
+  <g font-family="ui-monospace, Menlo, Consolas, monospace" font-weight="700">
+    <text x="150" y="122" font-size="24" fill="#8bd450">WASM ARCADE DOS CABINET</text>
+    <text x="150" y="176" font-size="26" fill="#b6ffae">C:\&gt; dir</text>
+    <text x="150" y="214" font-size="20" fill="#6fae54">KEEN4      EXE    102,355</text>
+    <text x="150" y="244" font-size="20" fill="#6fae54">DUKE2      EXE     58,852</text>
+    <text x="150" y="274" font-size="20" fill="#6fae54">YOURGAME   JSDOS  ?</text>
+    <text x="150" y="322" font-size="26" fill="#b6ffae">C:\&gt; run ^</text>
+    <rect x="288" y="301" width="14" height="26" fill="#b6ffae"/>
+  </g>
+  <g opacity=".5" stroke="#8bd450" stroke-width="2">
+    <path d="M118 392h564"/>
+  </g>
+  <g fill="#2a2a33" stroke="#3a3a46" stroke-width="2">
+    <rect x="356" y="426" width="88" height="26" rx="6"/>
+    <rect x="300" y="452" width="200" height="14" rx="7"/>
+  </g>
+  <text x="400" y="472" font-family="ui-monospace, Menlo, monospace" font-size="14" letter-spacing="5" fill="#3f5346" text-anchor="middle">BRING YOUR OWN BUNDLE</text>
+</svg>
