@@ -1,9 +1,9 @@
 # WASM Arcade
 
-A static arcade of 32 authentic classics running in the browser. Real game code,
-real pixels, no plugins, no server-side component.
+A static arcade of local classics, with a browser Flash player for SWF files
+you provide. Real game code, real pixels, no server-side component.
 
-**Last updated: 2026-11-06**
+**Last updated: 2026-11-07**
 
 ---
 
@@ -14,21 +14,23 @@ real pixels, no plugins, no server-side component.
 | **Dangerous Dave** | `games/dave/` | C reimplementation compiled to `dave.wasm` | Playable out of the box |
 | **2048** | `games/2048/` | Freestanding C → 3.5 KB `game.wasm` | Playable out of the box |
 | **Quake** | `games/quake/` | Qwasm (Quake engine compiled to WebAssembly) | Playable out of the box with bundled LibreQuake data; your own PAKs optional |
-| **Quake II demo** | [Qwasm2](https://qwasm2.m-h.org.uk/) | Yamagi Quake II compiled to WebAssembly | Browser-playable externally; demo starts on the Qwasm2 site |
+| **Quake II demo** | — | Yamagi Quake II compiled to WebAssembly | Reference only; not included in this arcade |
 | **Commander Keen 4** | `games/keen4/` | js-dos 8.5.3 / DOSBox compiled to WebAssembly | Playable out of the box with the bundled shareware episode |
 | **Duke Nukem II** | `games/duke2/` | js-dos 8.5.3 / DOSBox compiled to WebAssembly | Playable out of the box with the bundled shareware episode |
 | **Prince of Persia 2** | `games/pop2/` | Static 68k-Mac recompilation to WebAssembly | Playable after adding your own game data; bundled DOS demo also available |
 | **Prince of Persia 2 (DOS demo)** | `games/pop2demo/` | js-dos 8.5.3 / DOSBox compiled to WebAssembly | Playable out of the box |
 | **DOS Cabinet** | `games/dos/` | js-dos 8.5.3 / DOSBox compiled to WebAssembly | Runs a `.jsdos` bundle you supply |
 | **DOS Vault (25 cabinets)** | `games/<slug>/` | js-dos 8.5.3 / DOSBox compiled to WebAssembly | Shareware, freeware and demos, all bundled and auto-starting |
+| **Flash player** | `games/flash/` | Locally hosted Ruffle 0.7.1 | Load an SWF from your device; no game files are bundled |
 
 The landing page (`index.html`) is a bespoke, responsive console menu with a
 game-first WebGL coverflow. The covers are textured 3D cards with live highlights;
 arrow keys, swipes and on-screen arrows browse them. It falls back to the regular
 game shelf when WebGL is unavailable and retains the custom cursor on desktop.
-The library includes the 32 local cabinets and five external/reference entries:
-a browser-playable Quake II demo, official pages for Quake III Arena and
-Capitalism II/Lab, and a reference entry for GTA 2. Optional procedural interface sounds and an original
+The library includes the 32 local game cabinets, the local Flash player, and
+five reference-only entries for Quake II, Quake III Arena, Capitalism II/Lab,
+and GTA 2. Reference entries do not navigate off-site. Optional
+procedural interface sounds and an original
 ambient DnB loop—with a slow minor-key chord progression, soft synthesized reverb
 and understated breakbeat—are generated locally and start only after choosing
 **Sound on**. Audio pauses when the menu tab is hidden or you leave for a game.
@@ -73,13 +75,25 @@ config. They boot straight into the game, with no file picker and no setup.
 | **Capitalism** | `games/capitalism/` | Playable demo (Interactive Magic) |
 | **Prince of Persia 2 (DOS demo)** | `games/pop2demo/` | Freely distributable demo (Brøderbund) |
 
-**External links:** Quake II's browser demo opens on Qwasm2. Quake III Arena and
-Capitalism II/Lab link to their official PC releases but do not run inside this
-arcade. GTA 2 is included as a reference entry: the 1999 top-down Windows game
-needs game files and a compatible runtime that this arcade does not provide.
-No commercial game data is bundled. The free *Carmageddon* demo was evaluated
+**Reference entries:** Quake II, Quake III Arena, Capitalism II/Lab, and GTA 2
+are shown for context but are not playable here; no external game links are
+provided. No commercial game data is bundled. The free *Carmageddon* demo was evaluated
 but does not boot reliably under this js-dos build, so it is not listed as
 playable. The Mac PoP2 cabinet continues to support bring-your-own full data.
+
+### Flash games
+
+The **Flash** filter currently contains a local *Load a Flash game* player.
+Choose an SWF you have rights to use; it runs in this tab with Ruffle and is not
+uploaded or persisted. Ruffle can run many—but not all—SWFs; some games need
+unsupported features or additional files. Free-to-play Flash games are not
+automatically free to redistribute: no famous game SWFs have been added without
+verified permission to bundle them. The Flash category contains no outbound game links.
+
+The locally hosted Ruffle 0.7.1 web runtime is from the
+[official Ruffle release](https://github.com/ruffle-rs/ruffle/releases/tag/v0.7.1).
+Its MIT and Apache 2.0 license texts are included in `vendor/ruffle/`. No Flash
+game SWFs are bundled.
 
 > **Glace:** `assets/glace-1.png` and `assets/glace-2.png` are kept in the repo,
 > but there is no Glace game data or WebAssembly port in this project, so Glace is

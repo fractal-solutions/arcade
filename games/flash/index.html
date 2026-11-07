@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#070a12">
+  <meta name="description" content="Load a Flash SWF you provide and play it locally with Ruffle.">
+  <title>Flash Player — WASM Arcade</title>
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="flash.css">
+  <script src="../../vendor/ruffle/ruffle.js" defer></script>
+  <script src="flash.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="../../"><span aria-hidden="true">▚</span> WASM ARCADE</a>
+    <a class="back-link" href="../../">← Back to games</a>
+  </header>
+
+  <main>
+    <section class="player-panel" aria-labelledby="page-title">
+      <p class="eyebrow">LOCAL FLASH PLAYER · RUFFLE</p>
+      <h1 id="page-title">Bring your own SWF</h1>
+      <p class="lede">Choose a Flash game file from your device. It runs in this browser tab; the arcade does not upload or save it.</p>
+
+      <form class="loader" id="swf-form">
+        <label class="file-picker" for="swf-file">
+          <span class="file-icon" aria-hidden="true">＋</span>
+          <span><strong>Choose a .swf file</strong><small id="file-name">Nothing selected</small></span>
+          <input id="swf-file" name="swf-file" type="file" accept=".swf,application/x-shockwave-flash">
+        </label>
+        <button class="primary-button" id="load-button" type="submit" disabled>Load game</button>
+        <button class="quiet-button" id="clear-button" type="button" disabled>Unload</button>
+      </form>
+
+      <p class="status" id="player-status" role="status" aria-live="polite">Select a SWF file to begin.</p>
+
+      <div class="player-frame">
+        <div class="player-toolbar">
+          <span class="live-led" aria-hidden="true"></span>
+          <span id="player-title">FLASH PLAYER</span>
+          <button class="fullscreen-button" id="fullscreen-button" type="button" disabled>Fullscreen</button>
+        </div>
+        <div class="player-container" id="player-container">
+          <div class="empty-state">
+            <span class="empty-mark" aria-hidden="true">▶</span>
+            <p>Your game will appear here</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="fine-print">Ruffle supports many, but not all, Flash games. Some titles require legacy APIs or extra files and may not run. Only load SWFs you trust.</p>
+    </section>
+  </main>
+
+</body>
+</html>

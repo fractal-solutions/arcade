@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1">
+      <stop stop-color="#081222"/>
+      <stop offset="1" stop-color="#17122d"/>
+    </linearGradient>
+    <linearGradient id="beam" x2="1" y2="1">
+      <stop stop-color="#68efff"/>
+      <stop offset="1" stop-color="#9d7cff"/>
+    </linearGradient>
+    <radialGradient id="glow">
+      <stop stop-color="#62eaff" stop-opacity=".28"/>
+      <stop offset="1" stop-color="#62eaff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg)"/>
+  <ellipse cx="400" cy="250" rx="340" ry="250" fill="url(#glow)"/>
+  <g fill="none" stroke="#9bdcff" stroke-opacity=".14">
+    <path d="M0 390 800 80M0 450 800 140M0 330 800 20"/>
+    <path d="M140 0v500M280 0v500M520 0v500M660 0v500"/>
+  </g>
+  <path d="m435 76-128 190h88l-42 158 151-222h-91l46-126z" fill="url(#beam)" opacity=".92"/>
+  <path d="M231 121h338v258H231z" fill="none" stroke="#bcefff" stroke-opacity=".44" stroke-width="2"/>
+  <path d="M231 158h338" stroke="#bcefff" stroke-opacity=".28"/>
+  <circle cx="252" cy="140" r="5" fill="#ff786b"/>
+  <circle cx="271" cy="140" r="5" fill="#ffca65"/>
+  <circle cx="290" cy="140" r="5" fill="#71e9c2"/>
+  <text x="400" y="431" fill="#d9eaff" font-family="monospace" font-size="18" letter-spacing="8" text-anchor="middle">FLASH // PLAY</text>
+</svg>

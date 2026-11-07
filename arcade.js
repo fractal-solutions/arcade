@@ -106,6 +106,7 @@
     launch: $('#featured-launch'),
     launchLabel: $('#featured-launch-label'),
     prompt: $('.library-prompt'),
+    selectPrompt: $('.featured-prompt'),
   };
   const coverflowCanvas = $('#coverflow-canvas');
   const coverflowIndex = $('#coverflow-index');
@@ -117,7 +118,7 @@
   const libraryStateKey = 'arcade.library.state.v1';
   let selectedCard = null;
   let restoringLibrary = false;
-  const KINDS = new Set(['all', 'wasm', 'emu', 'data', 'external']);
+  const KINDS = new Set(['all', 'wasm', 'emu', 'data', 'external', 'flash']);
 
   function readLibraryState() {
     try {
@@ -161,9 +162,12 @@
     const platform = $('.art-tag', card);
     const kind = $('.chip', card);
     const description = $('.body p', card);
-    const link = $('.cabinet-link', card);
+    const cabinetLink = $('.cabinet-link', card);
+    const link = cabinetLink && cabinetLink.tagName === 'A' ? cabinetLink : null;
     const index = $('.art-index', card);
-    const external = card.dataset.kind === 'external';
+    const external = card.dataset.kind === 'external' || (link && link.target === '_blank');
+    if (featured.launch) featured.launch.hidden = !link;
+    if (featured.selectPrompt) featured.selectPrompt.hidden = !link;
 
     if (featured.art && image) {
       featured.art.src = image.currentSrc || image.src;
@@ -183,9 +187,14 @@
         featured.launch.removeAttribute('target');
         featured.launch.removeAttribute('rel');
       }
-      featured.launch.setAttribute('aria-label', `${external ? 'Open' : 'Play'} ${title ? title.textContent.trim() : 'selected game'}`);
+      const action = external || card.dataset.game === 'flash-player' ? 'Open' : 'Play';
+      featured.launch.setAttribute('aria-label', `${action} ${title ? title.textContent.trim() : 'selected game'}`);
     }
-    if (featured.launchLabel) featured.launchLabel.textContent = external ? 'Open official page' : 'Launch game';
+    if (featured.launchLabel) {
+      featured.launchLabel.textContent = external
+        ? 'Reference only'
+        : (card.dataset.kind === 'flash' ? 'Open Flash player' : 'Launch game');
+    }
     if (featured.prompt) featured.prompt.textContent = String(cards.indexOf(card) + 1).padStart(2, '0');
     renderCoverflow();
     if (!restoringLibrary) saveLibraryState();

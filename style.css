@@ -3089,6 +3089,8 @@ main { min-height: calc(100vh - 60px); }
 body.has-coverflow #cabinet-grid { display: none; }
 body:not(.has-coverflow) .coverflow-stage { display: none; }
 .cabinet.is-filtered-out { display: none; }
+.featured-launch[hidden] { display: none; }
+.featured-prompt[hidden] { display: none; }
 
 @media (max-width: 720px) {
   .masthead,

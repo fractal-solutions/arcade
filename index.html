@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#05060a">
-  <meta name="description" content="A browser arcade of DOS and PC classics: 32 local games, Quake II's browser demo, plus links to Quake III Arena, the Capitalism series, and GTA 2.">
+  <meta name="description" content="A browser arcade of DOS and PC classics, a local Flash player for your own SWF files, and links to classic Flash games.">
   <title>WASM Arcade — authentic classics in the browser</title>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css?v=20261108">
@@ -37,7 +37,7 @@
           aria-describedby="coverflow-live"></canvas>
         <div class="coverflow-heading" aria-hidden="true">
           <span>ARCADE <i>SELECT</i></span>
-          <span id="coverflow-index">01 <b>/</b> 37</span>
+          <span id="coverflow-index">01 <b>/</b> 38</span>
         </div>
         <span class="coverflow-live" id="coverflow-live" aria-live="polite"></span>
         <div class="library-controls">
@@ -48,6 +48,35 @@
           </div>
         </div>
       </div>
+
+      <div class="selector-head">
+        <div>
+          <p class="eyebrow" id="selector-heading">// BROWSE BY FORMAT</p>
+          <h2 class="selector-title">All games</h2>
+        </div>
+        <div class="selector" role="tablist" aria-label="Filter games">
+          <button type="button" class="selector-btn is-active" role="tab" aria-selected="true" data-filter="all">
+            All <b data-count-for="all">38</b>
+          </button>
+          <button type="button" class="selector-btn" role="tab" aria-selected="false" data-filter="wasm">
+            WASM <b data-count-for="wasm">3</b>
+          </button>
+          <button type="button" class="selector-btn" role="tab" aria-selected="false" data-filter="emu">
+            Emulated <b data-count-for="emu">28</b>
+          </button>
+          <button type="button" class="selector-btn" role="tab" aria-selected="false" data-filter="data">
+            Your data <b data-count-for="data">1</b>
+          </button>
+          <button type="button" class="selector-btn" role="tab" aria-selected="false" data-filter="external">
+            References <b data-count-for="external">5</b>
+          </button>
+          <button type="button" class="selector-btn" role="tab" aria-selected="false" data-filter="flash">
+            Flash <b data-count-for="flash">5</b>
+          </button>
+          <span class="selector-glint" aria-hidden="true"></span>
+        </div>
+      </div>
+      <p class="selector-status" id="selector-status" aria-live="polite">Showing 38 of 38 entries</p>
 
       <section class="featured-game" aria-label="Selected game" aria-live="polite">
         <div class="featured-copy">
@@ -64,32 +93,6 @@
           </div>
         </div>
       </section>
-
-      <div class="selector-head">
-        <div>
-          <p class="eyebrow" id="selector-heading">// BROWSE BY FORMAT</p>
-          <h2 class="selector-title">All games</h2>
-        </div>
-        <div class="selector" role="tablist" aria-label="Filter games">
-          <button type="button" class="selector-btn is-active" role="tab" aria-selected="true" data-filter="all">
-            All <b data-count-for="all">37</b>
-          </button>
-          <button type="button" class="selector-btn" role="tab" aria-selected="false" data-filter="wasm">
-            WASM <b data-count-for="wasm">3</b>
-          </button>
-          <button type="button" class="selector-btn" role="tab" aria-selected="false" data-filter="emu">
-            Emulated <b data-count-for="emu">28</b>
-          </button>
-          <button type="button" class="selector-btn" role="tab" aria-selected="false" data-filter="data">
-            Your data <b data-count-for="data">1</b>
-          </button>
-          <button type="button" class="selector-btn" role="tab" aria-selected="false" data-filter="external">
-            External <b data-count-for="external">5</b>
-          </button>
-          <span class="selector-glint" aria-hidden="true"></span>
-        </div>
-      </div>
-      <p class="selector-status" id="selector-status" aria-live="polite">Showing 37 of 37 entries</p>
 
       <div class="cabinets" id="cabinet-grid">
 
@@ -171,8 +174,7 @@
 
         <!-- Quake II browser demo -->
         <article class="cabinet quake2" data-game="quake2" data-kind="external" style="--i:3; --accent:#ff6b4a">
-          <a class="cabinet-link" href="https://qwasm2.m-h.org.uk/" target="_blank" rel="noopener noreferrer"
-             aria-label="Play the Quake II demo in Qwasm2 (opens a new tab)">
+          <div class="cabinet-link" role="group" aria-label="Quake II reference entry">
             <div class="art">
               <img src="assets/quake2.svg" alt="Quake II industrial sci-fi poster" width="800" height="500" loading="lazy">
               <span class="art-index" aria-hidden="true">03+</span>
@@ -182,17 +184,16 @@
             <div class="body">
               <div class="title-row">
                 <h2>Quake II</h2>
-                <span class="chip external">Browser demo</span>
+                <span class="chip external">Reference only</span>
               </div>
-              <p>Play the first three levels in Qwasm2, a WebAssembly port of Yamagi Quake II.
-                The engine and demo run on the project's site; full-game PAKs are optional
-                and must come from your own copy.</p>
+              <p>A browser port and demo exist, but this arcade does not bundle their engine
+                or game data. This entry is informational and does not open an external site.</p>
               <div class="card-foot">
-                <span class="progress">External browser launch</span>
-                <span class="cta">Play online <span aria-hidden="true">↗</span></span>
+                <span class="progress">Not installed</span>
+                <span class="cta">Reference only</span>
               </div>
             </div>
-          </a>
+          </div>
         </article>
 
         <!-- Commander Keen 4 -->
@@ -834,8 +835,7 @@
           </a>
         </article>
         <article class="cabinet quake3" data-game="quake3" data-kind="external" style="--i:32; --accent:#ff745e">
-          <a class="cabinet-link" href="https://store.steampowered.com/app/2200/Quake_III_Arena/" target="_blank" rel="noopener noreferrer"
-             aria-label="View the official Quake III Arena release on Steam (opens a new tab)">
+          <div class="cabinet-link" role="group" aria-label="Quake III Arena reference entry">
             <div class="art">
               <img src="assets/quake3.svg" alt="Quake III Arena arena combat artwork" width="800" height="500" loading="lazy">
               <span class="art-index" aria-hidden="true">33</span>
@@ -845,20 +845,19 @@
             <div class="body">
               <div class="title-row">
                 <h2>Quake III Arena</h2>
-                <span class="chip external">Official PC release</span>
+                <span class="chip external">Reference only</span>
               </div>
-              <p>Find the official PC release. This arcade does not yet include a Quake III
-                WebAssembly engine or game data, so this opens Steam rather than launching locally.</p>
+              <p>This arcade does not include a Quake III WebAssembly engine or game data.
+                This is an informational entry, not a playable cabinet.</p>
               <div class="card-foot">
-                <span class="progress">Not playable in this arcade</span>
-                <span class="cta">View release <span aria-hidden="true">↗</span></span>
+                <span class="progress">Not installed</span>
+                <span class="cta">Reference only</span>
               </div>
             </div>
-          </a>
+          </div>
         </article>
         <article class="cabinet capitalism2" data-game="capitalism2" data-kind="external" style="--i:33; --accent:#e7c56e">
-          <a class="cabinet-link" href="https://store.steampowered.com/app/638200/Capitalism_2/" target="_blank" rel="noopener noreferrer"
-             aria-label="View Capitalism II on Steam (opens a new tab)">
+          <div class="cabinet-link" role="group" aria-label="Capitalism II reference entry">
             <div class="art">
               <img src="assets/capitalism2.svg" alt="Capitalism II abstract city and market artwork" width="800" height="500" loading="lazy">
               <span class="art-index" aria-hidden="true">34</span>
@@ -868,20 +867,19 @@
             <div class="body">
               <div class="title-row">
                 <h2>Capitalism II</h2>
-                <span class="chip external">Official PC release</span>
+                <span class="chip external">Reference only</span>
               </div>
-              <p>The standalone business sim you asked for. Its official PC release is linked
-                here; this is not a DOS game and does not run in the current browser cabinet.</p>
+              <p>The standalone business simulation you asked for. It is not a DOS game
+                and does not run in this browser cabinet.</p>
               <div class="card-foot">
-                <span class="progress">Not playable in this arcade</span>
-                <span class="cta">View release <span aria-hidden="true">↗</span></span>
+                <span class="progress">Not installed</span>
+                <span class="cta">Reference only</span>
               </div>
             </div>
-          </a>
+          </div>
         </article>
         <article class="cabinet capitalismlab" data-game="capitalismlab" data-kind="external" style="--i:34; --accent:#72d7ba">
-          <a class="cabinet-link" href="https://www.capitalismlab.com/" target="_blank" rel="noopener noreferrer"
-             aria-label="View Capitalism Lab official site (opens a new tab)">
+          <div class="cabinet-link" role="group" aria-label="Capitalism Lab reference entry">
             <div class="art">
               <img src="assets/capitalismlab.svg" alt="Capitalism Lab abstract digital commerce artwork" width="800" height="500" loading="lazy">
               <span class="art-index" aria-hidden="true">35</span>
@@ -891,25 +889,24 @@
             <div class="body">
               <div class="title-row">
                 <h2>Capitalism Lab</h2>
-                <span class="chip external">Official site</span>
+                <span class="chip external">Reference only</span>
               </div>
-              <p>The official successor to Capitalism II. It is a commercial Windows game;
-                the official site has product and download information, but it does not run here.</p>
+              <p>The successor to Capitalism II. It is a Windows game and does not run in
+                this browser cabinet.</p>
               <div class="card-foot">
-                <span class="progress">Not playable in this arcade</span>
-                <span class="cta">Official site <span aria-hidden="true">↗</span></span>
+                <span class="progress">Not installed</span>
+                <span class="cta">Reference only</span>
               </div>
             </div>
-          </a>
+          </div>
         </article>
         <article class="cabinet gta2" data-game="gta2" data-kind="external" style="--i:35; --accent:#e5c15b">
-          <a class="cabinet-link" href="https://en.wikipedia.org/wiki/Grand_Theft_Auto_2" target="_blank" rel="noopener noreferrer"
-             aria-label="Read about Grand Theft Auto 2 (opens a new tab)">
+          <div class="cabinet-link" role="group" aria-label="Grand Theft Auto 2 reference entry">
             <div class="art">
               <img src="assets/gta2.svg" alt="Original top-down pixel-art city scene for GTA 2" width="800" height="500" loading="lazy">
               <span class="art-index" aria-hidden="true">36</span>
               <span class="art-tag">PC &middot; 1999</span>
-              <span class="play-badge" aria-hidden="true">↗</span>
+              <span class="play-badge" aria-hidden="true">i</span>
             </div>
             <div class="body">
               <div class="title-row">
@@ -919,11 +916,33 @@
               <p>Yes—the 1999 GTA 2 is the top-down city game. It needs its Windows game files and a compatible runtime, neither of which this browser arcade currently bundles.</p>
               <div class="card-foot">
                 <span class="progress">Reference only · not playable here</span>
-                <span class="cta">Game info <span aria-hidden="true">↗</span></span>
+                <span class="cta">Reference only</span>
+              </div>
+            </div>
+          </div>
+        </article>
+        <article class="cabinet flash-player" data-game="flash-player" data-kind="flash" style="--i:37; --accent:#59f3ff">
+          <a class="cabinet-link" href="games/flash/" aria-label="Load your own Flash SWF">
+            <div class="art">
+              <img src="assets/flash.svg" alt="Abstract neon Flash player artwork" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">38</span>
+              <span class="art-tag">FLASH · LOCAL PLAYER</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Load a Flash game</h2>
+                <span class="chip wasm">Ruffle player</span>
+              </div>
+              <p>Choose an SWF file from your device and run it locally with Ruffle. Your file is not uploaded or saved by the arcade.</p>
+              <div class="card-foot">
+                <span class="progress">Bring your own SWF</span>
+                <span class="cta">Open player <span aria-hidden="true">→</span></span>
               </div>
             </div>
           </a>
         </article>
+      </div>
       <p class="selector-empty" id="selector-empty" hidden>No cabinets in this class. Try another filter.</p>
     </section>
 
@@ -943,12 +962,12 @@
       </div>
       <div class="note">
         <h2>More classics, done right</h2>
-        <p>Quake II's demo now opens in Qwasm2; Quake III Arena and Capitalism II/Lab link to
-          their official PC releases because they need separate engines or Windows installs.
-        GTA 2 is the 1999 top-down classic; this selector links to background information
-        because its Windows files and runtime are not bundled.
+        <p>Quake II, Quake III Arena, Capitalism II/Lab and GTA 2 are reference entries only;
+          their engines, Windows installs or data are not bundled, and the cards do not navigate
+          off-site.
           The free Carmageddon demo still fails to boot in this DOSBox build, so it is not
-          marked as playable.</p>
+          marked as playable. The Flash filter offers a local Ruffle player for SWFs you
+          provide; it contains no external game links or redistributed commercial SWFs.</p>
       </div>
       <div class="note">
         <h2>Saves that stay put</h2>
@@ -1025,7 +1044,6 @@ tar --format=ustar -czhf pop2-data.tar.gz -C /tmp/pop2 app data pop2</code></pre
     </p>
     <div class="sheet-actions">
       <a class="button primary" href="games/pop2/">Open Prince of Persia 2</a>
-      <a class="button" href="https://github.com/mac-recomp/pop2" target="_blank" rel="noopener">Prep tools on GitHub</a>
     </div>
   </dialog>
 
@@ -1105,12 +1123,11 @@ GAME.EXE</code></pre>
     </ol>
     <p class="sheet-note">
       Shareware Quake data is not redistributed by this arcade; supply it from your own
-      copy. LibreQuake is an independent free data project. Engine by
-      <a href="https://github.com/GMH-Code/Qwasm" target="_blank" rel="noopener">Qwasm</a>.
+      copy. LibreQuake is an independent free data project. The Qwasm engine and
+      preparation instructions are included locally in this repository.
     </p>
     <div class="sheet-actions">
       <a class="button primary" href="games/quake/">Open Quake</a>
-      <a class="button" href="https://github.com/GMH-Code/Qwasm" target="_blank" rel="noopener">Qwasm on GitHub</a>
     </div>
   </dialog>
 
