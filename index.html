@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#05060a">
-  <meta name="description" content="A browser arcade of DOS and PC classics: 32 local games, Quake II's browser demo, plus links to Quake III Arena and the Capitalism series.">
+  <meta name="description" content="A browser arcade of DOS and PC classics: 32 local games, Quake II's browser demo, plus links to Quake III Arena, the Capitalism series, and GTA 2.">
   <title>WASM Arcade — authentic classics in the browser</title>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css?v=20261108">
@@ -37,7 +37,7 @@
           aria-describedby="coverflow-live"></canvas>
         <div class="coverflow-heading" aria-hidden="true">
           <span>ARCADE <i>SELECT</i></span>
-          <span id="coverflow-index">01 <b>/</b> 36</span>
+          <span id="coverflow-index">01 <b>/</b> 37</span>
         </div>
         <span class="coverflow-live" id="coverflow-live" aria-live="polite"></span>
         <div class="library-controls">
@@ -72,7 +72,7 @@
         </div>
         <div class="selector" role="tablist" aria-label="Filter games">
           <button type="button" class="selector-btn is-active" role="tab" aria-selected="true" data-filter="all">
-            All <b data-count-for="all">36</b>
+            All <b data-count-for="all">37</b>
           </button>
           <button type="button" class="selector-btn" role="tab" aria-selected="false" data-filter="wasm">
             WASM <b data-count-for="wasm">3</b>
@@ -84,12 +84,12 @@
             Your data <b data-count-for="data">1</b>
           </button>
           <button type="button" class="selector-btn" role="tab" aria-selected="false" data-filter="external">
-            External <b data-count-for="external">4</b>
+            External <b data-count-for="external">5</b>
           </button>
           <span class="selector-glint" aria-hidden="true"></span>
         </div>
       </div>
-      <p class="selector-status" id="selector-status" aria-live="polite">Showing 36 of 36 entries</p>
+      <p class="selector-status" id="selector-status" aria-live="polite">Showing 37 of 37 entries</p>
 
       <div class="cabinets" id="cabinet-grid">
 
@@ -902,6 +902,28 @@
             </div>
           </a>
         </article>
+        <article class="cabinet gta2" data-game="gta2" data-kind="external" style="--i:35; --accent:#e5c15b">
+          <a class="cabinet-link" href="https://en.wikipedia.org/wiki/Grand_Theft_Auto_2" target="_blank" rel="noopener noreferrer"
+             aria-label="Read about Grand Theft Auto 2 (opens a new tab)">
+            <div class="art">
+              <img src="assets/gta2.svg" alt="Original top-down pixel-art city scene for GTA 2" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">36</span>
+              <span class="art-tag">PC &middot; 1999</span>
+              <span class="play-badge" aria-hidden="true">↗</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Grand Theft Auto <b>2</b></h2>
+                <span class="chip external">Top-down classic</span>
+              </div>
+              <p>Yes—the 1999 GTA 2 is the top-down city game. It needs its Windows game files and a compatible runtime, neither of which this browser arcade currently bundles.</p>
+              <div class="card-foot">
+                <span class="progress">Reference only · not playable here</span>
+                <span class="cta">Game info <span aria-hidden="true">↗</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
       <p class="selector-empty" id="selector-empty" hidden>No cabinets in this class. Try another filter.</p>
     </section>
 
@@ -923,6 +945,8 @@
         <h2>More classics, done right</h2>
         <p>Quake II's demo now opens in Qwasm2; Quake III Arena and Capitalism II/Lab link to
           their official PC releases because they need separate engines or Windows installs.
+        GTA 2 is the 1999 top-down classic; this selector links to background information
+        because its Windows files and runtime are not bundled.
           The free Carmageddon demo still fails to boot in this DOSBox build, so it is not
           marked as playable.</p>
       </div>

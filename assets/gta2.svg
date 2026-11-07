@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1">
+      <stop stop-color="#172638"/>
+      <stop offset="1" stop-color="#080d14"/>
+    </linearGradient>
+    <linearGradient id="street" x2="0" y2="1">
+      <stop stop-color="#343b3c"/>
+      <stop offset="1" stop-color="#171e22"/>
+    </linearGradient>
+    <linearGradient id="gold" x2="0" y2="1">
+      <stop stop-color="#fff1a3"/>
+      <stop offset="1" stop-color="#cb923b"/>
+    </linearGradient>
+    <pattern id="windows" width="35" height="30" patternUnits="userSpaceOnUse">
+      <rect x="5" y="5" width="15" height="12" rx="1" fill="#e1ae54" opacity=".55"/>
+      <rect x="24" y="5" width="7" height="12" rx="1" fill="#6ba6b3" opacity=".4"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="500" fill="url(#sky)"/>
+  <g opacity=".28" fill="#b9d1d1">
+    <circle cx="59" cy="49" r="1"/><circle cx="174" cy="31" r="1.5"/>
+    <circle cx="348" cy="53" r="1"/><circle cx="714" cy="47" r="1.5"/>
+    <circle cx="633" cy="29" r="1"/><circle cx="522" cy="66" r="1"/>
+  </g>
+  <path fill="#3c4441" d="M0 113h800v41H0zM0 382h800v42H0z"/>
+  <path fill="url(#street)" d="M0 154h800v228H0z"/>
+  <path fill="#c6a567" opacity=".75" d="M0 153h800v5H0zM0 378h800v5H0z"/>
+  <path stroke="#d7c58c" stroke-dasharray="31 25" stroke-width="4" opacity=".6" d="M0 269h800"/>
+  <g fill="#283038" stroke="#71817b" stroke-width="2">
+    <path d="M36 28h220v83H36zM286 20h159v91H286zM478 35h286v76H478z"/>
+    <path d="M30 424h243v59H30zM301 424h184v59H301zM515 424h249v59H515z"/>
+  </g>
+  <g opacity=".8">
+    <path fill="url(#windows)" d="M45 37h201v65H45zM295 29h141v73H295zM487 44h268v58H487z"/>
+    <path fill="url(#windows)" d="M39 431h225v45H39zM310 431h166v45H310zM524 431h232v45H524z"/>
+  </g>
+  <g fill="#20282d" stroke="#a49b79" stroke-width="2">
+    <path d="M128 208h143v49H128z"/>
+    <path d="M503 294h157v52H503z"/>
+  </g>
+  <g fill="#b74937" stroke="#f1c878" stroke-width="2">
+    <path d="M202 281h91l14 18v27h-120v-26z"/>
+    <path d="M562 185h88l18 17v29H545v-27z"/>
+  </g>
+  <g fill="#88aeb1">
+    <path d="M219 286h24v13h-24zM254 286h23v13h-23z"/>
+    <path d="M563 190h26v13h-26zM599 190h28v13h-28z"/>
+  </g>
+  <g fill="#e4d59c">
+    <circle cx="192" cy="319" r="4"/><circle cx="291" cy="319" r="4"/>
+    <circle cx="553" cy="224" r="4"/><circle cx="659" cy="224" r="4"/>
+  </g>
+  <path fill="#11171c" d="M0 0h800v104H0z" opacity=".82"/>
+  <text x="34" y="42" fill="#a5bec0" font-family="monospace" font-size="13" letter-spacing="5">1999 · TOP-DOWN CITY CLASSIC</text>
+  <text x="32" y="88" fill="url(#gold)" font-family="Arial, sans-serif" font-size="43" font-weight="800" letter-spacing="2">GRAND THEFT AUTO 2</text>
+  <path stroke="#d7b85d" stroke-width="2" opacity=".85" d="M35 98h292"/>
+  <rect width="800" height="500" fill="none" stroke="#bca85d" stroke-opacity=".42" stroke-width="3"/>
+</svg>

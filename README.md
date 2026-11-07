@@ -26,9 +26,9 @@ The landing page (`index.html`) is a bespoke, responsive console menu with a
 game-first WebGL coverflow. The covers are textured 3D cards with live highlights;
 arrow keys, swipes and on-screen arrows browse them. It falls back to the regular
 game shelf when WebGL is unavailable and retains the custom cursor on desktop.
-The library includes the 32 local cabinets and four external launch links: a
-browser-playable Quake II demo plus official pages for Quake III Arena and
-Capitalism II/Lab. Optional procedural interface sounds and an original
+The library includes the 32 local cabinets and five external/reference entries:
+a browser-playable Quake II demo, official pages for Quake III Arena and
+Capitalism II/Lab, and a reference entry for GTA 2. Optional procedural interface sounds and an original
 ambient DnB loop—with a slow minor-key chord progression, soft synthesized reverb
 and understated breakbeat—are generated locally and start only after choosing
 **Sound on**. Audio pauses when the menu tab is hidden or you leave for a game.
@@ -74,12 +74,12 @@ config. They boot straight into the game, with no file picker and no setup.
 | **Prince of Persia 2 (DOS demo)** | `games/pop2demo/` | Freely distributable demo (Brøderbund) |
 
 **External links:** Quake II's browser demo opens on Qwasm2. Quake III Arena and
-Capitalism II/Lab have links to their official PC releases in the selector, but
-they do not run inside this arcade. Quake III needs a separate WebAssembly engine;
-Capitalism II/Lab are Windows games, not DOS bundles. No commercial game data is
-bundled. The free *Carmageddon* demo was evaluated but does not boot reliably under
-this js-dos build, so it is not listed as playable. The Mac PoP2 cabinet continues
-to support bring-your-own full data.
+Capitalism II/Lab link to their official PC releases but do not run inside this
+arcade. GTA 2 is included as a reference entry: the 1999 top-down Windows game
+needs game files and a compatible runtime that this arcade does not provide.
+No commercial game data is bundled. The free *Carmageddon* demo was evaluated
+but does not boot reliably under this js-dos build, so it is not listed as
+playable. The Mac PoP2 cabinet continues to support bring-your-own full data.
 
 > **Glace:** `assets/glace-1.png` and `assets/glace-2.png` are kept in the repo,
 > but there is no Glace game data or WebAssembly port in this project, so Glace is
@@ -153,8 +153,11 @@ the data prompt, or open `games/pop2demo/` directly.
 All 25 DOS cabinets pass keyboard input straight to DOSBox. Click the game once
 to capture the mouse where the game needs it; `Esc` releases it. Standalone
 games use their original keys (arrows/WASD, `Ctrl`, `Space`, `Enter`, function
-keys). Every cabinet has a **Fullscreen** button in the header, and js-dos
-provides its own touch/on-screen controls where supported.
+keys). Every cabinet has a **Fullscreen** button in the header. Touch devices
+get per-game action controls, plus a **Keyboard** toggle in the controller
+settings for an on-screen QWERTY keyboard. **Key labels** switches the action
+buttons to their literal keyboard keys; a physical keyboard works when the game
+is focused.
 
 ### 2048
 

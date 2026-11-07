@@ -206,7 +206,9 @@ body.has-touch-controls .frame > #dos {
   letter-spacing: .12em;
 }
 .touch-layout,
-.touch-haptics {
+.touch-haptics,
+.touch-key-mode,
+.touch-keyboard-toggle {
   min-height: 28px;
   padding: 0 9px;
   border: 1px solid rgba(89, 243, 255, .24);
@@ -217,17 +219,31 @@ body.has-touch-controls .frame > #dos {
   letter-spacing: .04em;
 }
 .touch-layout:focus-visible,
-.touch-haptics:focus-visible {
+.touch-haptics:focus-visible,
+.touch-key-mode:focus-visible,
+.touch-keyboard-toggle:focus-visible {
   outline: 1px solid var(--accent-2);
   outline-offset: 2px;
 }
-.touch-haptics {
+.touch-haptics,
+.touch-key-mode,
+.touch-keyboard-toggle {
   border-color: rgba(140, 215, 255, .14);
   color: var(--muted);
 }
-.touch-haptics[aria-pressed="true"] {
+.touch-haptics[aria-pressed="true"],
+.touch-key-mode[aria-pressed="true"] {
   border-color: color-mix(in srgb, var(--accent-2) 60%, transparent);
   color: var(--accent-2);
+}
+.touch-keyboard-toggle[aria-pressed="true"] {
+  border-color: color-mix(in srgb, var(--accent) 70%, transparent);
+  color: var(--accent);
+}
+.touch-keyboard-hint {
+  flex-basis: 100%;
+  color: var(--dim);
+  font: 600 8px/1.4 var(--mono);
 }
 .touch-side {
   position: relative;
@@ -507,6 +523,55 @@ body.has-touch-controls .frame > #dos {
     0 4px 8px rgba(0, 0, 0, .42),
     inset 0 2px 5px rgba(0, 0, 0, .38);
 }
+.touch-keyboard { display: none; }
+.touch-keyboard[hidden] { display: none; }
+.touch-controls[data-input-mode="keyboard"] .touch-side { display: none; }
+.touch-controls[data-input-mode="keyboard"] .touch-keyboard {
+  display: flex;
+  grid-area: 2 / 1 / 3 / -1;
+}
+.touch-keyboard {
+  position: relative;
+  z-index: 4;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+  padding: 5px max(5px, env(safe-area-inset-right)) max(5px, env(safe-area-inset-bottom)) max(5px, env(safe-area-inset-left));
+  background:
+    radial-gradient(ellipse at 15% 100%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 50%),
+    radial-gradient(ellipse at 85% 100%, color-mix(in srgb, var(--accent-2) 10%, transparent), transparent 50%),
+    linear-gradient(180deg, rgba(10, 15, 23, .95), rgba(5, 8, 13, .99));
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.touch-keyboard-row {
+  display: flex;
+  justify-content: center;
+  gap: 3px;
+  min-width: 0;
+}
+.touchboard-key {
+  flex: 1 1 0;
+  width: auto;
+  height: auto;
+  min-width: 0;
+  min-height: clamp(24px, 4.7dvh, 36px);
+  padding: 1px;
+  border-radius: 6px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--accent) 18%, #26313e), #101720);
+  box-shadow:
+    0 3px 0 #030509,
+    0 4px 8px rgba(0, 0, 0, .4),
+    inset 0 1px 0 rgba(255, 255, 255, .16);
+  font: 700 10px/1 var(--mono);
+}
+.touchboard-key.is-wide { flex-grow: 1.65; }
+.touchboard-key[data-key="Space"] { flex-grow: 4; }
+.touchboard-key:active,
+.touchboard-key.is-down { transform: translateY(2px); }
 
 .touch-controls[data-layout="dpad"] .move-stick,
 .touch-controls[data-layout="analog"] .touch-dpad,
@@ -522,6 +587,12 @@ body.has-touch-controls .frame > #dos {
 .touch-controls[data-layout="combo"] .touch-dpad { display: grid; }
 .touch-controls[data-layout="dual"] .touch-actions {
   gap: 7px;
+}
+body.has-touch-controls .frame.is-keyboard-mode {
+  grid-template-rows: minmax(0, 1fr) clamp(174px, 31dvh, 240px);
+}
+body.has-touch-controls .frame.is-keyboard-mode > #dos {
+  grid-area: 1 / 1 / 2 / -1;
 }
 .touch-controls[data-layout="analog"] .touch-move > .touch-label,
 .touch-controls[data-layout="dual"] .touch-move > .touch-label,
@@ -562,7 +633,9 @@ body.has-touch-controls .frame > #dos {
     padding: 3px;
   }
   .touch-layout,
-  .touch-haptics { min-height: 26px; padding-inline: 7px; }
+  .touch-haptics,
+  .touch-key-mode,
+  .touch-keyboard-toggle { min-height: 26px; padding-inline: 7px; }
   .touch-controls[data-layout="combo"] .touch-move {
     flex-direction: row;
     gap: 5px;
@@ -597,6 +670,10 @@ body.has-touch-controls .frame > #dos {
     width: 100%;
     height: 100%;
   }
+  .touchboard-key {
+    height: clamp(20px, 4dvh, 28px);
+    min-height: clamp(20px, 4dvh, 28px);
+  }
   .touch-actions > .touch-label { display: none; }
 }
 
@@ -614,6 +691,10 @@ body.has-touch-controls .frame > #dos {
     grid-template-rows: repeat(3, 34px);
     grid-auto-rows: 34px;
     gap: 2px;
+  }
+  .touchboard-key {
+    height: clamp(20px, 5dvh, 27px);
+    min-height: clamp(20px, 5dvh, 27px);
   }
   .touch-controls[data-layout="combo"] .touch-move {
     gap: 5px;
@@ -648,6 +729,13 @@ body.has-touch-controls .frame > #dos {
   .touch-controls[data-layout="dual"] .touch-action-key {
     width: 100%;
     height: 100%;
+  }
+}
+
+@media (max-width: 760px) and (orientation: landscape) {
+  body.has-touch-controls .frame.is-keyboard-mode {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) clamp(150px, 34dvh, 210px);
   }
 }
 

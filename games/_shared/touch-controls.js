@@ -174,7 +174,10 @@ if (dosRoot && frame && hasTouch && !frame.querySelector('.touch-controls')) {
     ? '<option value="dual">Dual Analog</option>' : ''}
           </select>
         </label>
+        <button class="touch-key-mode" type="button" aria-pressed="false">Key labels</button>
+        <button class="touch-keyboard-toggle" type="button" aria-pressed="false">Keyboard</button>
         <button class="touch-haptics" type="button" aria-pressed="false">Haptics off</button>
+        <span class="touch-keyboard-hint">A physical keyboard also works when the game is focused.</span>
       </div>
     </details>
     <section class="touch-side touch-move" aria-label="Movement controls">
@@ -211,7 +214,7 @@ if (dosRoot && frame && hasTouch && !frame.querySelector('.touch-controls')) {
     button.className = `touch-key touch-action-key${utilityClass}`;
     button.type = 'button';
     button.dataset.key = key;
-    button.setAttribute('aria-label', `${label} (${keyLabels[key]})`);
+    button.dataset.action = label;
 
     const actionName = document.createElement('span');
     actionName.className = 'touch-action-name';
@@ -222,16 +225,67 @@ if (dosRoot && frame && hasTouch && !frame.querySelector('.touch-controls')) {
     button.append(actionName, keyHint);
     actionGrid.append(button);
   });
+  const keyboard = document.createElement('section');
+  keyboard.className = 'touch-keyboard';
+  keyboard.setAttribute('aria-label', 'On-screen keyboard');
+  keyboard.hidden = true;
+  const keyboardRows = [
+    ['Backquote', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal', 'Backspace'],
+    ['KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP', 'BracketLeft', 'BracketRight'],
+    ['KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL', 'Semicolon', 'Quote', 'Enter'],
+    ['Shift', 'KeyZ', 'KeyX', 'KeyC', 'KeyV', 'KeyB', 'KeyN', 'KeyM', 'Comma', 'Period', 'Slash', 'Backslash'],
+    ['Control', 'Alt', 'Tab', 'Space', 'Escape', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'ArrowRight'],
+  ];
+  const keyboardLabels = {
+    Backspace: '⌫',
+    Control: 'Ctrl',
+    Backquote: '`',
+    Minus: '-',
+    Equal: '=',
+    BracketLeft: '[',
+    BracketRight: ']',
+    Semicolon: ';',
+    Quote: "'",
+    Comma: ',',
+    Period: '.',
+    Slash: '/',
+    Backslash: '\\',
+    ArrowLeft: '←',
+    ArrowDown: '↓',
+    ArrowUp: '↑',
+    ArrowRight: '→',
+  };
+  keyboardRows.forEach((row) => {
+    const rowElement = document.createElement('div');
+    rowElement.className = 'touch-keyboard-row';
+    row.forEach((keyName) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `touch-key touchboard-key${['Space', 'Enter', 'Backspace'].includes(keyName) ? ' is-wide' : ''}`;
+      button.dataset.key = keyName;
+      button.textContent = keyboardLabels[keyName] || keyName
+        .replace(/^Key/, '')
+        .replace(/^Digit/, '');
+      button.setAttribute('aria-label', `${keyName} key`);
+      rowElement.append(button);
+    });
+    keyboard.append(rowElement);
+  });
+  controls.append(keyboard);
   frame.append(controls);
   const header = document.querySelector('.bar');
   const toolbar = controls.querySelector('.touch-toolbar');
   if (header && toolbar) header.append(toolbar);
   const layoutSelect = toolbar.querySelector('.touch-layout');
+  const keyModeButton = toolbar.querySelector('.touch-key-mode');
+  const keyboardToggle = toolbar.querySelector('.touch-keyboard-toggle');
   const hapticsButton = toolbar.querySelector('.touch-haptics');
   let savedLayout = null;
+  let keyLabelsEnabled = false;
   let hapticsEnabled = false;
   try {
     savedLayout = localStorage.getItem(`arcade.touch.layout.${gameSlug}`);
+    keyLabelsEnabled = localStorage.getItem('arcade.touch.key-labels') === '1';
     hapticsEnabled = localStorage.getItem('arcade.touch.haptics') === '1';
   } catch (_) {
     savedLayout = null;
@@ -245,6 +299,21 @@ if (dosRoot && frame && hasTouch && !frame.querySelector('.touch-controls')) {
     : defaultLayout;
   layoutSelect.value = initialLayout;
   controls.dataset.layout = initialLayout;
+  controls.dataset.inputMode = keyLabelsEnabled ? 'keys' : 'actions';
+  keyModeButton.setAttribute('aria-pressed', String(keyLabelsEnabled));
+  keyModeButton.textContent = keyLabelsEnabled ? 'Action labels' : 'Key labels';
+  for (const button of actionGrid.querySelectorAll('.touch-action-key')) {
+    const actionName = button.querySelector('.touch-action-name');
+    const keyHint = button.querySelector('.touch-key-hint');
+    actionName.textContent = keyLabelsEnabled ? keyLabels[button.dataset.key] : button.dataset.action;
+    keyHint.textContent = keyLabelsEnabled ? button.dataset.action : keyLabels[button.dataset.key];
+    button.setAttribute(
+      'aria-label',
+      keyLabelsEnabled
+        ? `${keyLabels[button.dataset.key]} key (${button.dataset.action})`
+        : `${button.dataset.action} (${keyLabels[button.dataset.key]})`,
+    );
+  }
   hapticsButton.setAttribute('aria-pressed', String(hapticsEnabled));
   hapticsButton.textContent = typeof navigator.vibrate === 'function'
     ? (hapticsEnabled ? 'Haptics on' : 'Haptics off')
@@ -260,6 +329,42 @@ if (dosRoot && frame && hasTouch && !frame.querySelector('.touch-controls')) {
       console.warn('Unable to save touch layout:', error);
     }
     releaseAll();
+    toolbar.open = false;
+  });
+
+  keyModeButton.addEventListener('click', () => {
+    keyLabelsEnabled = !keyLabelsEnabled;
+    controls.dataset.inputMode = keyLabelsEnabled ? 'keys' : 'actions';
+    keyModeButton.setAttribute('aria-pressed', String(keyLabelsEnabled));
+    keyModeButton.textContent = keyLabelsEnabled ? 'Action labels' : 'Key labels';
+    for (const button of actionGrid.querySelectorAll('.touch-action-key')) {
+      const actionName = button.querySelector('.touch-action-name');
+      const keyHint = button.querySelector('.touch-key-hint');
+      actionName.textContent = keyLabelsEnabled ? keyLabels[button.dataset.key] : button.dataset.action;
+      keyHint.textContent = keyLabelsEnabled ? button.dataset.action : keyLabels[button.dataset.key];
+      button.setAttribute(
+        'aria-label',
+        keyLabelsEnabled
+          ? `${keyLabels[button.dataset.key]} key (${button.dataset.action})`
+          : `${button.dataset.action} (${keyLabels[button.dataset.key]})`,
+      );
+    }
+    try {
+      localStorage.setItem('arcade.touch.key-labels', keyLabelsEnabled ? '1' : '0');
+    } catch (error) {
+      console.warn('Unable to save touch key-label preference:', error);
+    }
+    toolbar.open = false;
+  });
+
+  keyboardToggle.addEventListener('click', () => {
+    const keyboardOpen = controls.dataset.inputMode !== 'keyboard';
+    releaseAll();
+    controls.dataset.inputMode = keyboardOpen ? 'keyboard' : 'actions';
+    frame.classList.toggle('is-keyboard-mode', keyboardOpen);
+    keyboard.hidden = !keyboardOpen;
+    keyboardToggle.setAttribute('aria-pressed', String(keyboardOpen));
+    keyboardToggle.textContent = keyboardOpen ? 'Actions' : 'Keyboard';
     toolbar.open = false;
   });
 
@@ -297,7 +402,33 @@ if (dosRoot && frame && hasTouch && !frame.querySelector('.touch-controls')) {
     Escape: { key: 'Escape', code: 'Escape', keyCode: 27 },
     Tab: { key: 'Tab', code: 'Tab', keyCode: 9 },
     Shift: { key: 'Shift', code: 'ShiftLeft', keyCode: 16 },
+    Backspace: { key: 'Backspace', code: 'Backspace', keyCode: 8 },
+    Minus: { key: '-', code: 'Minus', keyCode: 189 },
+    Equal: { key: '=', code: 'Equal', keyCode: 187 },
+    BracketLeft: { key: '[', code: 'BracketLeft', keyCode: 219 },
+    BracketRight: { key: ']', code: 'BracketRight', keyCode: 221 },
+    Semicolon: { key: ';', code: 'Semicolon', keyCode: 186 },
+    Quote: { key: "'", code: 'Quote', keyCode: 222 },
+    Comma: { key: ',', code: 'Comma', keyCode: 188 },
+    Period: { key: '.', code: 'Period', keyCode: 190 },
+    Slash: { key: '/', code: 'Slash', keyCode: 191 },
+    Backquote: { key: '`', code: 'Backquote', keyCode: 192 },
+    Backslash: { key: '\\', code: 'Backslash', keyCode: 220 },
   };
+  for (const letter of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
+    keys[`Key${letter}`] = {
+      key: letter.toLowerCase(),
+      code: `Key${letter}`,
+      keyCode: letter.charCodeAt(0),
+    };
+  }
+  for (let digit = 0; digit <= 9; digit += 1) {
+    keys[`Digit${digit}`] = {
+      key: String(digit),
+      code: `Digit${digit}`,
+      keyCode: 48 + digit,
+    };
+  }
   const activePointers = new Map();
   const pressedCounts = new Map();
 
