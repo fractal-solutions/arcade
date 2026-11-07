@@ -148,8 +148,12 @@ const defaultActions = [
 if (dosRoot && frame && hasTouch && !frame.querySelector('.touch-controls')) {
   document.body.classList.add('has-touch-controls');
 
-  const bundle = dosRoot.dataset.bundle || '';
-  const gameSlug = bundle.replace(/\.jsdos$/i, '') ||
+  const queryBundle = new URLSearchParams(location.search).get('url');
+  const queryBundleName = queryBundle
+    ? new URL(queryBundle, location.href).pathname.split('/').pop()
+    : '';
+  const bundle = dosRoot.dataset.bundle || queryBundleName || '';
+  const gameSlug = bundle.replace(/\.jsdos$/i, '').toLowerCase() ||
     location.pathname.split('/').filter(Boolean).pop();
   const actions = profiles[gameSlug] || defaultActions;
 
@@ -209,6 +213,17 @@ if (dosRoot && frame && hasTouch && !frame.querySelector('.touch-controls')) {
     actionGrid.append(button);
   });
   frame.append(controls);
+  const header = document.querySelector('.bar');
+  if (header && typeof ResizeObserver === 'function') {
+    const updateToolbarPosition = () => {
+      const bottom = Math.ceil(header.getBoundingClientRect().bottom);
+      controls.style.setProperty('--touch-toolbar-top', `${Math.max(52, bottom + 8)}px`);
+    };
+    const headerObserver = new ResizeObserver(updateToolbarPosition);
+    headerObserver.observe(header);
+    updateToolbarPosition();
+    window.addEventListener('pagehide', () => headerObserver.disconnect(), { once: true });
+  }
   const layoutSelect = controls.querySelector('.touch-layout');
   const hapticsButton = controls.querySelector('.touch-haptics');
   let savedLayout = null;
@@ -343,22 +358,28 @@ if (dosRoot && frame && hasTouch && !frame.querySelector('.touch-controls')) {
     activePointers.delete(pointerId);
   }
 
-  const activeStickDirections = (stick, event) => {
+  function moveStickNub(stick, event) {
     const rect = stick.getBoundingClientRect();
-    const radius = Math.max(1, Math.min(rect.width, rect.height) * 0.36);
-    const dx = Math.max(-1, Math.min(1, (event.clientX - (rect.left + rect.width / 2)) / radius));
-    const dy = Math.max(-1, Math.min(1, (event.clientY - (rect.top + rect.height / 2)) / radius));
-    const magnitude = Math.hypot(dx, dy);
-    const threshold = 0.27;
-    const keysDown = [];
-    if (magnitude >= threshold) {
-      if (Math.abs(dx) > 0.28) keysDown.push(dx < 0 ? 'ArrowLeft' : 'ArrowRight');
-      if (Math.abs(dy) > 0.28) keysDown.push(dy < 0 ? 'ArrowUp' : 'ArrowDown');
-    }
-    const travelX = dx * radius * 0.58;
-    const travelY = dy * radius * 0.58;
+    const radius = Math.max(1, Math.min(rect.width, rect.height) / 2);
+    const dx = event.clientX - (rect.left + rect.width / 2);
+    const dy = event.clientY - (rect.top + rect.height / 2);
+    const distance = Math.hypot(dx, dy);
+    const travel = radius * 0.34;
+    const scale = distance > travel ? travel / distance : 1;
     stick.querySelector('.touch-stick-nub').style.transform =
-      `translate(calc(-50% + ${travelX}px), calc(-50% + ${travelY}px))`;
+      `translate(calc(-50% + ${dx * scale}px), calc(-50% + ${dy * scale}px))`;
+    return { dx: dx / radius, dy: dy / radius, distance: distance / radius };
+  }
+
+  const activeStickDirections = (stick, event) => {
+    const { dx, dy, distance } = moveStickNub(stick, event);
+    const keysDown = [];
+    if (distance >= 0.2) {
+      if (dx > 0.38) keysDown.push('ArrowRight');
+      if (dx < -0.38) keysDown.push('ArrowLeft');
+      if (dy > 0.38) keysDown.push('ArrowDown');
+      if (dy < -0.38) keysDown.push('ArrowUp');
+    }
     return keysDown;
   };
 
@@ -385,12 +406,7 @@ if (dosRoot && frame && hasTouch && !frame.querySelector('.touch-controls')) {
       if (event.pointerId !== activePointer) return;
       event.preventDefault();
       if (look) {
-        const rect = stick.getBoundingClientRect();
-        const radius = Math.max(1, Math.min(rect.width, rect.height) * 0.36);
-        const dx = Math.max(-1, Math.min(1, (event.clientX - (rect.left + rect.width / 2)) / radius));
-        const dy = Math.max(-1, Math.min(1, (event.clientY - (rect.top + rect.height / 2)) / radius));
-        const nub = stick.querySelector('.touch-stick-nub');
-        nub.style.transform = `translate(calc(-50% + ${dx * radius * 0.58}px), calc(-50% + ${dy * radius * 0.58}px))`;
+        moveStickNub(stick, event);
         const overlay = dosRoot.querySelector('.emulator-mouse-overlay');
         const movementX = event.clientX - lookLastX;
         const movementY = event.clientY - lookLastY;

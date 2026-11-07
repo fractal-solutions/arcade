@@ -230,9 +230,23 @@ body.has-touch-controls .frame > #dos {
   letter-spacing: .16em;
 }
 .touch-dpad {
+  position: relative;
   display: grid;
   grid-template: repeat(3, 1fr) / repeat(3, 1fr);
   gap: 3px;
+  isolation: isolate;
+  filter: drop-shadow(0 5px 5px rgba(0, 0, 0, .48));
+}
+.touch-dpad::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border: 1px solid rgba(140, 225, 255, .18);
+  border-radius: 8px;
+  background: linear-gradient(155deg, rgba(42, 52, 64, .98), rgba(11, 17, 25, .98));
+  clip-path: polygon(33.33% 0, 66.67% 0, 66.67% 33.33%, 100% 33.33%, 100% 66.67%, 66.67% 66.67%, 66.67% 100%, 33.33% 100%, 33.33% 66.67%, 0 66.67%, 0 33.33%, 33.33% 33.33%);
+  content: "";
+  pointer-events: none;
 }
 .key-up { grid-area: 1 / 2; }
 .key-left { grid-area: 2 / 1; }
@@ -245,58 +259,96 @@ body.has-touch-controls .frame > #dos {
   font-size: 7px;
 }
 .touch-stick {
+  --stick-size: clamp(104px, min(26vh, 17vw), 168px);
   position: relative;
   display: none;
   flex: 0 0 auto;
-  width: clamp(72px, 17vh, 104px);
-  height: clamp(72px, 17vh, 104px);
-  border: 1px solid rgba(140, 225, 255, .34);
+  width: var(--stick-size);
+  height: var(--stick-size);
+  border: 1px solid rgba(206, 218, 228, .24);
   border-radius: 50%;
   background:
-    radial-gradient(circle at 50% 50%, rgba(89, 243, 255, .13), rgba(4, 8, 14, .38) 65%, rgba(4, 8, 14, .76));
-  box-shadow: inset 0 0 24px rgba(89, 243, 255, .08), 0 4px 12px rgba(0, 0, 0, .34);
+    radial-gradient(ellipse at 38% 18%, rgba(255, 255, 255, .12), transparent 38%),
+    radial-gradient(circle at 50% 35%, #34343b, #1a1a20 62%, #0b0b0e 100%);
+  box-shadow:
+    0 8px 0 #050506,
+    0 12px 24px rgba(0, 0, 0, .58),
+    inset 0 2px 2px rgba(255, 255, 255, .12),
+    inset 0 -12px 22px rgba(0, 0, 0, .7);
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
+.touch-stick::before {
+  position: absolute;
+  inset: 5%;
+  border: 1px solid rgba(255, 255, 255, .06);
+  border-radius: 50%;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, .48), 0 1px 0 rgba(255, 255, 255, .04);
+  content: "";
+  pointer-events: none;
+}
 .touch-stick-ring {
   position: absolute;
-  inset: 14%;
-  border: 1px dashed rgba(160, 218, 241, .24);
+  inset: 13%;
+  border: 1px dashed rgba(255, 255, 255, .11);
   border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .2);
   pointer-events: none;
 }
 .touch-stick-nub {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 42%;
-  height: 42%;
-  border: 2px solid rgba(124, 247, 196, .6);
+  width: 46%;
+  height: 46%;
+  border: 1px solid #55555f;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, rgba(124, 247, 196, .42), rgba(9, 24, 23, .86));
-  box-shadow: 0 0 14px rgba(124, 247, 196, .2), inset 0 1px 0 rgba(255, 255, 255, .24);
+  background:
+    radial-gradient(circle at 38% 27%, rgba(255, 255, 255, .23), transparent 23%),
+    radial-gradient(circle at 42% 32%, #55555f, #303039 48%, #1a1a20 78%, #111115 100%);
+  box-shadow:
+    0 5px 0 #08080a,
+    0 8px 18px rgba(0, 0, 0, .68),
+    inset 0 2px 2px rgba(255, 255, 255, .2),
+    inset 0 -4px 8px rgba(0, 0, 0, .4);
   pointer-events: none;
   transform: translate(-50%, -50%);
+  transition: transform 40ms linear, border-color 70ms ease, background 70ms ease;
 }
-.touch-stick.is-active .touch-stick-nub { border-color: var(--accent-2); }
+.touch-stick-nub::after {
+  position: absolute;
+  inset: 16%;
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 50%;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, .46);
+  content: "";
+}
+.touch-stick.is-active .touch-stick-nub {
+  border-color: #a28b64;
+  background:
+    radial-gradient(circle at 38% 27%, rgba(255, 255, 255, .25), transparent 23%),
+    radial-gradient(circle at 42% 32%, #655844, #393124 48%, #1d1912 78%, #11100d 100%);
+}
 .touch-stick::after {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  color: rgba(190, 213, 233, .52);
+  right: 0;
+  bottom: -16px;
+  left: 0;
+  color: rgba(190, 213, 233, .42);
   content: attr(aria-label);
-  font: 600 6px/1 var(--mono);
+  font: 600 7px/1 var(--mono);
   letter-spacing: .1em;
   pointer-events: none;
-  transform: translate(-50%, 32px);
+  text-align: center;
   white-space: nowrap;
 }
 .touch-action-grid {
   display: grid;
   grid-template-columns: repeat(3, clamp(34px, 9vh, 46px));
-  grid-template-rows: repeat(3, clamp(34px, 9vh, 46px)) 25px;
+  grid-template-rows: repeat(3, clamp(34px, 9vh, 46px));
+  grid-auto-rows: clamp(34px, 9vh, 46px);
   gap: 3px;
 }
 .touch-action-key {
@@ -311,10 +363,12 @@ body.has-touch-controls .frame > #dos {
 .touch-action-key:nth-child(3) { grid-area: 3 / 2; }
 .touch-action-key:nth-child(4) { grid-area: 2 / 1; }
 .touch-utility-key {
-  border-radius: 999px;
+  border-radius: 50%;
+  translate: 0 7px;
 }
-.touch-action-key:nth-child(5) { grid-area: 4 / 1 / 5 / 3; }
-.touch-action-key:nth-child(6) { grid-area: 4 / 3 / 5 / 4; }
+.touch-action-key:nth-child(5) { grid-area: 4 / 1; }
+.touch-action-key:nth-child(6) { grid-area: 4 / 2; }
+.touch-action-key:nth-child(7) { grid-area: 4 / 3; }
 .touch-utility-key .touch-action-name {
   font-size: 6px;
 }
@@ -356,7 +410,19 @@ body.has-touch-controls .frame > #dos {
   width: clamp(38px, 11vh, 46px);
   height: clamp(38px, 11vh, 46px);
   border-radius: 50%;
+  border-color: rgba(140, 225, 255, .22);
+  background: linear-gradient(155deg, rgba(42, 52, 64, .98), rgba(11, 17, 25, .98));
   font-size: 15px;
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, .48),
+    inset 0 1px 0 rgba(255, 255, 255, .12),
+    inset 0 -2px 0 rgba(0, 0, 0, .35);
+}
+.touch-dpad .key-center { border-radius: 50%; }
+.touch-action-key {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
 }
 .touch-key:active,
 .touch-key.is-down {
@@ -381,14 +447,17 @@ body.has-touch-controls .frame > #dos {
 .touch-controls[data-layout="dual"] .touch-actions {
   gap: 7px;
 }
+.touch-controls[data-layout="analog"] .touch-move > .touch-label,
+.touch-controls[data-layout="dual"] .touch-move > .touch-label,
+.touch-controls[data-layout="dual"] .touch-actions > .touch-label { display: none; }
 
 @media (orientation: portrait) {
   body.has-touch-controls .frame {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr) minmax(122px, 22dvh);
+    grid-template-rows: minmax(0, 1fr) minmax(144px, 24dvh);
   }
-  body.has-touch-controls .frame > #dos {
-    grid-area: 1 / 1 / 2 / 3;
+  .touch-stick {
+    --stick-size: clamp(104px, min(24dvh, 34vw), 138px);
   }
   .touch-move {
     grid-area: 2 / 1;
@@ -400,7 +469,10 @@ body.has-touch-controls .frame > #dos {
     padding: 4px max(4px, env(safe-area-inset-right)) max(4px, env(safe-area-inset-bottom)) 0;
     background: linear-gradient(180deg, rgba(6, 11, 18, .18), rgba(6, 11, 18, .82));
   }
-  .touch-side { gap: 4px; }
+  .touch-side {
+    gap: 4px;
+    transform: translateY(-8px);
+  }
   .touch-toolbar {
     top: max(6px, env(safe-area-inset-top));
     gap: 3px;
@@ -424,15 +496,24 @@ body.has-touch-controls .frame > #dos {
   }
   .touch-controls[data-layout="combo"] .touch-dpad .key-center { font-size: 6px; }
   .touch-controls[data-layout="combo"] .move-stick {
-    width: 72px;
-    height: 72px;
+    --stick-size: clamp(78px, 22vw, 96px);
   }
   .touch-key,
   .touch-dpad .touch-key {
     width: clamp(32px, 6vh, 40px);
     height: clamp(32px, 6vh, 40px);
   }
-  .touch-action-grid { gap: 3px; }
+  .touch-action-grid {
+    grid-template-columns: repeat(3, clamp(30px, 5dvh, 38px));
+    grid-template-rows: repeat(3, clamp(30px, 5dvh, 38px));
+    grid-auto-rows: clamp(30px, 5dvh, 38px);
+    gap: 2px;
+  }
+  .touch-action-key {
+    width: 100%;
+    height: 100%;
+  }
+  .touch-controls:not([data-layout="dual"]) .touch-actions > .touch-label { display: none; }
 }
 
 @media (max-width: 760px) and (orientation: landscape) {
@@ -446,7 +527,8 @@ body.has-touch-controls .frame > #dos {
   }
   .touch-action-grid {
     grid-template-columns: repeat(3, 34px);
-    grid-template-rows: repeat(3, 34px) 22px;
+    grid-template-rows: repeat(3, 34px);
+    grid-auto-rows: 34px;
     gap: 2px;
   }
   .touch-controls[data-layout="combo"] .touch-move {
@@ -461,9 +543,32 @@ body.has-touch-controls .frame > #dos {
     height: 31px;
   }
   .touch-controls[data-layout="combo"] .move-stick {
-    width: 74px;
-    height: 74px;
+    --stick-size: clamp(88px, 17vh, 104px);
   }
+}
+
+@media (orientation: portrait) {
+  .touch-controls[data-layout="dual"] .touch-actions {
+    flex-direction: row;
+    gap: 4px;
+  }
+  .touch-controls[data-layout="dual"] .look-stick {
+    --stick-size: clamp(72px, 20vw, 84px);
+  }
+  .touch-controls[data-layout="dual"] .touch-action-grid {
+    grid-template-columns: repeat(3, clamp(26px, 4dvh, 32px));
+    grid-template-rows: repeat(3, clamp(26px, 4dvh, 32px));
+    grid-auto-rows: clamp(26px, 4dvh, 32px);
+    gap: 2px;
+  }
+  .touch-controls[data-layout="dual"] .touch-action-key {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+body.is-fullscreen .touch-toolbar {
+  top: var(--touch-toolbar-top, max(52px, calc(env(safe-area-inset-top) + 44px)));
 }
 
 @media (max-width: 680px) {
