@@ -10,6 +10,10 @@
   const params = new URLSearchParams(location.search);
   const queryUrl = params.get('url');
 
+  import('./touch-controls.js').catch((error) => {
+    console.error('Unable to load DOS touch controls:', error);
+  });
+
   function fail(message) {
     if (!err) return;
     if (message) {

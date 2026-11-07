@@ -7,7 +7,7 @@
   <meta name="description" content="A browser arcade of DOS and PC classics: 32 local games, Quake II's browser demo, plus links to Quake III Arena and the Capitalism series.">
   <title>WASM Arcade — authentic classics in the browser</title>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20261108">
 </head>
 <body>
   <canvas id="field" class="field" aria-hidden="true"></canvas>
@@ -21,11 +21,7 @@
       <span class="brand-mark" aria-hidden="true">▚</span>
       <span class="brand-name">WASM&nbsp;ARCADE</span>
     </a>
-    <p class="brand-note">Real game code &middot; real pixels &middot; no plugins</p>
     <div class="hud" aria-label="Arcade status">
-      <span class="hud-item"><i class="led" aria-hidden="true"></i> SYS.ONLINE</span>
-      <span class="hud-item hud-clock" id="clock">--:--:--</span>
-      <span class="hud-item hud-cabinets" id="cabinet-count">36 entries</span>
       <button type="button" class="sound-toggle" id="sound-toggle" aria-pressed="false" aria-label="Enable music and interface sounds">
         <span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
         <span id="sound-label">Sound off</span>
@@ -33,75 +29,46 @@
     </div>
   </header>
 
-  <div class="ticker" aria-hidden="true">
-    <div class="ticker-track">
-      <span>WASM32 ENGINE</span><span>◆</span>
-      <span>SDL + C</span><span>◆</span>
-      <span>DOSBOX IN THE BROWSER</span><span>◆</span>
-      <span>LOCAL-FIRST SAVES</span><span>◆</span>
-      <span>ZERO UPLOADS</span><span>◆</span>
-      <span>LIBREQUAKE BUNDLED</span><span>◆</span>
-      <span>36 LIBRARY ENTRIES</span><span>◆</span>
-      <span>WASM32 ENGINE</span><span>◆</span>
-      <span>SDL + C</span><span>◆</span>
-      <span>DOSBOX IN THE BROWSER</span><span>◆</span>
-      <span>LOCAL-FIRST SAVES</span><span>◆</span>
-      <span>ZERO UPLOADS</span><span>◆</span>
-      <span>LIBREQUAKE BUNDLED</span><span>◆</span>
-      <span>36 LIBRARY ENTRIES</span><span>◆</span>
-    </div>
-  </div>
-
   <main>
-    <section class="intro" aria-labelledby="intro-heading">
-      <div class="hero-copy">
-        <p class="eyebrow"><span class="eyebrow-line" aria-hidden="true"></span> INSERT COIN // NEURAL LINK READY</p>
-        <h1 id="intro-heading" class="glitch" data-text="Thirty-six classics,">
-          Thirty-six classics,<br><em data-text="one living room.">one living room.</em>
-        </h1>
-        <p class="lede">
-          Pick a title, skim the shelf and jump straight in. Thirty-two games run right here;
-          Quake II's browser demo and official Quake III and Capitalism releases are one click
-          away. The local library includes Quake, Dangerous Dave, 2048, Commander Keen 4,
-          Duke Nukem II, Prince of Persia 2 and a DOS vault of shareware, freeware and demos.
-        </p>
-        <div class="hero-cta">
-          <a class="button primary big" href="#cabinets">Browse games <span aria-hidden="true">→</span></a>
-          <span class="hero-note">32 local games · 4 external launches</span>
+    <section class="selector-section" id="cabinets" aria-label="Game library">
+      <div class="coverflow-stage" id="coverflow-stage">
+        <canvas id="coverflow-canvas" role="group" tabindex="0"
+          aria-label="3D game selection. Use left and right arrow keys to browse; press Enter to launch."
+          aria-describedby="coverflow-live"></canvas>
+        <div class="coverflow-heading" aria-hidden="true">
+          <span>ARCADE <i>SELECT</i></span>
+          <span id="coverflow-index">01 <b>/</b> 36</span>
         </div>
-        <div class="intro-meta">
-          <span><b>1990–2014</b> era</span>
-          <span><b>Keyboard</b> or touch</span>
-          <span><b>Offline</b> after first load</span>
+        <span class="coverflow-live" id="coverflow-live" aria-live="polite"></span>
+        <div class="library-controls">
+          <span><kbd>←</kbd><kbd>→</kbd> BROWSE <i aria-hidden="true">·</i> ENTER SELECT</span>
+          <div class="library-arrows">
+            <button type="button" class="rail-arrow" id="library-prev" aria-label="Previous game">←</button>
+            <button type="button" class="rail-arrow" id="library-next" aria-label="Next game">→</button>
+          </div>
         </div>
       </div>
 
-      <aside class="telemetry" aria-label="Arcade telemetry">
-        <div class="telemetry-head">
-          <span>ARCADE.SYS</span>
-          <span class="telemetry-led" aria-hidden="true"></span>
+      <section class="featured-game" aria-label="Selected game" aria-live="polite">
+        <div class="featured-copy">
+          <p class="featured-kicker"><span class="featured-led" aria-hidden="true"></span><span id="featured-platform">DOS · 1990</span><span class="featured-separator">/</span><span id="featured-kind">WASM port</span></p>
+          <h1 id="featured-title">Dangerous Dave</h1>
+          <p class="featured-description" id="featured-description">John Romero's 1990 shareware classic. Twelve levels of jetpacks, spiders, treasure and very unfair jumps.</p>
+          <div class="featured-actions">
+            <a class="featured-launch" id="featured-launch" href="games/dave/">
+              <span class="featured-play-icon" aria-hidden="true">▶</span>
+              <span id="featured-launch-label">Launch game</span>
+              <span aria-hidden="true">→</span>
+            </a>
+            <span class="featured-prompt"><kbd>Enter</kbd> SELECT</span>
+          </div>
         </div>
-        <dl class="telemetry-grid">
-          <div><dt>uplink</dt><dd>local</dd></div>
-          <div><dt>engine</dt><dd>wasm32</dd></div>
-          <div><dt>games</dt><dd id="tele-cabinets">36</dd></div>
-          <div><dt>save state</dt><dd id="tele-save">empty</dd></div>
-          <div><dt>render</dt><dd>WASM + DOSBox</dd></div>
-          <div><dt>clock</dt><dd id="tele-clock">00:00:00</dd></div>
-        </dl>
-        <div class="telemetry-log" id="tele-log" aria-live="off">
-          <p>&gt; boot wasm arcade</p>
-          <p>&gt; link established</p>
-          <p>&gt; awaiting player input<span class="cursor">_</span></p>
-        </div>
-      </aside>
-    </section>
+      </section>
 
-    <section class="selector-section" id="cabinets" aria-labelledby="selector-heading">
       <div class="selector-head">
         <div>
-          <p class="eyebrow" id="selector-heading">// XMB library · select a title</p>
-          <h2 class="selector-title">Game library</h2>
+          <p class="eyebrow" id="selector-heading">// BROWSE BY FORMAT</p>
+          <h2 class="selector-title">All games</h2>
         </div>
         <div class="selector" role="tablist" aria-label="Filter games">
           <button type="button" class="selector-btn is-active" role="tab" aria-selected="true" data-filter="all">
@@ -123,14 +90,6 @@
         </div>
       </div>
       <p class="selector-status" id="selector-status" aria-live="polite">Showing 36 of 36 entries</p>
-
-      <div class="library-controls">
-        <span>Use <kbd>←</kbd> <kbd>→</kbd> or swipe to browse</span>
-        <div class="library-arrows">
-          <button type="button" class="rail-arrow" id="library-prev" aria-label="Previous games">←</button>
-          <button type="button" class="rail-arrow" id="library-next" aria-label="Next games">→</button>
-        </div>
-      </div>
 
       <div class="cabinets" id="cabinet-grid">
 

@@ -96,7 +96,103 @@
   const filterButtons = $$('.selector-btn');
   const statusEl = $('#selector-status');
   const emptyEl = $('#selector-empty');
+  const featured = {
+    art: $('#featured-art'),
+    index: $('#featured-index'),
+    platform: $('#featured-platform'),
+    kind: $('#featured-kind'),
+    title: $('#featured-title'),
+    description: $('#featured-description'),
+    launch: $('#featured-launch'),
+    launchLabel: $('#featured-launch-label'),
+    prompt: $('.library-prompt'),
+  };
+  const coverflowCanvas = $('#coverflow-canvas');
+  const coverflowIndex = $('#coverflow-index');
+  const coverflowLive = $('#coverflow-live');
+  let coverflowRenderer = null;
+  function renderCoverflow() {
+    if (coverflowRenderer) coverflowRenderer.render();
+  }
+  const libraryStateKey = 'arcade.library.state.v1';
+  let selectedCard = null;
+  let restoringLibrary = false;
   const KINDS = new Set(['all', 'wasm', 'emu', 'data', 'external']);
+
+  function readLibraryState() {
+    try {
+      const state = JSON.parse(sessionStorage.getItem(libraryStateKey) || 'null');
+      return state && typeof state === 'object' ? state : null;
+    } catch (error) {
+      console.warn('Unable to restore library state:', error);
+      return null;
+    }
+  }
+
+  function saveLibraryState() {
+    if (!selectedCard || !grid) return;
+    try {
+      sessionStorage.setItem(libraryStateKey, JSON.stringify({
+        game: selectedCard.dataset.game,
+        filter: filterButtons.find((button) => button.classList.contains('is-active'))?.dataset.filter || 'all',
+        railLeft: grid.scrollLeft,
+        pageTop: window.scrollY,
+      }));
+    } catch (error) {
+      console.warn('Unable to save library state:', error);
+    }
+  }
+
+  function selectCard(card) {
+    if (!card || card.classList.contains('is-filtered-out')) return;
+    selectedCard = card;
+    for (const item of cards) {
+      const active = item === card;
+      item.classList.toggle('is-selected', active);
+      const link = $('.cabinet-link', item);
+      if (link) {
+        if (active) link.setAttribute('aria-current', 'true');
+        else link.removeAttribute('aria-current');
+      }
+    }
+
+    const image = $('.art img', card);
+    const title = $('.body h2', card);
+    const platform = $('.art-tag', card);
+    const kind = $('.chip', card);
+    const description = $('.body p', card);
+    const link = $('.cabinet-link', card);
+    const index = $('.art-index', card);
+    const external = card.dataset.kind === 'external';
+
+    if (featured.art && image) {
+      featured.art.src = image.currentSrc || image.src;
+      featured.art.alt = '';
+    }
+    if (featured.index && index) featured.index.textContent = index.textContent.trim();
+    if (featured.platform && platform) featured.platform.textContent = platform.textContent.trim();
+    if (featured.kind && kind) featured.kind.textContent = kind.textContent.trim();
+    if (featured.title && title) featured.title.textContent = title.textContent.trim();
+    if (featured.description && description) featured.description.textContent = description.textContent.trim();
+    if (featured.launch && link) {
+      featured.launch.href = link.href;
+      if (link.target) {
+        featured.launch.target = link.target;
+        featured.launch.rel = link.rel;
+      } else {
+        featured.launch.removeAttribute('target');
+        featured.launch.removeAttribute('rel');
+      }
+      featured.launch.setAttribute('aria-label', `${external ? 'Open' : 'Play'} ${title ? title.textContent.trim() : 'selected game'}`);
+    }
+    if (featured.launchLabel) featured.launchLabel.textContent = external ? 'Open official page' : 'Launch game';
+    if (featured.prompt) featured.prompt.textContent = String(cards.indexOf(card) + 1).padStart(2, '0');
+    renderCoverflow();
+    if (!restoringLibrary) saveLibraryState();
+  }
+
+  const restoredState = readLibraryState();
+  if (restoredState && KINDS.has(restoredState.filter)) restoringLibrary = true;
 
   function applyFilter(kind) {
     if (!KINDS.has(kind)) kind = 'all';
@@ -121,7 +217,21 @@
       statusEl.textContent = `Showing ${visible} of ${total} library entr${total === 1 ? 'y' : 'ies'}${kind === 'all' ? '' : ` · ${kind}`}`;
     }
     if (emptyEl) emptyEl.hidden = visible !== 0;
-    if (grid) grid.scrollTo({ left: 0, behavior: reduced ? 'auto' : 'smooth' });
+    if (grid) {
+      const restoredRailLeft = restoringLibrary && Number.isFinite(restoredState && restoredState.railLeft)
+        ? restoredState.railLeft
+        : 0;
+      grid.scrollTo({
+        left: restoredRailLeft,
+        behavior: reduced || restoringLibrary ? 'auto' : 'smooth',
+      });
+    }
+
+    if (selectedCard && selectedCard.classList.contains('is-filtered-out')) {
+      const firstVisible = cards.find((card) => !card.classList.contains('is-filtered-out'));
+      if (firstVisible) selectCard(firstVisible);
+    }
+    renderCoverflow();
   }
 
   filterButtons.forEach((btn, index) => {
@@ -140,7 +250,361 @@
     });
   });
 
-  applyFilter('all');
+  applyFilter(restoredState && KINDS.has(restoredState.filter) ? restoredState.filter : 'all');
+
+  const restoredCard = restoredState && cards.find((card) => card.dataset.game === restoredState.game);
+  const initialCard = restoredCard && !restoredCard.classList.contains('is-filtered-out')
+    ? restoredCard
+    : cards.find((card) => !card.classList.contains('is-filtered-out'));
+  if (initialCard) selectCard(initialCard);
+  restoringLibrary = false;
+
+  if (restoredState) {
+    const restorePosition = () => {
+      if (!grid) return;
+      if (Number.isFinite(restoredState.railLeft)) grid.scrollLeft = restoredState.railLeft;
+      if (Number.isFinite(restoredState.pageTop)) window.scrollTo(0, restoredState.pageTop);
+    };
+    requestAnimationFrame(() => requestAnimationFrame(restorePosition));
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) window.setTimeout(restorePosition, 60);
+    });
+  }
+
+  function createCoverflowRenderer(canvas) {
+    const gl = canvas.getContext('webgl', {
+      alpha: true,
+      antialias: true,
+      powerPreference: 'high-performance',
+    });
+    if (!gl) return null;
+
+    const vertexSource = `
+      attribute vec2 aPosition;
+      attribute vec2 aUv;
+      uniform float uOffset;
+      uniform float uHalfWidth;
+      uniform float uHalfHeight;
+      uniform float uScale;
+      uniform float uAngle;
+      uniform float uDepth;
+      varying vec2 vUv;
+      void main() {
+        vec2 point = aPosition * vec2(uHalfWidth, uHalfHeight) * uScale;
+        float c = cos(uAngle);
+        float s = sin(uAngle);
+        float rotatedX = point.x * c;
+        float z = -point.x * s + uDepth;
+        float perspective = 1.0 / (1.0 - z * 0.12);
+        gl_Position = vec4((rotatedX + uOffset) * perspective, point.y * perspective, 0.0, 1.0);
+        vUv = aUv;
+      }
+    `;
+    const fragmentSource = `
+      precision mediump float;
+      uniform sampler2D uTexture;
+      uniform float uFocus;
+      uniform float uTime;
+      varying vec2 vUv;
+      void main() {
+        vec4 cover = texture2D(uTexture, vUv);
+        float edge = min(min(vUv.x, 1.0 - vUv.x), min(vUv.y, 1.0 - vUv.y));
+        float frame = 1.0 - smoothstep(0.0, 0.009, edge);
+        float sweepX = fract(uTime * 0.13) * 1.6 - 0.3;
+        float sweep = exp(-pow((vUv.x - sweepX) * 17.0, 2.0)) * uFocus * 0.22;
+        float scan = 0.985 + 0.015 * sin(vUv.y * 620.0);
+        float shade = mix(0.74, 1.0, uFocus);
+        vec3 rim = mix(vec3(0.32, 0.45, 0.63), vec3(0.58, 0.82, 1.0), uFocus);
+        vec3 color = cover.rgb * shade * scan + sweep;
+        color = mix(color, rim, frame * 0.88);
+        gl_FragColor = vec4(color, cover.a);
+      }
+    `;
+
+    function compileShader(type, source) {
+      const shader = gl.createShader(type);
+      if (!shader) throw new Error('Unable to allocate coverflow shader.');
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        const message = gl.getShaderInfoLog(shader) || 'Unknown shader error';
+        gl.deleteShader(shader);
+        throw new Error(`Unable to compile coverflow shader: ${message}`);
+      }
+      return shader;
+    }
+
+    let program;
+    try {
+      program = gl.createProgram();
+      if (!program) throw new Error('Unable to allocate coverflow program.');
+      gl.attachShader(program, compileShader(gl.VERTEX_SHADER, vertexSource));
+      gl.attachShader(program, compileShader(gl.FRAGMENT_SHADER, fragmentSource));
+      gl.linkProgram(program);
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        throw new Error(`Unable to link coverflow renderer: ${gl.getProgramInfoLog(program) || 'Unknown program error'}`);
+      }
+    } catch (error) {
+      console.error('Unable to initialize the WebGL game shelf:', error);
+      return null;
+    }
+
+    const locations = {
+      position: gl.getAttribLocation(program, 'aPosition'),
+      uv: gl.getAttribLocation(program, 'aUv'),
+      offset: gl.getUniformLocation(program, 'uOffset'),
+      halfWidth: gl.getUniformLocation(program, 'uHalfWidth'),
+      halfHeight: gl.getUniformLocation(program, 'uHalfHeight'),
+      scale: gl.getUniformLocation(program, 'uScale'),
+      angle: gl.getUniformLocation(program, 'uAngle'),
+      depth: gl.getUniformLocation(program, 'uDepth'),
+      texture: gl.getUniformLocation(program, 'uTexture'),
+      focus: gl.getUniformLocation(program, 'uFocus'),
+      time: gl.getUniformLocation(program, 'uTime'),
+    };
+    const geometry = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, geometry);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+      -0.5, -0.5, 0, 0,  0.5, -0.5, 1, 0,  -0.5, 0.5, 0, 1,
+      -0.5, 0.5, 0, 1,  0.5, -0.5, 1, 0,  0.5, 0.5, 1, 1,
+    ]), gl.STATIC_DRAW);
+    gl.useProgram(program);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.uniform1i(locations.texture, 0);
+
+    const textures = new Map();
+    function ensureTexture(card) {
+      if (textures.has(card)) return textures.get(card);
+      const imageElement = $('.art img', card);
+      if (!imageElement) return null;
+      const texture = gl.createTexture();
+      if (!texture) return null;
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([12, 21, 38, 255]));
+      textures.set(card, texture);
+
+      const image = new Image();
+      image.decoding = 'async';
+      image.onload = () => {
+        if (textures.get(card) !== texture) return;
+        const raster = document.createElement('canvas');
+        raster.width = image.naturalWidth;
+        raster.height = image.naturalHeight;
+        const context = raster.getContext('2d');
+        if (!context) {
+          console.error(`Unable to rasterize cover art for ${card.dataset.game}.`);
+          return;
+        }
+        context.drawImage(image, 0, 0);
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, raster);
+        if (motionReduced && !document.hidden) render();
+      };
+      image.onerror = () => console.warn(`Unable to load cover art for ${card.dataset.game}.`);
+      image.src = imageElement.currentSrc || imageElement.src;
+      return texture;
+    }
+
+    let width = 0;
+    let height = 0;
+    let frame = 0;
+    let disposed = false;
+    let lastPositionLabel = '';
+    let lastLiveLabel = '';
+    const motionReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const visibleCards = () => cards.filter((card) => !card.classList.contains('is-filtered-out'));
+    const currentPosition = () => Math.max(0, visibleCards().indexOf(selectedCard));
+
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.7);
+      const nextWidth = Math.max(1, Math.round(rect.width * dpr));
+      const nextHeight = Math.max(1, Math.round(rect.height * dpr));
+      if (width === nextWidth && height === nextHeight) return;
+      width = nextWidth;
+      height = nextHeight;
+      canvas.width = width;
+      canvas.height = height;
+      gl.viewport(0, 0, width, height);
+    }
+
+    function drawCard(card, relativeIndex, halfWidth, halfHeight, time) {
+      const texture = ensureTexture(card);
+      if (!texture) return;
+      const distance = Math.abs(relativeIndex);
+      const scale = distance === 0 ? 1 : Math.max(0.68, 0.9 - distance * 0.065);
+      const offset = relativeIndex * halfWidth * 0.92;
+      const angle = relativeIndex === 0 ? 0 : Math.sign(relativeIndex) * -0.34;
+      const depth = -distance * 0.13;
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.uniform1f(locations.offset, offset);
+      gl.uniform1f(locations.halfWidth, halfWidth);
+      gl.uniform1f(locations.halfHeight, halfHeight);
+      gl.uniform1f(locations.scale, scale);
+      gl.uniform1f(locations.angle, angle);
+      gl.uniform1f(locations.depth, depth);
+      gl.uniform1f(locations.focus, distance === 0 ? 1 : 0);
+      gl.uniform1f(locations.time, time);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+    }
+
+    function render(time = 0) {
+      if (disposed) return;
+      resize();
+      gl.clearColor(0, 0, 0, 0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.useProgram(program);
+      gl.bindBuffer(gl.ARRAY_BUFFER, geometry);
+      gl.enableVertexAttribArray(locations.position);
+      gl.vertexAttribPointer(locations.position, 2, gl.FLOAT, false, 16, 0);
+      gl.enableVertexAttribArray(locations.uv);
+      gl.vertexAttribPointer(locations.uv, 2, gl.FLOAT, false, 16, 8);
+
+      const available = visibleCards();
+      if (!available.length) return;
+      const selectedIndex = Math.min(available.length - 1, currentPosition());
+      const halfHeight = 1.12;
+      const halfWidth = halfHeight * 1.58 * height / width;
+      const nearby = new Set(available.slice(
+        Math.max(0, selectedIndex - 3),
+        Math.min(available.length, selectedIndex + 4),
+      ));
+      for (const [card, texture] of textures) {
+        if (!nearby.has(card)) {
+          gl.deleteTexture(texture);
+          textures.delete(card);
+        }
+      }
+      for (let distance = 3; distance >= 1; distance--) {
+        const leftIndex = selectedIndex - distance;
+        const rightIndex = selectedIndex + distance;
+        if (leftIndex >= 0) drawCard(available[leftIndex], -distance, halfWidth, halfHeight, time / 1000);
+        if (rightIndex < available.length) drawCard(available[rightIndex], distance, halfWidth, halfHeight, time / 1000);
+      }
+      drawCard(available[selectedIndex], 0, halfWidth, halfHeight, time / 1000);
+
+      const positionLabel = `${String(selectedIndex + 1).padStart(2, '0')} / ${String(available.length).padStart(2, '0')}`;
+      if (coverflowIndex && positionLabel !== lastPositionLabel) {
+        coverflowIndex.innerHTML = `${positionLabel.slice(0, 2)} <b>/</b> ${positionLabel.slice(-2)}`;
+        lastPositionLabel = positionLabel;
+      }
+      if (coverflowLive && selectedCard) {
+        const title = $('.body h2', selectedCard);
+        const liveLabel = `${title ? title.textContent.trim() : 'Game'}, ${selectedIndex + 1} of ${available.length}`;
+        if (liveLabel !== lastLiveLabel) {
+          coverflowLive.textContent = liveLabel;
+          lastLiveLabel = liveLabel;
+        }
+      }
+      if (!motionReduced && !document.hidden) frame = requestAnimationFrame(render);
+    }
+
+    function selectRelative(amount) {
+      const available = visibleCards();
+      if (!available.length) return;
+      const nextIndex = (currentPosition() + amount + available.length) % available.length;
+      selectCard(available[nextIndex]);
+    }
+
+    let pointerStart = null;
+    canvas.addEventListener('pointerdown', (event) => {
+      pointerStart = { x: event.clientX, y: event.clientY };
+      canvas.setPointerCapture(event.pointerId);
+    });
+    canvas.addEventListener('pointermove', (event) => {
+      if (event.pointerType !== 'mouse' || pointerStart) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      const halfWidth = 1.12 * 1.58 * height / width;
+      const position = x / (halfWidth * 0.92);
+      const relativeIndex = Math.round(position);
+      if (Math.abs(position - relativeIndex) > 0.48) return;
+      const available = visibleCards();
+      const target = available[currentPosition() + relativeIndex];
+      if (target) selectCard(target);
+    });
+    canvas.addEventListener('pointerup', (event) => {
+      if (!pointerStart) return;
+      const deltaX = event.clientX - pointerStart.x;
+      const deltaY = event.clientY - pointerStart.y;
+      const rect = canvas.getBoundingClientRect();
+      const available = visibleCards();
+      if (Math.abs(deltaX) > 30 && Math.abs(deltaX) > Math.abs(deltaY)) {
+        const halfWidth = 1.12 * 1.58 * height / width;
+        const pixelsPerCard = Math.max(70, halfWidth * 0.92 * rect.width / 2);
+        const steps = Math.max(1, Math.round(Math.abs(deltaX) / pixelsPerCard));
+        selectRelative(deltaX < 0 ? steps : -steps);
+      } else {
+        const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        const halfWidth = 1.12 * 1.58 * height / width;
+        const cardOffset = Math.round(x / (halfWidth * 0.92));
+        const target = Math.max(0, Math.min(available.length - 1, currentPosition() + cardOffset));
+        if (available[target]) selectCard(available[target]);
+      }
+      pointerStart = null;
+    });
+    canvas.addEventListener('pointercancel', () => { pointerStart = null; });
+    canvas.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+        event.preventDefault();
+        selectRelative(event.key === 'ArrowRight' ? 1 : -1);
+      } else if (event.key === 'Home' || event.key === 'End') {
+        event.preventDefault();
+        const available = visibleCards();
+        if (available.length) selectCard(available[event.key === 'Home' ? 0 : available.length - 1]);
+      } else if (event.key === 'Enter' && featured.launch) {
+        event.preventDefault();
+        featured.launch.click();
+      }
+    });
+
+    const onVisibilityChange = () => {
+      if (document.hidden && frame) cancelAnimationFrame(frame), frame = 0;
+      else if (!document.hidden && !motionReduced && !frame) frame = requestAnimationFrame(render);
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    const resizeObserver = new ResizeObserver(() => render());
+    resizeObserver.observe(canvas);
+    canvas.addEventListener('webglcontextlost', (event) => {
+      event.preventDefault();
+      disposed = true;
+      if (frame) cancelAnimationFrame(frame);
+      document.body.classList.remove('has-coverflow');
+      canvas.setAttribute('aria-hidden', 'true');
+      canvas.hidden = true;
+      console.error('The WebGL coverflow context was lost; showing the standard game shelf.');
+    });
+
+    document.body.classList.add('has-coverflow');
+    canvas.removeAttribute('aria-hidden');
+    render();
+    return {
+      render: () => {
+        if (motionReduced) render();
+      },
+      dispose: () => {
+        disposed = true;
+        if (frame) cancelAnimationFrame(frame);
+        resizeObserver.disconnect();
+        document.removeEventListener('visibilitychange', onVisibilityChange);
+      },
+    };
+  }
+
+  if (coverflowCanvas) {
+    coverflowRenderer = createCoverflowRenderer(coverflowCanvas);
+    if (!coverflowRenderer) coverflowCanvas.hidden = true;
+  }
+
+  if (featured.launch) {
+    featured.launch.addEventListener('click', saveLibraryState);
+  }
 
   /* ------------------------------------------------------------ library navigation */
 
@@ -149,6 +613,15 @@
 
   function scrollLibrary(direction) {
     if (!grid) return;
+    if (coverflowRenderer) {
+      const visibleCards = cards.filter((card) => !card.classList.contains('is-filtered-out'));
+      if (!visibleCards.length) return;
+      const currentIndex = Math.max(0, visibleCards.indexOf(selectedCard));
+      const nextIndex = (currentIndex + direction + visibleCards.length) % visibleCards.length;
+      selectCard(visibleCards[nextIndex]);
+      coverflowCanvas.focus();
+      return;
+    }
     const firstCard = cards.find((card) => !card.classList.contains('is-filtered-out'));
     const cardWidth = firstCard ? firstCard.getBoundingClientRect().width : 320;
     grid.scrollBy({
@@ -160,9 +633,41 @@
   if (libraryPrev) libraryPrev.addEventListener('click', () => scrollLibrary(-1));
   if (libraryNext) libraryNext.addEventListener('click', () => scrollLibrary(1));
 
+  if (grid) {
+    let scrollTimer = 0;
+    grid.addEventListener('scroll', () => {
+      window.clearTimeout(scrollTimer);
+      scrollTimer = window.setTimeout(() => {
+        if (restoringLibrary) return;
+        const visibleCards = cards.filter((card) => !card.classList.contains('is-filtered-out'));
+        const center = grid.getBoundingClientRect().left + grid.clientWidth / 2;
+        let closest = null;
+        let closestDistance = Infinity;
+        for (const card of visibleCards) {
+          const rect = card.getBoundingClientRect();
+          const distance = Math.abs(rect.left + rect.width / 2 - center);
+          if (distance < closestDistance) {
+            closest = card;
+            closestDistance = distance;
+          }
+        }
+        if (closest) selectCard(closest);
+      }, 90);
+    }, { passive: true });
+  }
+
   for (const card of cards) {
     const link = $('.cabinet-link', card);
     if (!link) continue;
+
+    link.addEventListener('focus', () => selectCard(card));
+    link.addEventListener('pointerenter', (event) => {
+      if (event.pointerType === 'mouse') selectCard(card);
+    });
+    link.addEventListener('click', () => {
+      selectCard(card);
+      saveLibraryState();
+    });
 
     link.addEventListener('focus', () => {
       card.scrollIntoView({

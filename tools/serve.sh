@@ -15,6 +15,15 @@ cd "$(dirname "$0")/.."
 PORT="${1:-8000}"
 BIND="${HOST:-0.0.0.0}"
 
+if python3 -c 'import sys; sys.exit(0 if sys.version_info.major == 3 else 1)' >/dev/null 2>&1; then
+  PYTHON=python3
+elif python -c 'import sys; sys.exit(0 if sys.version_info.major == 3 else 1)' >/dev/null 2>&1; then
+  PYTHON=python
+else
+  echo "Python 3 is required to serve the arcade (python3 or python)." >&2
+  exit 1
+fi
+
 # Print non-loopback IPv4 addresses, preferring Wi-Fi/Ethernet interfaces.
 lan_addresses() {
   FOUND=""
@@ -40,8 +49,8 @@ lan_addresses() {
   fi
 
   # Fallback for systems where ifconfig is unavailable or restricted.
-  if command -v python3 >/dev/null 2>&1; then
-    python3 - <<'PY' 2>/dev/null || true
+  if command -v "$PYTHON" >/dev/null 2>&1; then
+    "$PYTHON" - <<'PY' 2>/dev/null || true
 import socket
 ips = []
 try:
@@ -104,4 +113,4 @@ fi
 
 echo
 echo "Press Ctrl-C to stop."
-exec python3 -m http.server "$PORT" --bind "$BIND"
+exec "$PYTHON" -m http.server "$PORT" --bind "$BIND"

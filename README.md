@@ -22,14 +22,19 @@ real pixels, no plugins, no server-side component.
 | **DOS Cabinet** | `games/dos/` | js-dos 8.5.3 / DOSBox compiled to WebAssembly | Runs a `.jsdos` bundle you supply |
 | **DOS Vault (25 cabinets)** | `games/<slug>/` | js-dos 8.5.3 / DOSBox compiled to WebAssembly | Shareware, freeware and demos, all bundled and auto-starting |
 
-The landing page (`index.html`) presents the library as a horizontally browsable,
-keyboard-friendly game shelf. It includes the 32 local cabinets and four external
-launch links: a browser-playable Quake II demo plus official pages for Quake III
-Arena and Capitalism II/Lab. Optional procedural interface sounds and an original
+The landing page (`index.html`) is a bespoke, responsive console menu with a
+game-first WebGL coverflow. The covers are textured 3D cards with live highlights;
+arrow keys, swipes and on-screen arrows browse them. It falls back to the regular
+game shelf when WebGL is unavailable and retains the custom cursor on desktop.
+The library includes the 32 local cabinets and four external launch links: a
+browser-playable Quake II demo plus official pages for Quake III Arena and
+Capitalism II/Lab. Optional procedural interface sounds and an original
 ambient DnB loop—with a slow minor-key chord progression, soft synthesized reverb
 and understated breakbeat—are generated locally and start only after choosing
 **Sound on**. Audio pauses when the menu tab is hidden or you leave for a game.
-The custom pointer reticle remains enabled on desktop.
+The custom pointer reticle remains enabled on desktop. The home menu keeps the
+selected game, active filter, shelf position and page position for the current
+browser tab, so returning from a game resumes the same place in the library.
 
 The game pages are responsive, and every cabinet has a fullscreen mode designed
 for phones in landscape. Quake additionally ships a PSP-style touch pad that
@@ -183,14 +188,19 @@ remembered per browser under `arcade.quake.pad`.
 ### Commander Keen 4 and Duke Nukem II
 
 Both cabinets boot their bundled shareware episodes automatically inside js-dos.
-Use the keyboard as in the original DOS games, or the js-dos on-screen controls
-on touch devices. **Fullscreen** in the cabinet header expands the DOS screen.
+Use the keyboard as in the original DOS games, or the arcade touch controls on
+touch devices. The d-pad moves, and named touch actions are mapped to the
+original keys (for example, DOOM has Fire, Use, Run, Strafe, Map, and Menu).
+Small key hints show each action's keyboard binding. **Fullscreen** in the
+cabinet header expands the DOS screen.
 
 ### DOS Cabinet
 
 Use the built-in js-dos UI to choose a `.jsdos` bundle (or load one by URL).
 Keyboard input is passed through to DOSBox. Use the **Fullscreen** button in the
-cabinet header for an immersive view.
+cabinet header for an immersive view. Touch layouts can be switched between
+D-pad, analog, and PSP-style D-pad + analog; first-person DOS titles also offer
+dual analog movement and mouse-look.
 
 ---
 
@@ -216,11 +226,17 @@ cabinet header for an immersive view.
   without cropping. The PSP overlay uses `env(safe-area-inset-*)` and a compact
   layout below `520px` height; the header collapses to a half-transparent bar
   over the game in fullscreen.
-- **Keen 4 / Duke Nukem II / DOS Vault:** fullscreen expands the js-dos frame to
-  the whole viewport and hides the header bar; the DOS picture keeps its 4:3
-  aspect and js-dos letterboxes it on taller screens.
-- **DOS Cabinet:** fullscreen expands the js-dos frame to the whole viewport and
-  hides the header bar.
+- **Keen 4 / Duke Nukem II / DOS Vault / DOS Cabinet:** touch devices get
+  movement and per-game named action buttons that send keyboard input to DOSBox.
+  In fullscreen landscape, the game stays centered between left/right controls;
+  in portrait, controls sit below the game. The game keeps its aspect ratio in
+  the remaining space. Choose **D-Pad**, **Analog**, **PSP Combo** (both on the
+  move side), or—on first-person games—**Dual Analog** (right stick sends mouse
+  look). The D-pad center sends Enter/confirm. Haptics can be toggled where the
+  browser and device support vibration. Desktop keyboard and mouse controls
+  remain unchanged.
+- The mobile action cluster uses the familiar four-button diamond for primary
+  actions, with secondary actions below it.
 - **Prince of Persia 2:** the data prompt is compact, scrolls inside the 4:3
   stage, and includes a visible **Back to the arcade** link so it never traps the
   player. On short landscape it switches to a two-column dropzone and hides
