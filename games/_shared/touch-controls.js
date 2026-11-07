@@ -160,18 +160,23 @@ if (dosRoot && frame && hasTouch && !frame.querySelector('.touch-controls')) {
   const controls = document.createElement('div');
   controls.className = 'touch-controls';
   controls.innerHTML = `
-    <div class="touch-toolbar" aria-label="Touch controller settings">
-      <label class="touch-layout-label">PAD
-        <select class="touch-layout" aria-label="Touch controller layout">
-          <option value="dpad">D-Pad</option>
-          <option value="analog">Analog</option>
-          <option value="combo">PSP Combo</option>
-          ${['doom', 'heretic', 'wolf3d', 'blakestone', 'kenslabyrinth'].includes(gameSlug)
+    <details class="touch-toolbar">
+      <summary aria-label="Touch controller settings" title="Touch controller settings">
+        <span aria-hidden="true">⚙</span>
+      </summary>
+      <div class="touch-settings">
+        <label class="touch-layout-label">PAD
+          <select class="touch-layout" aria-label="Touch controller layout">
+            <option value="dpad">D-Pad</option>
+            <option value="analog">Analog</option>
+            <option value="combo">PSP Combo</option>
+            ${['doom', 'heretic', 'wolf3d', 'blakestone', 'kenslabyrinth'].includes(gameSlug)
     ? '<option value="dual">Dual Analog</option>' : ''}
-        </select>
-      </label>
-      <button class="touch-haptics" type="button" aria-pressed="false">Haptics off</button>
-    </div>
+          </select>
+        </label>
+        <button class="touch-haptics" type="button" aria-pressed="false">Haptics off</button>
+      </div>
+    </details>
     <section class="touch-side touch-move" aria-label="Movement controls">
       <span class="touch-label">MOVE</span>
       <div class="touch-dpad">
@@ -198,7 +203,12 @@ if (dosRoot && frame && hasTouch && !frame.querySelector('.touch-controls')) {
   actions.forEach(({ label, key }) => {
     const button = document.createElement('button');
     const index = actionGrid.children.length;
-    button.className = `touch-key touch-action-key${index >= 4 ? ' touch-utility-key' : ''}`;
+    const utilityClass = key === 'Enter'
+      ? ' touch-utility-key touch-confirm-key'
+      : key === 'Escape'
+        ? ' touch-utility-key touch-menu-key'
+        : index >= 4 ? ' touch-utility-key touch-secondary-key' : '';
+    button.className = `touch-key touch-action-key${utilityClass}`;
     button.type = 'button';
     button.dataset.key = key;
     button.setAttribute('aria-label', `${label} (${keyLabels[key]})`);
@@ -214,18 +224,10 @@ if (dosRoot && frame && hasTouch && !frame.querySelector('.touch-controls')) {
   });
   frame.append(controls);
   const header = document.querySelector('.bar');
-  if (header && typeof ResizeObserver === 'function') {
-    const updateToolbarPosition = () => {
-      const bottom = Math.ceil(header.getBoundingClientRect().bottom);
-      controls.style.setProperty('--touch-toolbar-top', `${Math.max(52, bottom + 8)}px`);
-    };
-    const headerObserver = new ResizeObserver(updateToolbarPosition);
-    headerObserver.observe(header);
-    updateToolbarPosition();
-    window.addEventListener('pagehide', () => headerObserver.disconnect(), { once: true });
-  }
-  const layoutSelect = controls.querySelector('.touch-layout');
-  const hapticsButton = controls.querySelector('.touch-haptics');
+  const toolbar = controls.querySelector('.touch-toolbar');
+  if (header && toolbar) header.append(toolbar);
+  const layoutSelect = toolbar.querySelector('.touch-layout');
+  const hapticsButton = toolbar.querySelector('.touch-haptics');
   let savedLayout = null;
   let hapticsEnabled = false;
   try {
@@ -258,6 +260,7 @@ if (dosRoot && frame && hasTouch && !frame.querySelector('.touch-controls')) {
       console.warn('Unable to save touch layout:', error);
     }
     releaseAll();
+    toolbar.open = false;
   });
 
   let lastVibration = 0;
@@ -279,6 +282,7 @@ if (dosRoot && frame && hasTouch && !frame.querySelector('.touch-controls')) {
       console.warn('Unable to save haptics preference:', error);
     }
     if (hapticsEnabled) vibrate();
+    toolbar.open = false;
   });
 
   const keys = {
