@@ -1,7 +1,7 @@
 # WASM Arcade
 
-A static arcade of local classics, with a browser Flash player for SWF files
-you provide. Real game code, real pixels, no server-side component.
+A static arcade of local classics, with a local vault of 26 classic Flash games
+running in Ruffle. Real game code, real pixels, no server-side component.
 
 **Last updated: 2026-11-07**
 
@@ -21,15 +21,15 @@ you provide. Real game code, real pixels, no server-side component.
 | **Prince of Persia 2 (DOS demo)** | `games/pop2demo/` | js-dos 8.5.3 / DOSBox compiled to WebAssembly | Playable out of the box |
 | **DOS Cabinet** | `games/dos/` | js-dos 8.5.3 / DOSBox compiled to WebAssembly | Runs a `.jsdos` bundle you supply |
 | **DOS Vault (25 cabinets)** | `games/<slug>/` | js-dos 8.5.3 / DOSBox compiled to WebAssembly | Shareware, freeware and demos, all bundled and auto-starting |
-| **Flash player** | `games/flash/` | Locally hosted Ruffle 0.7.1 | Load an SWF from your device; no game files are bundled |
+| **Flash Vault (26 games)** | `games/flash/` | Locally hosted Ruffle 0.7.1 + bundled SWFs | Playable out of the box; bring-your-own-SWF still supported |
 
 The landing page (`index.html`) is a bespoke, responsive console menu with a
 game-first WebGL coverflow. The covers are textured 3D cards with live highlights;
 arrow keys, swipes and on-screen arrows browse them. It falls back to the regular
 game shelf when WebGL is unavailable and retains the custom cursor on desktop.
-The library includes the 32 local game cabinets, the local Flash player, and
-five reference-only entries for Quake II, Quake III Arena, Capitalism II/Lab,
-and GTA 2. Reference entries do not navigate off-site. Optional
+The library includes 64 entries: 59 local cabinets (including the 26-game Flash
+Vault) and five reference-only entries for Quake II, Quake III Arena, Capitalism
+II/Lab, and GTA 2. Reference entries do not navigate off-site. Optional
 procedural interface sounds and an original
 ambient DnB loop—with a slow minor-key chord progression, soft synthesized reverb
 and understated breakbeat—are generated locally and start only after choosing
@@ -81,19 +81,61 @@ provided. No commercial game data is bundled. The free *Carmageddon* demo was ev
 but does not boot reliably under this js-dos build, so it is not listed as
 playable. The Mac PoP2 cabinet continues to support bring-your-own full data.
 
-### Flash games
+### Flash Vault
 
-The **Flash** filter currently contains a local *Load a Flash game* player.
-Choose an SWF you have rights to use; it runs in this tab with Ruffle and is not
-uploaded or persisted. Ruffle can run many—but not all—SWFs; some games need
-unsupported features or additional files. Free-to-play Flash games are not
-automatically free to redistribute: no famous game SWFs have been added without
-verified permission to bundle them. The Flash category contains no outbound game links.
+The **Flash** filter opens `games/flash/`, a local vault of 26 SWF games. Every
+file lives in `games/flash/swf/` and runs in the locally hosted Ruffle 0.7.1
+runtime. The vault has a searchable, genre-filtered grid, a random pick,
+fullscreen, last-played memory and a bring-your-own-SWF panel. Deep links work:
+`games/flash/?game=n` opens a specific game directly.
+
+| Game | Year | Genre |
+| --- | --- | --- |
+| **N** | 2004 | Platformer |
+| **QWOP** | 2008 | Ragdoll sport |
+| **The World's Hardest Game** | 2008 | Reflex puzzle |
+| **Bloxorz** | 2007 | Puzzle |
+| **Achievement Unlocked** | 2008 | Puzzle platformer |
+| **Motherload** | 2004 | Mining sim |
+| **Interactive Buddy** | 2005 | Sandbox |
+| **Age of War** | 2007 | Lane strategy |
+| **Bloons TD 2** | 2009 | Tower defense |
+| **Learn to Fly** | 2009 | Launch game |
+| **Doodle Jump** | 2009 | Arcade |
+| **The Fancy Pants Adventure** | 2006 | Platformer |
+| **Riddle School** | 2006 | Point and click |
+| **Storm the House** | 2005 | Defense shooter |
+| **Portal: The Flash Version** | 2007 | Puzzle platformer |
+| **Super Meat Boy** | 2008 | Masocore platformer |
+| **Pandemic 2** | 2008 | Outbreak sim |
+| **Papa's Pizzeria** | 2007 | Management sim |
+| **Duck Life** | 2007 | Racing RPG |
+| **Stick RPG** | 2003 | Life sim |
+| **Rubik's Cube** | 2007 | Puzzle |
+| **Checkers** | 2007 | Board game |
+| **Minesweeper** | 2007 | Puzzle |
+| **Pac-Man** | 2007 | Arcade |
+| **Tetris** | 2007 | Puzzle |
+| **Snake** | 2007 | Arcade |
+
+The files are preservation copies of games that were freely playable on the web.
+They were downloaded from public preservation collections
+([AmmarSAA/Flash-Games-Directory](https://github.com/AmmarSAA/Flash-Games-Directory)
+and [selenite-cc/flasharchive](https://github.com/selenite-cc/flasharchive)) and
+are kept here for private, local play. Game names, code and artwork remain with
+their original creators; this project does not sell, relicense or claim them.
+If you are a rights holder and want a title removed, delete its SWF, its cover
+art and its entry in `games/flash/catalog.json`.
+
+Ruffle runs many—but not all—SWFs. A few titles may have missing audio, video or
+AVM2 edge cases. The page keeps a **Load your own SWF** panel for files that are
+not in the vault. The player does not draw the arcade's custom cursor, so the
+game pointer and the system pointer stay aligned. The Flash category contains no
+outbound game links.
 
 The locally hosted Ruffle 0.7.1 web runtime is from the
 [official Ruffle release](https://github.com/ruffle-rs/ruffle/releases/tag/v0.7.1).
-Its MIT and Apache 2.0 license texts are included in `vendor/ruffle/`. No Flash
-game SWFs are bundled.
+Its MIT and Apache 2.0 license texts are included in `vendor/ruffle/`.
 
 > **Glace:** `assets/glace-1.png` and `assets/glace-2.png` are kept in the repo,
 > but there is no Glace game data or WebAssembly port in this project, so Glace is
@@ -219,6 +261,30 @@ cabinet header for an immersive view. Touch layouts can be switched between
 D-pad, analog, and PSP-style D-pad + analog; first-person DOS titles also offer
 dual analog movement and mouse-look.
 
+### Flash Vault
+
+Open `games/flash/` from the **Flash** filter or any Flash card. Click a card to
+load that game, or press **Random** to pick one from the current filter. The
+search box matches titles, genres and descriptions; the genre menu narrows the
+grid. Each game keeps its own controls — the caption under the player shows the
+expected keys or mouse input for the selected title. The player takes keyboard
+focus when a game loads, and clicking the picture refocuses it.
+
+Most of these games expect a keyboard, so the player has an optional **Keys**
+pad: a d-pad, Space/Enter/Esc and Q/W/O/P buttons that send real key events to
+Ruffle. It appears automatically on touch devices and can be toggled from the
+toolbar; the preference is remembered. It works in fullscreen too, including
+short landscape layouts.
+
+**Fullscreen** expands the player; on Android/Chrome it also tries to lock to
+landscape, while iOS Safari falls back to an immersive CSS layout with a rotate
+hint. **Close** unloads the game and returns to the picker. Deep links such as
+`games/flash/?game=portal-flash` open a game directly.
+
+The **Load your own SWF** panel at the bottom of the page accepts any local
+`.swf`; the file is read into memory, checked for a valid `FWS`/`CWS`/`ZWS`
+header and never uploaded or persisted.
+
 ---
 
 ## Mobile, landscape and fullscreen
@@ -252,6 +318,10 @@ dual analog movement and mouse-look.
   look). The D-pad center sends Enter/confirm. Haptics can be toggled where the
   browser and device support vibration. Desktop keyboard and mouse controls
   remain unchanged.
+- **Flash Vault:** the Ruffle player takes keyboard focus when a game loads. The
+  optional **Keys** pad adds a d-pad, Space/Enter/Esc and Q/W/O/P, sends real key
+  events to the SWF, and stays available in fullscreen. It defaults on for touch
+  devices; the preference is remembered.
 - The mobile action cluster uses the familiar four-button diamond for primary
   actions, with secondary actions below it.
 - **Prince of Persia 2:** the data prompt is compact, scrolls inside the 4:3
@@ -260,7 +330,7 @@ dual analog movement and mouse-look.
   secondary copy.
 - The landing page uses `viewport-fit=cover` and `env(safe-area-inset-*)` so
   notches and rounded corners do not clip controls. On narrow phones the game
-  filter becomes a 2 × 2 grid instead of a horizontally clipped strip.
+  filter wraps into a two-column grid instead of a horizontally clipped strip.
 
 All animations (warp field, aurora, ticker, glitch, tilt, reticle) are disabled
 automatically under `prefers-reduced-motion: reduce`.
@@ -276,6 +346,8 @@ Everything is local. Nothing is uploaded.
 | `arcade.dave.progress.v1` | Dangerous Dave | `{ highestLevel, bestScore, updated }` |
 | `rea2048:best` | 2048 | Best score as a number |
 | `arcade.quake.pad` | Quake | `1` / `0` — touch pad preference |
+| `arcade.flash.last.v1` | Flash Vault | Slug of the last game played |
+| `arcade.flash.keys.v1` | Flash Vault | `1` / `0` — touch key pad preference |
 | IndexedDB | Prince of Persia 2 | Cached `pop2-data.tar.gz` and saved games |
 | js-dos storage | Keen 4, Duke Nukem II, DOS Vault, DOS Cabinet | DOSBox saves, configs and bundle state |
 
@@ -357,6 +429,7 @@ for checking that the vendored js-dos layer works.
    - `wasm` — a game compiled to WebAssembly that runs immediately
    - `emu` — an emulated/DOS cabinet (may bundle a free episode or accept a bundle)
    - `data` — an engine that needs data supplied by the player
+   - `flash` — a card that opens the local Flash Vault (`games/flash/?game=<slug>`)
 3. Use an existing card as the template for the art, chips, progress line and
    call to action. Add an `assets/<slug>.svg` or `.png` poster if you have one.
 4. Update the filter counts only if you change the kinds: the numbers in the
@@ -389,11 +462,16 @@ arcade/
 │   ├── pop2/               Prince of Persia 2 cabinet + self-hosting docs
 │   ├── pop2demo/           Prince of Persia 2 DOS demo cabinet + bundle
 │   ├── dos/                js-dos cabinet
+│   ├── flash/              Flash Vault page, catalog, 26 bundled SWFs
 │   └── <slug>/             25 DOS Vault cabinets, each with its own .jsdos bundle
+├── assets/flash/           generated SVG cover art for the Flash Vault
 ├── vendor/js-dos/          vendored js-dos 8.5.3 and emulator cores
+├── vendor/ruffle/          vendored Ruffle 0.7.1 web runtime
 ├── test/                   sample .jsdos bundles for the test harness
 ├── test-keen.html          minimal js-dos smoke test
-└── tools/serve.sh          static server helper
+└── tools/
+    ├── serve.sh            static server helper
+    └── make-flash-art.ps1  regenerates Flash Vault cover art from catalog.json
 ```
 
 ---
@@ -424,6 +502,13 @@ arcade/
   publishers: id Software, Apogee Software / 3D Realms, Epic MegaGames, Raven
   Software, Ken Silverman, Interactive Magic and Brøderbund. See the table above
   for the license basis of each title. No full commercial game data is included.
+- **Flash Vault** — 26 classic Flash games, kept as preservation copies for
+  private local play. Names, code and artwork belong to their original creators
+  and publishers. Source repositories and per-file provenance are documented in
+  `games/flash/README.md`. No title is sold, relicensed or claimed by this
+  project.
+- **Ruffle** — the Flash emulator used by the vault, by Ruffle contributors,
+  distributed under MIT / Apache 2.0; see `vendor/ruffle/`.
 - **js-dos** — by Tommy Visic and contributors, distributed under its own
   license; see `vendor/js-dos/`.
 - **Glace artwork** — retained in `assets/`; no engine or game data is included.

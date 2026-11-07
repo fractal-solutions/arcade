@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#05060a">
-  <meta name="description" content="A browser arcade of DOS and PC classics, a local Flash player for your own SWF files, and links to classic Flash games.">
+  <meta name="description" content="A browser arcade of DOS and PC classics, plus a local vault of 26 classic Flash games running in Ruffle.">
   <title>WASM Arcade — authentic classics in the browser</title>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css?v=20261108">
@@ -37,7 +37,7 @@
           aria-describedby="coverflow-live"></canvas>
         <div class="coverflow-heading" aria-hidden="true">
           <span>ARCADE <i>SELECT</i></span>
-          <span id="coverflow-index">01 <b>/</b> 38</span>
+          <span id="coverflow-index">01 <b>/</b> 64</span>
         </div>
         <span class="coverflow-live" id="coverflow-live" aria-live="polite"></span>
         <div class="library-controls">
@@ -56,7 +56,7 @@
         </div>
         <div class="selector" role="tablist" aria-label="Filter games">
           <button type="button" class="selector-btn is-active" role="tab" aria-selected="true" data-filter="all">
-            All <b data-count-for="all">38</b>
+            All <b data-count-for="all">64</b>
           </button>
           <button type="button" class="selector-btn" role="tab" aria-selected="false" data-filter="wasm">
             WASM <b data-count-for="wasm">3</b>
@@ -71,12 +71,12 @@
             References <b data-count-for="external">5</b>
           </button>
           <button type="button" class="selector-btn" role="tab" aria-selected="false" data-filter="flash">
-            Flash <b data-count-for="flash">5</b>
+            Flash <b data-count-for="flash">27</b>
           </button>
           <span class="selector-glint" aria-hidden="true"></span>
         </div>
       </div>
-      <p class="selector-status" id="selector-status" aria-live="polite">Showing 38 of 38 entries</p>
+      <p class="selector-status" id="selector-status" aria-live="polite">Showing 64 of 64 entries</p>
 
       <section class="featured-game" aria-label="Selected game" aria-live="polite">
         <div class="featured-copy">
@@ -921,23 +921,575 @@
             </div>
           </div>
         </article>
-        <article class="cabinet flash-player" data-game="flash-player" data-kind="flash" style="--i:37; --accent:#59f3ff">
-          <a class="cabinet-link" href="games/flash/" aria-label="Load your own Flash SWF">
+        <div class="vault-divider flash-divider" role="presentation">
+          <span class="vault-kicker">// THE FLASH VAULT</span>
+          <h3>26 games, already stashed.</h3>
+          <p>Local SWF files running in Ruffle: cult platformers, puzzle boxes, tower defense,
+            ragdoll sports and a stack of tiny arcade classics. No plugin, no outbound links.</p>
+        </div>
+        <article class="cabinet n" data-game="n" data-kind="flash" style="--i:37; --accent:#f5d76e">
+          <a class="cabinet-link" href="games/flash/?game=n" aria-label="Play N">
             <div class="art">
-              <img src="assets/flash.svg" alt="Abstract neon Flash player artwork" width="800" height="500" loading="lazy">
+              <img src="assets/flash/n.svg" alt="N cover art" width="800" height="500" loading="lazy">
               <span class="art-index" aria-hidden="true">38</span>
-              <span class="art-tag">FLASH · LOCAL PLAYER</span>
+              <span class="art-tag">FLASH &middot; 2004</span>
               <span class="play-badge" aria-hidden="true">▶</span>
             </div>
             <div class="body">
               <div class="title-row">
-                <h2>Load a Flash game</h2>
-                <span class="chip wasm">Ruffle player</span>
+                <h2>N</h2>
+                <span class="chip flash">Flash</span>
               </div>
-              <p>Choose an SWF file from your device and run it locally with Ruffle. Your file is not uploaded or saved by the arcade.</p>
+              <p>Metanet's minimalist ninja platformer: one fragile stick figure, 100 brutal rooms, and pure momentum.</p>
               <div class="card-foot">
-                <span class="progress">Bring your own SWF</span>
-                <span class="cta">Open player <span aria-hidden="true">→</span></span>
+                <span class="progress">Local SWF ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet qwop" data-game="qwop" data-kind="flash" style="--i:38; --accent:#ff9f6e">
+          <a class="cabinet-link" href="games/flash/?game=qwop" aria-label="Play QWOP">
+            <div class="art">
+              <img src="assets/flash/qwop.svg" alt="QWOP cover art" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">39</span>
+              <span class="art-tag">FLASH &middot; 2008</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>QWOP</h2>
+                <span class="chip flash">Flash</span>
+              </div>
+              <p>Bennett Foddy's four-key ragdoll sprint. Control each leg separately and try to travel 100 metres upright.</p>
+              <div class="card-foot">
+                <span class="progress">Local SWF ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet worlds-hardest-game" data-game="worlds-hardest-game" data-kind="flash" style="--i:39; --accent:#ff5c5c">
+          <a class="cabinet-link" href="games/flash/?game=worlds-hardest-game" aria-label="Play The World's Hardest Game">
+            <div class="art">
+              <img src="assets/flash/worlds-hardest-game.svg" alt="The World's Hardest Game cover art" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">40</span>
+              <span class="art-tag">FLASH &middot; 2008</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>The World's Hardest Game</h2>
+                <span class="chip flash">Flash</span>
+              </div>
+              <p>Guide a red square through 30 rooms of spikes, bullets and moving walls. One touch sends you back to the start.</p>
+              <div class="card-foot">
+                <span class="progress">Local SWF ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet bloxorz" data-game="bloxorz" data-kind="flash" style="--i:40; --accent:#63e6ff">
+          <a class="cabinet-link" href="games/flash/?game=bloxorz" aria-label="Play Bloxorz">
+            <div class="art">
+              <img src="assets/flash/bloxorz.svg" alt="Bloxorz cover art" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">41</span>
+              <span class="art-tag">FLASH &middot; 2007</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Bloxorz</h2>
+                <span class="chip flash">Flash</span>
+              </div>
+              <p>Roll a 1x1x2 block across floating tiles and drop it into the hole. Simple rules, fiendish 33-level campaign.</p>
+              <div class="card-foot">
+                <span class="progress">Local SWF ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet achievement-unlocked" data-game="achievement-unlocked" data-kind="flash" style="--i:41; --accent:#ffd166">
+          <a class="cabinet-link" href="games/flash/?game=achievement-unlocked" aria-label="Play Achievement Unlocked">
+            <div class="art">
+              <img src="assets/flash/achievement-unlocked.svg" alt="Achievement Unlocked cover art" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">42</span>
+              <span class="art-tag">FLASH &middot; 2008</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Achievement Unlocked</h2>
+                <span class="chip flash">Flash</span>
+              </div>
+              <p>jmtb02's genre parody where the real goal is to collect every absurd achievement, including the ones that make no sense.</p>
+              <div class="card-foot">
+                <span class="progress">Local SWF ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet motherload" data-game="motherload" data-kind="flash" style="--i:42; --accent:#ffb347">
+          <a class="cabinet-link" href="games/flash/?game=motherload" aria-label="Play Motherload">
+            <div class="art">
+              <img src="assets/flash/motherload.svg" alt="Motherload cover art" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">43</span>
+              <span class="art-tag">FLASH &middot; 2004</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Motherload</h2>
+                <span class="chip flash">Flash</span>
+              </div>
+              <p>XGen Studios' cult mining game. Drill deeper, manage fuel and cargo, and chase the motherlode before the tank runs dry.</p>
+              <div class="card-foot">
+                <span class="progress">Local SWF ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet interactive-buddy" data-game="interactive-buddy" data-kind="flash" style="--i:43; --accent:#c7a6ff">
+          <a class="cabinet-link" href="games/flash/?game=interactive-buddy" aria-label="Play Interactive Buddy">
+            <div class="art">
+              <img src="assets/flash/interactive-buddy.svg" alt="Interactive Buddy cover art" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">44</span>
+              <span class="art-tag">FLASH &middot; 2005</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Interactive Buddy</h2>
+                <span class="chip flash">Flash</span>
+              </div>
+              <p>A stress-ball sandbox with a ragdoll buddy, unlockable toys and a lot of questionable physics.</p>
+              <div class="card-foot">
+                <span class="progress">Local SWF ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet age-of-war" data-game="age-of-war" data-kind="flash" style="--i:44; --accent:#ff7a3d">
+          <a class="cabinet-link" href="games/flash/?game=age-of-war" aria-label="Play Age of War">
+            <div class="art">
+              <img src="assets/flash/age-of-war.svg" alt="Age of War cover art" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">45</span>
+              <span class="art-tag">FLASH &middot; 2007</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Age of War</h2>
+                <span class="chip flash">Flash</span>
+              </div>
+              <p>Louissi's lane strategy classic: evolve your base from cavemen to future tech and hold the line against the other age.</p>
+              <div class="card-foot">
+                <span class="progress">Local SWF ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet bloons-td-2" data-game="bloons-td-2" data-kind="flash" style="--i:45; --accent:#8dff9e">
+          <a class="cabinet-link" href="games/flash/?game=bloons-td-2" aria-label="Play Bloons TD 2">
+            <div class="art">
+              <img src="assets/flash/bloons-td-2.svg" alt="Bloons TD 2 cover art" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">46</span>
+              <span class="art-tag">FLASH &middot; 2009</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Bloons TD 2</h2>
+                <span class="chip flash">Flash</span>
+              </div>
+              <p>Ninja Kiwi's monkey-and-dart tower defense. Ten tracks, six towers and a lot of popping.</p>
+              <div class="card-foot">
+                <span class="progress">Local SWF ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet learn-to-fly" data-game="learn-to-fly" data-kind="flash" style="--i:46; --accent:#62d6ff">
+          <a class="cabinet-link" href="games/flash/?game=learn-to-fly" aria-label="Play Learn to Fly">
+            <div class="art">
+              <img src="assets/flash/learn-to-fly.svg" alt="Learn to Fly cover art" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">47</span>
+              <span class="art-tag">FLASH &middot; 2009</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Learn to Fly</h2>
+                <span class="chip flash">Flash</span>
+              </div>
+              <p>Launch a penguin, upgrade the sled, and chain glide distance into a surprisingly deep progression loop.</p>
+              <div class="card-foot">
+                <span class="progress">Local SWF ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet doodle-jump" data-game="doodle-jump" data-kind="flash" style="--i:47; --accent:#59f36f">
+          <a class="cabinet-link" href="games/flash/?game=doodle-jump" aria-label="Play Doodle Jump">
+            <div class="art">
+              <img src="assets/flash/doodle-jump.svg" alt="Doodle Jump cover art" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">48</span>
+              <span class="art-tag">FLASH &middot; 2009</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Doodle Jump</h2>
+                <span class="chip flash">Flash</span>
+              </div>
+              <p>Lima Sky's one-more-jump vertical platformer. Bounce upward, steer past hazards and never look down.</p>
+              <div class="card-foot">
+                <span class="progress">Local SWF ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet fancy-pants" data-game="fancy-pants" data-kind="flash" style="--i:48; --accent:#ff9ecf">
+          <a class="cabinet-link" href="games/flash/?game=fancy-pants" aria-label="Play The Fancy Pants Adventure">
+            <div class="art">
+              <img src="assets/flash/fancy-pants.svg" alt="The Fancy Pants Adventure cover art" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">49</span>
+              <span class="art-tag">FLASH &middot; 2006</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>The Fancy Pants Adventure</h2>
+                <span class="chip flash">Flash</span>
+              </div>
+              <p>Brad Borne's hand-drawn platformer with momentum-heavy running, wall jumps and secret rooms.</p>
+              <div class="card-foot">
+                <span class="progress">Local SWF ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet riddle-school" data-game="riddle-school" data-kind="flash" style="--i:49; --accent:#c7a6ff">
+          <a class="cabinet-link" href="games/flash/?game=riddle-school" aria-label="Play Riddle School">
+            <div class="art">
+              <img src="assets/flash/riddle-school.svg" alt="Riddle School cover art" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">50</span>
+              <span class="art-tag">FLASH &middot; 2006</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Riddle School</h2>
+                <span class="chip flash">Flash</span>
+              </div>
+              <p>JonBro's point-and-click escape comedy. Click everything, combine the weird, and get out of class.</p>
+              <div class="card-foot">
+                <span class="progress">Local SWF ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet storm-the-house" data-game="storm-the-house" data-kind="flash" style="--i:50; --accent:#ffd166">
+          <a class="cabinet-link" href="games/flash/?game=storm-the-house" aria-label="Play Storm the House">
+            <div class="art">
+              <img src="assets/flash/storm-the-house.svg" alt="Storm the House cover art" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">51</span>
+              <span class="art-tag">FLASH &middot; 2005</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Storm the House</h2>
+                <span class="chip flash">Flash</span>
+              </div>
+              <p>Hold a house against waves of stickmen. Buy weapons, repair the walls, and survive the siege.</p>
+              <div class="card-foot">
+                <span class="progress">Local SWF ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet portal-flash" data-game="portal-flash" data-kind="flash" style="--i:51; --accent:#62d6ff">
+          <a class="cabinet-link" href="games/flash/?game=portal-flash" aria-label="Play Portal: The Flash Version">
+            <div class="art">
+              <img src="assets/flash/portal-flash.svg" alt="Portal: The Flash Version cover art" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">52</span>
+              <span class="art-tag">FLASH &middot; 2007</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Portal: The Flash Version</h2>
+                <span class="chip flash">Flash</span>
+              </div>
+              <p>We Create Stuff's 2D Portal fan game: 40 test chambers, portals, cubes, buttons and turrets.</p>
+              <div class="card-foot">
+                <span class="progress">Local SWF ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet super-meat-boy" data-game="super-meat-boy" data-kind="flash" style="--i:52; --accent:#ff5c5c">
+          <a class="cabinet-link" href="games/flash/?game=super-meat-boy" aria-label="Play Super Meat Boy">
+            <div class="art">
+              <img src="assets/flash/super-meat-boy.svg" alt="Super Meat Boy cover art" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">53</span>
+              <span class="art-tag">FLASH &middot; 2008</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Super Meat Boy</h2>
+                <span class="chip flash">Flash</span>
+              </div>
+              <p>The original Flash prototype of Team Meat's masocore platformer: short, sharp, bloody and instantly retryable.</p>
+              <div class="card-foot">
+                <span class="progress">Local SWF ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet pandemic-2" data-game="pandemic-2" data-kind="flash" style="--i:53; --accent:#8dff9e">
+          <a class="cabinet-link" href="games/flash/?game=pandemic-2" aria-label="Play Pandemic 2">
+            <div class="art">
+              <img src="assets/flash/pandemic-2.svg" alt="Pandemic 2 cover art" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">54</span>
+              <span class="art-tag">FLASH &middot; 2008</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Pandemic 2</h2>
+                <span class="chip flash">Flash</span>
+              </div>
+              <p>Dark Realm's outbreak sim. Design a pathogen, evolve symptoms and try to end humanity before a cure is found.</p>
+              <div class="card-foot">
+                <span class="progress">Local SWF ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet papas-pizzeria" data-game="papas-pizzeria" data-kind="flash" style="--i:54; --accent:#ff9e3d">
+          <a class="cabinet-link" href="games/flash/?game=papas-pizzeria" aria-label="Play Papa's Pizzeria">
+            <div class="art">
+              <img src="assets/flash/papas-pizzeria.svg" alt="Papa's Pizzeria cover art" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">55</span>
+              <span class="art-tag">FLASH &middot; 2007</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Papa's Pizzeria</h2>
+                <span class="chip flash">Flash</span>
+              </div>
+              <p>Flipline's order-stacking restaurant sim. Take orders, build pizzas, bake them and keep the customers happy.</p>
+              <div class="card-foot">
+                <span class="progress">Local SWF ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet duck-life" data-game="duck-life" data-kind="flash" style="--i:55; --accent:#ffd166">
+          <a class="cabinet-link" href="games/flash/?game=duck-life" aria-label="Play Duck Life">
+            <div class="art">
+              <img src="assets/flash/duck-life.svg" alt="Duck Life cover art" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">56</span>
+              <span class="art-tag">FLASH &middot; 2007</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Duck Life</h2>
+                <span class="chip flash">Flash</span>
+              </div>
+              <p>Train a duck in running, swimming, flying and climbing, then race it to the championship.</p>
+              <div class="card-foot">
+                <span class="progress">Local SWF ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet stick-rpg" data-game="stick-rpg" data-kind="flash" style="--i:56; --accent:#c7a6ff">
+          <a class="cabinet-link" href="games/flash/?game=stick-rpg" aria-label="Play Stick RPG">
+            <div class="art">
+              <img src="assets/flash/stick-rpg.svg" alt="Stick RPG cover art" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">57</span>
+              <span class="art-tag">FLASH &middot; 2003</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Stick RPG</h2>
+                <span class="chip flash">Flash</span>
+              </div>
+              <p>XGen's stick-figure life sim. Get a job, go to school, buy stuff, and chase a better ending.</p>
+              <div class="card-foot">
+                <span class="progress">Local SWF ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet rubiks-cube" data-game="rubiks-cube" data-kind="flash" style="--i:57; --accent:#ff7a3d">
+          <a class="cabinet-link" href="games/flash/?game=rubiks-cube" aria-label="Play Rubik's Cube">
+            <div class="art">
+              <img src="assets/flash/rubiks-cube.svg" alt="Rubik's Cube cover art" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">58</span>
+              <span class="art-tag">FLASH &middot; 2007</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Rubik's Cube</h2>
+                <span class="chip flash">Flash</span>
+              </div>
+              <p>A 3D Rubik's Cube simulator for mouse and keyboard. Scramble, solve, repeat.</p>
+              <div class="card-foot">
+                <span class="progress">Local SWF ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet checkers" data-game="checkers" data-kind="flash" style="--i:58; --accent:#e7c56e">
+          <a class="cabinet-link" href="games/flash/?game=checkers" aria-label="Play Checkers">
+            <div class="art">
+              <img src="assets/flash/checkers.svg" alt="Checkers cover art" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">59</span>
+              <span class="art-tag">FLASH &middot; 2007</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Checkers</h2>
+                <span class="chip flash">Flash</span>
+              </div>
+              <p>The classic board game, playable in the browser with a friend or the computer.</p>
+              <div class="card-foot">
+                <span class="progress">Local SWF ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet minesweeper" data-game="minesweeper" data-kind="flash" style="--i:59; --accent:#63e6ff">
+          <a class="cabinet-link" href="games/flash/?game=minesweeper" aria-label="Play Minesweeper">
+            <div class="art">
+              <img src="assets/flash/minesweeper.svg" alt="Minesweeper cover art" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">60</span>
+              <span class="art-tag">FLASH &middot; 2007</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Minesweeper</h2>
+                <span class="chip flash">Flash</span>
+              </div>
+              <p>The Windows classic. Clear the board without detonating a mine.</p>
+              <div class="card-foot">
+                <span class="progress">Local SWF ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet pacman" data-game="pacman" data-kind="flash" style="--i:60; --accent:#ffd166">
+          <a class="cabinet-link" href="games/flash/?game=pacman" aria-label="Play Pac-Man">
+            <div class="art">
+              <img src="assets/flash/pacman.svg" alt="Pac-Man cover art" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">61</span>
+              <span class="art-tag">FLASH &middot; 2007</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Pac-Man</h2>
+                <span class="chip flash">Flash</span>
+              </div>
+              <p>The arcade icon in a compact Flash version. Eat the dots, dodge the ghosts, grab the fruit.</p>
+              <div class="card-foot">
+                <span class="progress">Local SWF ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet tetris" data-game="tetris" data-kind="flash" style="--i:61; --accent:#c7a6ff">
+          <a class="cabinet-link" href="games/flash/?game=tetris" aria-label="Play Tetris">
+            <div class="art">
+              <img src="assets/flash/tetris.svg" alt="Tetris cover art" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">62</span>
+              <span class="art-tag">FLASH &middot; 2007</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Tetris</h2>
+                <span class="chip flash">Flash</span>
+              </div>
+              <p>The falling-block classic. Clear lines, chase the high score, and resist the urge to stack one more piece.</p>
+              <div class="card-foot">
+                <span class="progress">Local SWF ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet snake" data-game="snake" data-kind="flash" style="--i:62; --accent:#8dff9e">
+          <a class="cabinet-link" href="games/flash/?game=snake" aria-label="Play Snake">
+            <div class="art">
+              <img src="assets/flash/snake.svg" alt="Snake cover art" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">63</span>
+              <span class="art-tag">FLASH &middot; 2007</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Snake</h2>
+                <span class="chip flash">Flash</span>
+              </div>
+              <p>The Nokia-era time killer. Eat, grow, and don't bite yourself.</p>
+              <div class="card-foot">
+                <span class="progress">Local SWF ready</span>
+                <span class="cta">Play <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        <article class="cabinet flash-player" data-game="flash-player" data-kind="flash" style="--i:63; --accent:#59f3ff">
+          <a class="cabinet-link" href="games/flash/" aria-label="Open the Flash Vault">
+            <div class="art">
+              <img src="assets/flash.svg" alt="Abstract neon Flash Vault artwork" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">64</span>
+              <span class="art-tag">FLASH &middot; LOCAL VAULT</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Open the Flash Vault</h2>
+                <span class="chip flash">Ruffle</span>
+              </div>
+              <p>Browse all 26 bundled games, or load an SWF from your device. Everything runs locally in Ruffle; your own file is never uploaded.</p>
+              <div class="card-foot">
+                <span class="progress">26 games + bring your own</span>
+                <span class="cta">Open vault <span aria-hidden="true">→</span></span>
               </div>
             </div>
           </a>
@@ -966,8 +1518,9 @@
           their engines, Windows installs or data are not bundled, and the cards do not navigate
           off-site.
           The free Carmageddon demo still fails to boot in this DOSBox build, so it is not
-          marked as playable. The Flash filter offers a local Ruffle player for SWFs you
-          provide; it contains no external game links or redistributed commercial SWFs.</p>
+          marked as playable. The Flash filter now opens a local vault of 26 SWF games,
+          running offline in Ruffle with no outbound game links; the vault also keeps a
+          bring-your-own-SWF player for anything else you want to load.</p>
       </div>
       <div class="note">
         <h2>Saves that stay put</h2>

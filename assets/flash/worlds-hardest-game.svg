@@ -1,0 +1,47 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500" role="img" aria-labelledby="title desc">
+  <title id="title">The World&apos;s Hardest Game</title>
+  <desc id="desc">Flash Vault cover art for The World&apos;s Hardest Game</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1426"/>
+      <stop offset=".55" stop-color="#070a12"/>
+      <stop offset="1" stop-color="#03050a"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="72%" cy="30%" r="78%">
+      <stop offset="0" stop-color="#ff5c5c" stop-opacity=".42"/>
+      <stop offset=".55" stop-color="#ff5c5c" stop-opacity=".08"/>
+      <stop offset="1" stop-color="#ff5c5c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#03050a" stop-opacity="0"/>
+      <stop offset=".5" stop-color="#03050a" stop-opacity=".72"/>
+      <stop offset="1" stop-color="#03050a" stop-opacity=".96"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg)"/>
+  <rect width="800" height="500" fill="url(#glow)"/>
+  <g opacity=".1" stroke="#ff5c5c" stroke-width="1">
+    <path d="M0 70 H800 M0 140 H800 M0 210 H800 M0 280 H800 M0 350 H800 M0 420 H800"/>
+    <path d="M70 0 V500 M140 0 V500 M210 0 V500 M280 0 V500 M350 0 V500 M420 0 V500 M490 0 V500 M560 0 V500 M630 0 V500 M700 0 V500 M770 0 V500"/>
+  </g>
+  <g fill="#ff5c5c" opacity=".85">
+  <rect x="500" y="105" width="42" height="42"/>
+  <rect x="560" y="105" width="42" height="42" opacity=".6"/>
+  <rect x="620" y="105" width="42" height="42" opacity=".35"/>
+  <rect x="500" y="165" width="42" height="42" opacity=".5"/>
+  <rect x="620" y="165" width="42" height="42" opacity=".8"/>
+  <rect x="560" y="225" width="42" height="42" opacity=".4"/>
+  <rect x="500" y="285" width="42" height="42" opacity=".7"/>
+  <rect x="620" y="285" width="42" height="42" opacity=".55"/>
+</g>
+<g fill="none" stroke="#ff5c5c" stroke-width="5" opacity=".7">
+  <path d="M420 330 L445 285 L470 330 Z M650 330 L675 285 L700 330 Z"/>
+</g>
+  <rect y="300" width="800" height="200" fill="url(#fade)"/>
+  <rect x="52" y="322" width="64" height="4" fill="#ff5c5c"/>
+  <text x="52" y="382" fill="#edf4ff" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="700" letter-spacing="-1">The World&apos;s Hardest Game</text>
+  <text x="52" y="418" fill="#ff5c5c" font-family="Consolas, monospace" font-size="15" letter-spacing="2">REFLEX PUZZLE Â· 2008</text>
+  <text x="52" y="456" fill="#8fa3bb" font-family="Consolas, monospace" font-size="11" letter-spacing="2">WASM ARCADE Â· FLASH VAULT</text>
+  <text x="748" y="72" fill="#ff5c5c" fill-opacity=".55" text-anchor="end" font-family="Consolas, monospace" font-size="18" letter-spacing="2">03</text>
+  <rect x="1" y="1" width="798" height="498" fill="none" stroke="#ff5c5c" stroke-opacity=".18"/>
+</svg>

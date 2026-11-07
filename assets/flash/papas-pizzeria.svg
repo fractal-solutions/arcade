@@ -1,0 +1,46 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500" role="img" aria-labelledby="title desc">
+  <title id="title">Papa&apos;s Pizzeria</title>
+  <desc id="desc">Flash Vault cover art for Papa&apos;s Pizzeria</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1426"/>
+      <stop offset=".55" stop-color="#070a12"/>
+      <stop offset="1" stop-color="#03050a"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="72%" cy="30%" r="78%">
+      <stop offset="0" stop-color="#ff9e3d" stop-opacity=".42"/>
+      <stop offset=".55" stop-color="#ff9e3d" stop-opacity=".08"/>
+      <stop offset="1" stop-color="#ff9e3d" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#03050a" stop-opacity="0"/>
+      <stop offset=".5" stop-color="#03050a" stop-opacity=".72"/>
+      <stop offset="1" stop-color="#03050a" stop-opacity=".96"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg)"/>
+  <rect width="800" height="500" fill="url(#glow)"/>
+  <g opacity=".1" stroke="#ff9e3d" stroke-width="1">
+    <path d="M0 70 H800 M0 140 H800 M0 210 H800 M0 280 H800 M0 350 H800 M0 420 H800"/>
+    <path d="M70 0 V500 M140 0 V500 M210 0 V500 M280 0 V500 M350 0 V500 M420 0 V500 M490 0 V500 M560 0 V500 M630 0 V500 M700 0 V500 M770 0 V500"/>
+  </g>
+  <g opacity=".9">
+  <circle cx="600" cy="190" r="105" fill="#ff9e3d" opacity=".25"/>
+  <circle cx="600" cy="190" r="95" fill="none" stroke="#ff9e3d" stroke-width="7"/>
+  <path d="M600 190 L680 130 A95 95 0 0 1 690 220 Z" fill="#ff9e3d" opacity=".45"/>
+  <circle cx="570" cy="160" r="10" fill="#ff9e3d"/>
+  <circle cx="630" cy="220" r="9" fill="#ff9e3d"/>
+  <circle cx="555" cy="230" r="8" fill="#ff9e3d"/>
+  <circle cx="645" cy="150" r="7" fill="#ff9e3d"/>
+</g>
+<g stroke="#ff9e3d" stroke-width="4" opacity=".3">
+  <path d="M430 320 H740 M430 350 H740"/>
+</g>
+  <rect y="300" width="800" height="200" fill="url(#fade)"/>
+  <rect x="52" y="322" width="64" height="4" fill="#ff9e3d"/>
+  <text x="52" y="382" fill="#edf4ff" font-family="Segoe UI, Arial, sans-serif" font-size="48" font-weight="700" letter-spacing="-1">Papa&apos;s Pizzeria</text>
+  <text x="52" y="418" fill="#ff9e3d" font-family="Consolas, monospace" font-size="15" letter-spacing="2">MANAGEMENT SIM Â· 2007</text>
+  <text x="52" y="456" fill="#8fa3bb" font-family="Consolas, monospace" font-size="11" letter-spacing="2">WASM ARCADE Â· FLASH VAULT</text>
+  <text x="748" y="72" fill="#ff9e3d" fill-opacity=".55" text-anchor="end" font-family="Consolas, monospace" font-size="18" letter-spacing="2">18</text>
+  <rect x="1" y="1" width="798" height="498" fill="none" stroke="#ff9e3d" stroke-opacity=".18"/>
+</svg>

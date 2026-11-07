@@ -1,0 +1,46 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500" role="img" aria-labelledby="title desc">
+  <title id="title">Bloons TD 2</title>
+  <desc id="desc">Flash Vault cover art for Bloons TD 2</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1426"/>
+      <stop offset=".55" stop-color="#070a12"/>
+      <stop offset="1" stop-color="#03050a"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="72%" cy="30%" r="78%">
+      <stop offset="0" stop-color="#8dff9e" stop-opacity=".42"/>
+      <stop offset=".55" stop-color="#8dff9e" stop-opacity=".08"/>
+      <stop offset="1" stop-color="#8dff9e" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#03050a" stop-opacity="0"/>
+      <stop offset=".5" stop-color="#03050a" stop-opacity=".72"/>
+      <stop offset="1" stop-color="#03050a" stop-opacity=".96"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg)"/>
+  <rect width="800" height="500" fill="url(#glow)"/>
+  <g opacity=".1" stroke="#8dff9e" stroke-width="1">
+    <path d="M0 70 H800 M0 140 H800 M0 210 H800 M0 280 H800 M0 350 H800 M0 420 H800"/>
+    <path d="M70 0 V500 M140 0 V500 M210 0 V500 M280 0 V500 M350 0 V500 M420 0 V500 M490 0 V500 M560 0 V500 M630 0 V500 M700 0 V500 M770 0 V500"/>
+  </g>
+  <g fill="none" stroke="#8dff9e" stroke-width="6" opacity=".9">
+  <circle cx="590" cy="190" r="105"/>
+  <circle cx="590" cy="190" r="72"/>
+  <circle cx="590" cy="190" r="38"/>
+  <circle cx="590" cy="190" r="12" fill="#8dff9e"/>
+</g>
+<g stroke="#8dff9e" stroke-width="6" stroke-linecap="round" opacity=".8">
+  <path d="M590 190 L690 105 M590 190 L485 120"/>
+</g>
+<g fill="#8dff9e" opacity=".7">
+  <circle cx="440" cy="300" r="10"/><circle cx="700" cy="290" r="8"/><circle cx="735" cy="140" r="7"/>
+</g>
+  <rect y="300" width="800" height="200" fill="url(#fade)"/>
+  <rect x="52" y="322" width="64" height="4" fill="#8dff9e"/>
+  <text x="52" y="382" fill="#edf4ff" font-family="Segoe UI, Arial, sans-serif" font-size="58" font-weight="700" letter-spacing="-1">Bloons TD 2</text>
+  <text x="52" y="418" fill="#8dff9e" font-family="Consolas, monospace" font-size="15" letter-spacing="2">TOWER DEFENSE Â· 2009</text>
+  <text x="52" y="456" fill="#8fa3bb" font-family="Consolas, monospace" font-size="11" letter-spacing="2">WASM ARCADE Â· FLASH VAULT</text>
+  <text x="748" y="72" fill="#8dff9e" fill-opacity=".55" text-anchor="end" font-family="Consolas, monospace" font-size="18" letter-spacing="2">09</text>
+  <rect x="1" y="1" width="798" height="498" fill="none" stroke="#8dff9e" stroke-opacity=".18"/>
+</svg>

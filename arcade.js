@@ -178,6 +178,7 @@
     if (featured.kind && kind) featured.kind.textContent = kind.textContent.trim();
     if (featured.title && title) featured.title.textContent = title.textContent.trim();
     if (featured.description && description) featured.description.textContent = description.textContent.trim();
+    const isFlashVault = card.dataset.game === 'flash-player';
     if (featured.launch && link) {
       featured.launch.href = link.href;
       if (link.target) {
@@ -187,13 +188,16 @@
         featured.launch.removeAttribute('target');
         featured.launch.removeAttribute('rel');
       }
-      const action = external || card.dataset.game === 'flash-player' ? 'Open' : 'Play';
-      featured.launch.setAttribute('aria-label', `${action} ${title ? title.textContent.trim() : 'selected game'}`);
+      const action = external || isFlashVault ? 'Open' : 'Play';
+      const titleText = title ? title.textContent.trim() : 'selected game';
+      featured.launch.setAttribute('aria-label', isFlashVault ? titleText : `${action} ${titleText}`);
     }
     if (featured.launchLabel) {
       featured.launchLabel.textContent = external
         ? 'Reference only'
-        : (card.dataset.kind === 'flash' ? 'Open Flash player' : 'Launch game');
+        : (isFlashVault
+          ? 'Open Flash vault'
+          : (card.dataset.kind === 'flash' ? 'Play Flash game' : 'Launch game'));
     }
     if (featured.prompt) featured.prompt.textContent = String(cards.indexOf(card) + 1).padStart(2, '0');
     renderCoverflow();

@@ -1,0 +1,44 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500" role="img" aria-labelledby="title desc">
+  <title id="title">Bloxorz</title>
+  <desc id="desc">Flash Vault cover art for Bloxorz</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1426"/>
+      <stop offset=".55" stop-color="#070a12"/>
+      <stop offset="1" stop-color="#03050a"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="72%" cy="30%" r="78%">
+      <stop offset="0" stop-color="#63e6ff" stop-opacity=".42"/>
+      <stop offset=".55" stop-color="#63e6ff" stop-opacity=".08"/>
+      <stop offset="1" stop-color="#63e6ff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#03050a" stop-opacity="0"/>
+      <stop offset=".5" stop-color="#03050a" stop-opacity=".72"/>
+      <stop offset="1" stop-color="#03050a" stop-opacity=".96"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg)"/>
+  <rect width="800" height="500" fill="url(#glow)"/>
+  <g opacity=".1" stroke="#63e6ff" stroke-width="1">
+    <path d="M0 70 H800 M0 140 H800 M0 210 H800 M0 280 H800 M0 350 H800 M0 420 H800"/>
+    <path d="M70 0 V500 M140 0 V500 M210 0 V500 M280 0 V500 M350 0 V500 M420 0 V500 M490 0 V500 M560 0 V500 M630 0 V500 M700 0 V500 M770 0 V500"/>
+  </g>
+  <g opacity=".9">
+  <path d="M520 120 L610 80 L700 120 L610 160 Z" fill="#63e6ff" opacity=".35"/>
+  <path d="M520 120 L610 160 L610 260 L520 220 Z" fill="#63e6ff" opacity=".8"/>
+  <path d="M610 160 L700 120 L700 220 L610 260 Z" fill="#63e6ff" opacity=".55"/>
+  <path d="M555 170 L610 195 L610 235 L555 210 Z" fill="#070a12" opacity=".6"/>
+  <path d="M610 195 L665 170 L665 210 L610 235 Z" fill="#070a12" opacity=".45"/>
+</g>
+<g stroke="#63e6ff" stroke-width="2" opacity=".3">
+  <path d="M430 300 H720 M430 330 H720"/>
+</g>
+  <rect y="300" width="800" height="200" fill="url(#fade)"/>
+  <rect x="52" y="322" width="64" height="4" fill="#63e6ff"/>
+  <text x="52" y="382" fill="#edf4ff" font-family="Segoe UI, Arial, sans-serif" font-size="58" font-weight="700" letter-spacing="-1">Bloxorz</text>
+  <text x="52" y="418" fill="#63e6ff" font-family="Consolas, monospace" font-size="15" letter-spacing="2">PUZZLE Â· 2007</text>
+  <text x="52" y="456" fill="#8fa3bb" font-family="Consolas, monospace" font-size="11" letter-spacing="2">WASM ARCADE Â· FLASH VAULT</text>
+  <text x="748" y="72" fill="#63e6ff" fill-opacity=".55" text-anchor="end" font-family="Consolas, monospace" font-size="18" letter-spacing="2">04</text>
+  <rect x="1" y="1" width="798" height="498" fill="none" stroke="#63e6ff" stroke-opacity=".18"/>
+</svg>

@@ -825,6 +825,13 @@ footer {
   font-size: .92em;
 }
 
+.flash-divider::before {
+  background: linear-gradient(90deg, var(--cyan), transparent);
+  box-shadow: 0 0 12px rgba(89, 243, 255, .55);
+}
+
+.flash-divider .vault-kicker { color: var(--cyan); }
+
 /* ---------- cabinets ---------- */
 
 .cabinets {
@@ -1068,6 +1075,7 @@ footer {
 .chip.data { color: var(--red); border-color: rgba(255, 106, 90, .3); background: rgba(255, 106, 90, .07); }
 .chip.emu { color: var(--green); border-color: rgba(139, 212, 80, .3); background: rgba(139, 212, 80, .07); }
 .chip.external { color: #b7c8ff; border-color: rgba(155, 140, 255, .3); background: rgba(155, 140, 255, .08); }
+.chip.flash { color: var(--cyan); border-color: rgba(89, 243, 255, .3); background: rgba(89, 243, 255, .07); }
 
 .body p {
   margin: 0;
@@ -1410,7 +1418,7 @@ footer .fine { color: #4d5a6b; font-size: 11px; }
 }
 
 @media (max-width: 560px) {
-  /* Two balanced rows instead of a horizontally clipped strip. */
+  /* Wrap into balanced rows instead of a horizontally clipped strip. */
   .selector {
     flex-wrap: wrap;
     overflow: visible;

@@ -4,54 +4,159 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#070a12">
-  <meta name="description" content="Load a Flash SWF you provide and play it locally with Ruffle.">
-  <title>Flash Player — WASM Arcade</title>
+  <meta name="description" content="A local vault of 26 classic Flash games, running offline in the browser with Ruffle.">
+  <title>Flash Vault — WASM Arcade</title>
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="flash.css">
+  <script>
+    window.RufflePlayer = window.RufflePlayer || {};
+    window.RufflePlayer.config = {
+      autoplay: 'on',
+      unmuteOverlay: 'hidden',
+      letterbox: 'on',
+      scale: 'showAll',
+      quality: 'high',
+      warnOnUnsupportedContent: false,
+      contextMenu: 'on',
+      splashScreen: false
+    };
+  </script>
   <script src="../../vendor/ruffle/ruffle.js" defer></script>
   <script src="flash.js" defer></script>
 </head>
 <body>
   <header class="topbar">
     <a class="brand" href="../../"><span aria-hidden="true">▚</span> WASM ARCADE</a>
-    <a class="back-link" href="../../">← Back to games</a>
+    <div class="topbar-actions">
+      <span class="vault-tag">FLASH VAULT · 26 GAMES</span>
+      <a class="back-link" href="../../">← Back to games</a>
+    </div>
   </header>
 
   <main>
-    <section class="player-panel" aria-labelledby="page-title">
-      <p class="eyebrow">LOCAL FLASH PLAYER · RUFFLE</p>
-      <h1 id="page-title">Bring your own SWF</h1>
-      <p class="lede">Choose a Flash game file from your device. It runs in this browser tab; the arcade does not upload or save it.</p>
+    <section class="vault-hero" aria-labelledby="page-title">
+      <div class="hero-copy">
+        <p class="eyebrow">LOCAL FLASH VAULT · RUFFLE</p>
+        <h1 id="page-title">26 games.<br><span>No plugin.</span></h1>
+        <p class="lede">The cult classics are stashed on this machine: <b>N</b>, <b>QWOP</b>,
+          <b>Motherload</b>, <b>Bloons TD 2</b>, <b>Fancy Pants</b>, <b>Portal: The Flash
+          Version</b> and more. Every SWF runs locally in Ruffle — no accounts, no trackers,
+          no outbound game links.</p>
+      </div>
+      <div class="hero-stats" aria-label="Vault statistics">
+        <span><b>26</b><small>games</small></span>
+        <span><b>42 MB</b><small>local files</small></span>
+        <span><b>0</b><small>trackers</small></span>
+      </div>
+    </section>
 
-      <form class="loader" id="swf-form">
-        <label class="file-picker" for="swf-file">
-          <span class="file-icon" aria-hidden="true">＋</span>
-          <span><strong>Choose a .swf file</strong><small id="file-name">Nothing selected</small></span>
-          <input id="swf-file" name="swf-file" type="file" accept=".swf,application/x-shockwave-flash">
-        </label>
-        <button class="primary-button" id="load-button" type="submit" disabled>Load game</button>
-        <button class="quiet-button" id="clear-button" type="button" disabled>Unload</button>
-      </form>
-
-      <p class="status" id="player-status" role="status" aria-live="polite">Select a SWF file to begin.</p>
-
+    <section class="player-shell" id="player-shell" aria-label="Flash player">
       <div class="player-frame">
         <div class="player-toolbar">
           <span class="live-led" aria-hidden="true"></span>
-          <span id="player-title">FLASH PLAYER</span>
-          <button class="fullscreen-button" id="fullscreen-button" type="button" disabled>Fullscreen</button>
+          <span id="player-title">SELECT A GAME</span>
+          <span class="player-meta" id="player-meta">LOCAL · RUFFLE</span>
+          <div class="player-toolbar-actions">
+            <button class="quiet-button" id="random-button" type="button">Random</button>
+            <button class="quiet-button keys-button" id="keys-button" type="button" aria-pressed="false" aria-label="Show touch keys" title="Show touch keys" disabled>⌨ <span>Keys</span></button>
+            <button class="quiet-button" id="fullscreen-button" type="button" disabled>Fullscreen</button>
+            <button class="quiet-button" id="close-button" type="button" disabled>Close</button>
+          </div>
         </div>
         <div class="player-container" id="player-container">
-          <div class="empty-state">
+          <div class="empty-state" id="empty-state">
             <span class="empty-mark" aria-hidden="true">▶</span>
-            <p>Your game will appear here</p>
+            <p>Pick a game below.<br><small>It runs locally with Ruffle.</small></p>
+          </div>
+        </div>
+        <div class="touch-keys" id="touch-keys" hidden aria-label="On-screen keyboard">
+          <div class="touch-dpad" role="group" aria-label="Direction keys">
+            <button type="button" class="key key-up" data-key="ArrowUp" aria-label="Up">▲</button>
+            <button type="button" class="key key-left" data-key="ArrowLeft" aria-label="Left">◀</button>
+            <button type="button" class="key key-down" data-key="ArrowDown" aria-label="Down">▼</button>
+            <button type="button" class="key key-right" data-key="ArrowRight" aria-label="Right">▶</button>
+          </div>
+          <div class="touch-actions" role="group" aria-label="Action keys">
+            <button type="button" class="key key-space" data-key="Space" aria-label="Space">Space</button>
+            <button type="button" class="key" data-key="Enter" aria-label="Enter">Enter</button>
+            <button type="button" class="key" data-key="Escape" aria-label="Escape">Esc</button>
+          </div>
+          <div class="touch-qwop" role="group" aria-label="QWOP keys">
+            <button type="button" class="key" data-key="KeyQ" aria-label="Q">Q</button>
+            <button type="button" class="key" data-key="KeyW" aria-label="W">W</button>
+            <button type="button" class="key" data-key="KeyO" aria-label="O">O</button>
+            <button type="button" class="key" data-key="KeyP" aria-label="P">P</button>
           </div>
         </div>
       </div>
-
-      <p class="fine-print">Ruffle supports many, but not all, Flash games. Some titles require legacy APIs or extra files and may not run. Only load SWFs you trust.</p>
+      <div class="player-caption">
+        <div class="caption-copy">
+          <p class="eyebrow" id="caption-kicker">NOW SELECTED</p>
+          <h2 id="caption-title">Choose a game</h2>
+          <p id="caption-description">Use the vault below, or press Random for a surprise. Every game is already downloaded and ready to play offline.</p>
+        </div>
+        <div class="caption-controls">
+          <span class="controls-label">CONTROLS</span>
+          <p id="caption-controls">Click a card to load it. Arrow keys browse the vault when the grid has focus.</p>
+        </div>
+      </div>
+      <p class="status" id="player-status" role="status" aria-live="polite">Ready.</p>
     </section>
+
+    <section class="library-section" aria-labelledby="library-title">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">// THE FLASH VAULT</p>
+          <h2 id="library-title">Pick a classic</h2>
+        </div>
+        <div class="library-tools">
+          <label class="search-box" for="game-search">
+            <span aria-hidden="true">⌕</span>
+            <input id="game-search" type="search" placeholder="Search 26 games" autocomplete="off">
+          </label>
+          <label class="genre-box" for="genre-filter">
+            <span class="sr-only">Filter by genre</span>
+            <select id="genre-filter">
+              <option value="all">All genres</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div class="game-grid" id="game-grid" aria-live="polite"></div>
+      <p class="empty-results" id="empty-results" hidden>No games match that search. Try another title or genre.</p>
+    </section>
+
+    <details class="byo-panel" id="byo-panel">
+      <summary>
+        <span class="summary-mark" aria-hidden="true">＋</span>
+        <span><strong>Load your own SWF</strong><small>Your file stays on this device and is never uploaded.</small></span>
+        <span class="summary-arrow" aria-hidden="true">→</span>
+      </summary>
+      <div class="byo-body">
+        <form class="loader" id="swf-form">
+          <label class="file-picker" for="swf-file">
+            <span class="file-icon" aria-hidden="true">＋</span>
+            <span><strong>Choose a .swf file</strong><small id="file-name">Nothing selected</small></span>
+            <input id="swf-file" name="swf-file" type="file" accept=".swf,application/x-shockwave-flash">
+          </label>
+          <button class="primary-button" id="load-button" type="submit" disabled>Load game</button>
+          <button class="quiet-button" id="clear-file-button" type="button" disabled>Clear</button>
+        </form>
+        <p class="fine-print">Ruffle supports many, but not all, SWFs. Some titles need unsupported legacy APIs or extra files. Only load SWFs you trust.</p>
+      </div>
+    </details>
+
+    <p class="fine-print vault-footnote">
+      Game names and artwork belong to their respective creators. This is a private,
+      local preservation shelf for games that were freely playable on the web; no
+      commercial storefront data is included. Ruffle is MIT / Apache-2.0 and lives in
+      <code>vendor/ruffle/</code>.
+    </p>
   </main>
 
+  <noscript>
+    <p class="noscript">The Flash Vault needs JavaScript and WebAssembly. Enable JavaScript to browse and play the local SWF library.</p>
+  </noscript>
 </body>
 </html>
