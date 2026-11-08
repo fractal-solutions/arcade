@@ -15,8 +15,8 @@ request once the page is loaded.
 | File | Purpose |
 | --- | --- |
 | `index.html` | Vault page: hero, player, search/filter grid, bring-your-own-SWF panel |
-| `flash.css` | Responsive dark UI, fullscreen and mobile layouts |
-| `flash.js` | Catalog loading, grid, deep links, search/filter, random, Ruffle, fullscreen, touch keys |
+| `flash.css` | Responsive dark UI, shelf/player views, fullscreen and mobile layouts |
+| `flash.js` | Catalog loading, grid, deep links, search/filter, random, Ruffle, fullscreen, touch keys and analog stick |
 | `catalog.json` | Source of truth for titles, files, posters, years, genres, accents and controls |
 | `swf/` | The 26 bundled SWF files |
 | `../../assets/flash/` | Generated SVG cover art, one per slug |
@@ -28,15 +28,18 @@ request once the page is loaded.
    opened from `file://`).
 2. It renders a card per game and wires deep links: `?game=<slug>` selects and
    starts that title.
-3. Selecting a game creates a Ruffle player and calls `load({ url })` with the
-   relative `swf/<slug>.swf` path. The player is focused after loading so
-   keyboard input goes straight to the game; clicking the picture refocuses it.
+3. Selecting a game switches from the shelf to a dedicated **Now Playing** view,
+   creates a Ruffle player and calls `load({ url })` with the relative
+   `swf/<slug>.swf` path. The player is focused after loading so keyboard input
+   goes straight to the game; clicking the picture refocuses it. **Back** unloads
+   the game and restores the shelf at the scroll position you left.
 4. The last played slug is stored under `arcade.flash.last.v1` in
    `localStorage` and shown as a **LAST** badge.
-5. The optional **Keys** pad sends `KeyboardEvent`s to Ruffle: a d-pad,
-   Space/Enter/Esc and Q/W/O/P. It is shown automatically on touch devices, can
-   be toggled in the toolbar, and the choice is stored under
-   `arcade.flash.keys.v1` (`1` / `0`).
+5. The optional **Keys** pad sends `KeyboardEvent`s to Ruffle: a d-pad or analog
+   stick, Space/Enter/Esc, Shift/Ctrl/Alt and Q/W/O/P. It is shown automatically
+   on touch devices, can be toggled in the toolbar, and the choice is stored
+   under `arcade.flash.keys.v1` (`1` / `0`). The movement control is stored under
+   `arcade.flash.pad.v1` (`dpad` / `analog`).
 6. The **Load your own SWF** panel reads a local file into an `ArrayBuffer`,
    verifies the `FWS` / `CWS` / `ZWS` header and calls `load({ data })`. The file
    is never uploaded or persisted.
@@ -50,16 +53,33 @@ failing silently.
 | Button | Key event |
 | --- | --- |
 | D-pad | `ArrowUp` / `ArrowLeft` / `ArrowDown` / `ArrowRight` |
+| Analog stick | the same arrow keys, including diagonals |
 | Space | `Space` (`key: " "`, `code: "Space"`) |
 | Enter | `Enter` |
 | Esc | `Escape` |
+| Shift / Ctrl / Alt | `ShiftLeft` / `ControlLeft` / `AltLeft` |
 | Q / W / O / P | `KeyQ` / `KeyW` / `KeyO` / `KeyP` |
 
 The pad dispatches `KeyboardEvent`s on `window` and focuses the Ruffle player
 first. Buttons use pointer capture, so a key stays down while you hold it and
 multiple keys can be held at once (needed for QWOP and most platformers). The
-pad is hidden until a game is running and can be toggled with the **Keys**
-button in the player toolbar.
+Q/W/O/P cluster only appears for games whose catalog controls mention those
+keys. The pad is hidden until a game is running and can be toggled with the
+**Keys** button in the player toolbar.
+
+**D-Pad / Analog** in the toolbar switches the movement control. Analog mode
+uses a round stick with the same dead zone and nub travel as the DOS cabinets;
+dragging it presses one or two arrow keys and the choice is remembered in
+`arcade.flash.pad.v1`.
+
+## Fullscreen
+
+In fullscreen the player toolbar hides by default so the game gets the whole
+viewport. Reveal it by swiping down from the top edge, tapping the small tab in
+the top-left corner, or waiting for the brief reveal shown when fullscreen
+starts. It hides again after a few idle seconds; swipe up on the bar to dismiss
+it immediately. The touch keys float over the bottom of the picture, and
+**Back** (or Escape) leaves fullscreen.
 
 ## Adding a game
 

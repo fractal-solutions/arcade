@@ -52,15 +52,20 @@
 
     <section class="player-shell" id="player-shell" aria-label="Flash player">
       <div class="player-frame">
-        <div class="player-toolbar">
+        <button class="toolbar-reveal" id="toolbar-reveal" type="button"
+          aria-label="Show player controls" aria-expanded="false" aria-controls="player-toolbar"
+          title="Show player controls"><span aria-hidden="true">▾</span></button>
+        <div class="player-toolbar" id="player-toolbar">
           <span class="live-led" aria-hidden="true"></span>
           <span id="player-title">SELECT A GAME</span>
           <span class="player-meta" id="player-meta">LOCAL · RUFFLE</span>
           <div class="player-toolbar-actions">
             <button class="quiet-button" id="random-button" type="button">Random</button>
+            <button class="quiet-button pad-button" id="pad-mode-button" type="button"
+              aria-label="Switch movement control to analog stick" title="Switch between D-pad and analog stick" hidden>D-Pad</button>
             <button class="quiet-button keys-button" id="keys-button" type="button" aria-pressed="false" aria-label="Show touch keys" title="Show touch keys" disabled>⌨ <span>Keys</span></button>
             <button class="quiet-button" id="fullscreen-button" type="button" disabled>Fullscreen</button>
-            <button class="quiet-button" id="close-button" type="button" disabled>Close</button>
+            <button class="quiet-button" id="close-button" type="button" aria-label="Back to the game shelf" title="Back to the game shelf" disabled>Back</button>
           </div>
         </div>
         <div class="player-container" id="player-container">
@@ -69,17 +74,26 @@
             <p>Pick a game below.<br><small>It runs locally with Ruffle.</small></p>
           </div>
         </div>
-        <div class="touch-keys" id="touch-keys" hidden aria-label="On-screen keyboard">
+        <div class="touch-keys" id="touch-keys" hidden data-pad="dpad" aria-label="On-screen keyboard">
           <div class="touch-dpad" role="group" aria-label="Direction keys">
             <button type="button" class="key key-up" data-key="ArrowUp" aria-label="Up">▲</button>
             <button type="button" class="key key-left" data-key="ArrowLeft" aria-label="Left">◀</button>
             <button type="button" class="key key-down" data-key="ArrowDown" aria-label="Down">▼</button>
             <button type="button" class="key key-right" data-key="ArrowRight" aria-label="Right">▶</button>
           </div>
+          <div class="touch-stick" id="touch-stick" role="application" aria-label="Analog movement stick">
+            <span class="touch-stick-ring" aria-hidden="true"></span>
+            <span class="touch-stick-nub" aria-hidden="true"></span>
+          </div>
           <div class="touch-actions" role="group" aria-label="Action keys">
             <button type="button" class="key key-space" data-key="Space" aria-label="Space">Space</button>
             <button type="button" class="key" data-key="Enter" aria-label="Enter">Enter</button>
             <button type="button" class="key" data-key="Escape" aria-label="Escape">Esc</button>
+          </div>
+          <div class="touch-mods" role="group" aria-label="Modifier keys">
+            <button type="button" class="key key-mod" data-key="ShiftLeft" aria-label="Shift">Shift</button>
+            <button type="button" class="key key-mod" data-key="ControlLeft" aria-label="Control">Ctrl</button>
+            <button type="button" class="key key-mod" data-key="AltLeft" aria-label="Alt">Alt</button>
           </div>
           <div class="touch-qwop" role="group" aria-label="QWOP keys">
             <button type="button" class="key" data-key="KeyQ" aria-label="Q">Q</button>
@@ -110,6 +124,8 @@
           <h2 id="library-title">Pick a classic</h2>
         </div>
         <div class="library-tools">
+          <button type="button" class="quiet-button shelf-random" id="shelf-random"
+            title="Pick a random game from the current filter">Surprise me</button>
           <label class="search-box" for="game-search">
             <span aria-hidden="true">⌕</span>
             <input id="game-search" type="search" placeholder="Search 26 games" autocomplete="off">

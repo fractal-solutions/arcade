@@ -388,12 +388,14 @@ ruffle-player,
 }
 
 .touch-keys {
-  --key: 38px;
-  display: grid;
-  grid-template-columns: auto minmax(110px, 1fr) auto;
+  --key-w: clamp(42px, 4.8vw, 54px);
+  --key-h: clamp(34px, 4.4vh, 42px);
+  --key-gap: 4px;
+  display: flex;
   align-items: center;
-  gap: clamp(8px, 1.4vw, 16px);
-  padding: 8px clamp(8px, 1.4vw, 14px);
+  justify-content: space-between;
+  gap: clamp(10px, 2.4vw, 30px);
+  padding: 8px clamp(10px, 2vw, 18px);
   border-top: 1px solid rgba(152, 190, 235, .14);
   background: linear-gradient(180deg, rgba(9, 14, 24, .96), rgba(5, 8, 14, .98));
   touch-action: none;
@@ -405,17 +407,18 @@ ruffle-player,
 
 .touch-dpad {
   display: grid;
-  grid-template-columns: repeat(3, var(--key));
-  grid-template-rows: repeat(3, var(--key));
-  gap: 3px;
+  grid-template-columns: repeat(3, var(--key-w));
+  grid-template-rows: repeat(3, var(--key-h));
+  gap: var(--key-gap);
+  flex: 0 0 auto;
 }
 
 .key {
   display: grid;
   place-items: center;
-  min-width: var(--key);
-  min-height: var(--key);
-  padding: 0 6px;
+  min-width: var(--key-w);
+  min-height: var(--key-h);
+  padding: 0 8px;
   border: 1px solid rgba(152, 190, 235, .28);
   border-radius: 7px;
   background: linear-gradient(180deg, rgba(30, 45, 70, .9), rgba(13, 20, 34, .94));
@@ -444,19 +447,124 @@ ruffle-player,
 .key-right { grid-column: 3; grid-row: 2; }
 .key-down { grid-column: 2; grid-row: 3; }
 
-.touch-actions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(48px, 1fr));
-  gap: 4px;
+/* Analog option: same footprint as the D-pad, arrow keys on drag. */
+.touch-stick {
+  --stick-size: calc(var(--key-h) * 3 + var(--key-gap) * 2);
+  position: relative;
+  display: none;
+  flex: 0 0 auto;
+  width: var(--stick-size);
+  height: var(--stick-size);
+  border: 1px solid rgba(152, 190, 235, .28);
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at 38% 18%, rgba(255, 255, 255, .12), transparent 38%),
+    radial-gradient(circle at 50% 35%, #2a3a52, #131c2b 62%, #070b12 100%);
+  box-shadow:
+    0 8px 0 #050506,
+    0 12px 24px rgba(0, 0, 0, .58),
+    inset 0 2px 2px rgba(255, 255, 255, .12),
+    inset 0 -12px 22px rgba(0, 0, 0, .7);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.key-space { grid-column: 1 / -1; }
+.touch-stick::before {
+  position: absolute;
+  inset: 5%;
+  border: 1px solid rgba(255, 255, 255, .06);
+  border-radius: 50%;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, .48), 0 1px 0 rgba(255, 255, 255, .04);
+  content: "";
+  pointer-events: none;
+}
+
+.touch-stick-ring {
+  position: absolute;
+  inset: 13%;
+  border: 1px dashed rgba(255, 255, 255, .11);
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .2);
+  pointer-events: none;
+}
+
+.touch-stick-nub {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 46%;
+  height: 46%;
+  border: 1px solid rgba(102, 234, 255, .32);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 38% 27%, rgba(255, 255, 255, .23), transparent 23%),
+    radial-gradient(circle at 42% 32%, #3d5878, #203249 48%, #0f1926 78%, #08101a 100%);
+  box-shadow:
+    0 5px 0 #08080a,
+    0 8px 18px rgba(0, 0, 0, .68),
+    inset 0 2px 2px rgba(255, 255, 255, .2),
+    inset 0 -4px 8px rgba(0, 0, 0, .4);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: transform 40ms linear, border-color 70ms ease, background 70ms ease;
+}
+
+.touch-stick-nub::after {
+  position: absolute;
+  inset: 16%;
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 50%;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, .46);
+  content: "";
+}
+
+.touch-stick.is-active .touch-stick-nub {
+  border-color: var(--cyan);
+  background:
+    radial-gradient(circle at 38% 27%, rgba(255, 255, 255, .25), transparent 23%),
+    radial-gradient(circle at 42% 32%, #2e6a80, #1b4052 48%, #0b1c28 78%, #071018 100%);
+}
+
+.touch-keys[data-pad="analog"] .touch-dpad { display: none; }
+.touch-keys[data-pad="analog"] .touch-stick { display: block; }
+
+.touch-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: 0 1 auto;
+}
+
+.touch-actions .key { min-width: clamp(46px, 5.4vw, 64px); }
+.touch-actions .key-space { min-width: clamp(74px, 8vw, 108px); }
+
+.touch-mods {
+  display: flex;
+  flex-direction: column;
+  gap: var(--key-gap);
+  flex: 0 0 auto;
+}
+
+.touch-mods .key {
+  min-width: clamp(46px, 5vw, 60px);
+  min-height: calc(var(--key-h) * .9);
+  padding-inline: 5px;
+  font-size: 9px;
+  letter-spacing: .04em;
+}
 
 .touch-qwop {
   display: grid;
-  grid-template-columns: repeat(2, var(--key));
-  gap: 4px;
+  grid-template-columns: repeat(2, var(--key-w));
+  gap: var(--key-gap);
+  flex: 0 0 auto;
 }
+
+/* Q/W/O/P only appears for games that actually use those keys. */
+.touch-keys:not(.has-qwop) .touch-qwop { display: none; }
 
 .player-caption {
   position: relative;
@@ -510,6 +618,71 @@ ruffle-player,
 
 .status.is-error { color: var(--bad); }
 .status.is-ok { color: var(--good); }
+
+/* ------------------------------------------------------------ player view */
+
+/* The vault is a two-view experience: shelf first, then a dedicated
+   Now Playing view. Selecting a card never leaves the player above the
+   fold, and Back returns to the exact shelf position. */
+body:not(.is-playing) .player-shell { display: none; }
+
+body.is-playing .topbar,
+body.is-playing .vault-hero,
+body.is-playing .library-section,
+body.is-playing .byo-panel,
+body.is-playing .vault-footnote { display: none; }
+
+body.is-playing main {
+  width: min(1320px, calc(100% - 24px));
+  padding: 10px 0;
+}
+
+body.is-playing .player-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 20px);
+  padding: clamp(8px, 1.2vw, 14px);
+}
+
+body.is-playing .player-frame {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+body.is-playing .player-container {
+  flex: 1 1 auto;
+  aspect-ratio: auto;
+  max-height: none;
+  min-height: 0;
+}
+
+body.is-playing .player-caption { padding: 12px 8px 0; }
+
+body.is-playing .caption-copy h2 {
+  margin-bottom: 5px;
+  font-size: clamp(18px, 2.2vw, 28px);
+}
+
+body.is-playing .caption-copy > p:last-child {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 1.5;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+body.is-playing .status { margin-top: 8px; }
+
+.shelf-random {
+  min-height: 38px;
+  padding: 0 14px;
+  border-color: rgba(102, 234, 255, .3);
+  background: rgba(102, 234, 255, .08);
+  white-space: nowrap;
+}
 
 /* ---------------------------------------------------------------- library */
 
@@ -818,17 +991,6 @@ ruffle-player,
   min-height: 0;
 }
 
-.player-frame:fullscreen .player-toolbar,
-.player-frame:-webkit-full-screen .player-toolbar {
-  flex: 0 0 auto;
-  background: rgba(6, 10, 18, .92);
-}
-
-.player-frame:fullscreen .touch-keys,
-.player-frame:-webkit-full-screen .touch-keys {
-  flex: 0 0 auto;
-}
-
 body.is-fullscreen {
   overflow: hidden;
 }
@@ -875,15 +1037,83 @@ body.is-fullscreen .player-container {
   min-height: 0;
 }
 
-body.is-fullscreen .player-toolbar {
-  background: rgba(6, 10, 18, .92);
+/* --- the toolbar gets out of the way; reveal it from the top edge --- */
+
+.toolbar-reveal { display: none; }
+
+.player-frame:fullscreen .toolbar-reveal,
+.player-frame:-webkit-full-screen .toolbar-reveal,
+body.is-fullscreen .toolbar-reveal {
+  display: grid;
+  place-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 30;
+  width: 58px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid rgba(152, 190, 235, .22);
+  border-top: 0;
+  border-left: 0;
+  border-radius: 0 0 10px 0;
+  background: rgba(4, 8, 14, .78);
+  color: var(--cyan);
+  font: 700 13px/1 var(--mono);
+  opacity: .58;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: opacity .18s ease, background .18s ease;
 }
 
-body.is-fullscreen .touch-keys {
-  flex: 0 0 auto;
-  background: rgba(4, 7, 12, .98);
-  padding-bottom: calc(8px + env(safe-area-inset-bottom));
+.player-frame:fullscreen .toolbar-reveal:hover,
+.player-frame:fullscreen .toolbar-reveal:focus-visible,
+body.is-fullscreen .toolbar-reveal:hover,
+body.is-fullscreen .toolbar-reveal:focus-visible {
+  opacity: 1;
+  background: rgba(10, 22, 38, .9);
 }
+
+.toolbar-reveal span { transition: transform .2s ease; }
+.toolbar-reveal.is-open span { transform: rotate(180deg); }
+
+.player-frame:fullscreen .player-toolbar,
+.player-frame:-webkit-full-screen .player-toolbar,
+body.is-fullscreen .player-toolbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  padding-left: 68px;
+  background: rgba(6, 10, 18, .92);
+  backdrop-filter: blur(10px);
+  transform: translateY(-100%);
+  transition: transform .24s ease;
+}
+
+body.is-toolbar-open .player-toolbar { transform: translateY(0); }
+
+/* The pad floats over the picture in fullscreen so the game keeps the
+   whole viewport instead of paying for a control strip. */
+.player-frame:fullscreen .touch-keys,
+.player-frame:-webkit-full-screen .touch-keys,
+body.is-fullscreen .touch-keys {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 8;
+  padding: 12px clamp(14px, 3vw, 32px) calc(12px + env(safe-area-inset-bottom));
+  border-top: 0;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, .62));
+  pointer-events: none;
+  --key-w: clamp(46px, 6vw, 62px);
+  --key-h: clamp(38px, 5.2vh, 48px);
+}
+
+.player-frame:fullscreen .touch-keys .key,
+body.is-fullscreen .touch-keys .key { pointer-events: auto; }
 
 .rotate-hint {
   position: fixed;
@@ -936,14 +1166,21 @@ body.is-fullscreen .touch-keys {
   .quiet-button { padding: 7px 7px; font-size: 8px; }
   .keys-button span { display: none; }
   .keys-button { padding: 7px 8px; }
-  .touch-keys { --key: 36px; grid-template-columns: auto minmax(90px, 1fr) auto; gap: 6px; padding: 7px 6px; }
+  .touch-keys { --key-w: 40px; --key-h: 34px; gap: 8px; padding: 7px 8px; }
   .key { font-size: 10px; border-radius: 6px; }
-  .touch-actions { grid-template-columns: repeat(2, minmax(42px, 1fr)); gap: 3px; }
-  .touch-qwop { gap: 3px; }
+  .touch-actions { gap: 4px; }
+  .touch-actions .key { min-width: 44px; }
+  .touch-actions .key-space { min-width: 68px; }
+  .touch-keys.has-qwop { flex-wrap: wrap; justify-content: center; row-gap: 7px; }
+  .touch-keys.has-qwop .touch-qwop { order: 3; }
   .player-container { aspect-ratio: 4 / 3; min-height: 58vw; max-height: 58vh; }
   .player-caption { padding: 14px 5px 2px; }
   .caption-copy h2 { font-size: 21px; }
   .caption-copy > p:last-child { font-size: 12px; }
+  body.is-playing main { width: calc(100% - 12px); padding: 6px 0; }
+  body.is-playing .player-shell { min-height: calc(100vh - 12px); padding: 6px; }
+  body.is-playing .player-caption { padding: 10px 4px 0; }
+  body.is-playing .caption-copy > p:last-child { display: none; }
   .library-tools { display: grid; grid-template-columns: 1fr; gap: 7px; }
   .search-box input { width: 100%; }
   .genre-box select { width: 100%; }
@@ -960,13 +1197,21 @@ body.is-fullscreen .touch-keys {
 
 @media (max-width: 380px) {
   .game-grid { grid-template-columns: 1fr; }
-  .touch-keys { --key: 32px; gap: 4px; }
-  .touch-actions { grid-template-columns: repeat(2, minmax(38px, 1fr)); }
+  .touch-keys { --key-w: 36px; --key-h: 32px; gap: 6px; }
+  .touch-actions .key { min-width: 40px; }
+  .touch-actions .key-space { min-width: 60px; }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  body.is-playing .player-caption,
+  body.is-playing .status { display: none; }
 }
 
 @media (max-height: 430px) and (orientation: landscape) {
-  .touch-keys { --key: 30px; padding: 5px 8px; gap: 6px; }
+  .touch-keys { --key-w: 38px; --key-h: 32px; padding: 5px 10px; gap: 8px; }
   .key { font-size: 9px; }
+  .player-frame:fullscreen .touch-keys,
+  body.is-fullscreen .touch-keys { --key-w: 42px; --key-h: 36px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

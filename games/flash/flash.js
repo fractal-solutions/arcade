@@ -5,6 +5,7 @@
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
   const LAST_KEY = 'arcade.flash.last.v1';
   const KEYS_KEY = 'arcade.flash.keys.v1';
+  const PAD_KEY = 'arcade.flash.pad.v1';
 
   const KEY_DEFS = {
     ArrowUp: { key: 'ArrowUp', code: 'ArrowUp', keyCode: 38 },
@@ -14,6 +15,9 @@
     Space: { key: ' ', code: 'Space', keyCode: 32 },
     Enter: { key: 'Enter', code: 'Enter', keyCode: 13 },
     Escape: { key: 'Escape', code: 'Escape', keyCode: 27 },
+    ShiftLeft: { key: 'Shift', code: 'ShiftLeft', keyCode: 16 },
+    ControlLeft: { key: 'Control', code: 'ControlLeft', keyCode: 17 },
+    AltLeft: { key: 'Alt', code: 'AltLeft', keyCode: 18 },
     KeyQ: { key: 'q', code: 'KeyQ', keyCode: 81 },
     KeyW: { key: 'w', code: 'KeyW', keyCode: 87 },
     KeyO: { key: 'o', code: 'KeyO', keyCode: 79 },
@@ -44,6 +48,12 @@
   const fileName = $('#file-name');
   const loadButton = $('#load-button');
   const clearFileButton = $('#clear-file-button');
+  const toolbarReveal = $('#toolbar-reveal');
+  const playerToolbar = $('#player-toolbar');
+  const shelfRandom = $('#shelf-random');
+  const padModeButton = $('#pad-mode-button');
+  const touchStick = $('#touch-stick');
+  const stickNub = touchStick ? $('.touch-stick-nub', touchStick) : null;
 
   const state = {
     games: [],
@@ -55,8 +65,28 @@
     query: '',
     lastPlayed: readLast(),
     keys: readKeys(),
+    pad: readPad(),
     immersive: false,
   };
+
+  let shelfScrollY = 0;
+  let toolbarTimer = 0;
+
+  /* ------------------------------------------------------------- views */
+
+  function enterPlayerView() {
+    if (document.body.classList.contains('is-playing')) return;
+    shelfScrollY = window.scrollY;
+    document.body.classList.add('is-playing');
+    window.scrollTo(0, 0);
+  }
+
+  function exitPlayerView() {
+    if (!document.body.classList.contains('is-playing')) return;
+    document.body.classList.remove('is-playing');
+    hideToolbar();
+    requestAnimationFrame(() => window.scrollTo(0, shelfScrollY));
+  }
 
   function readLast() {
     try {
@@ -83,6 +113,19 @@
   function writeKeys(on) {
     state.keys = on;
     try { localStorage.setItem(KEYS_KEY, on ? '1' : '0'); } catch (_) { /* storage may be disabled */ }
+  }
+
+  function readPad() {
+    try {
+      const stored = localStorage.getItem(PAD_KEY);
+      if (stored === 'dpad' || stored === 'analog') return stored;
+    } catch (_) { /* storage may be disabled */ }
+    return 'dpad';
+  }
+
+  function writePad(mode) {
+    state.pad = mode;
+    try { localStorage.setItem(PAD_KEY, mode); } catch (_) { /* storage may be disabled */ }
   }
 
   function report(message, tone = '') {
@@ -213,9 +256,15 @@
     if (game) selectGame(game, { scroll: false, quiet: true });
   }
 
+  function setTouchProfile(game) {
+    const needsQwop = Boolean(game && /Q\/W|O\/P/i.test(game.controls || ''));
+    touchKeys.classList.toggle('has-qwop', needsQwop);
+  }
+
   function selectGame(game, options = {}) {
     if (!game) return;
     state.selected = game;
+    setTouchProfile(game);
     for (const card of $$('.game-card', grid)) {
       card.classList.toggle('is-selected', card.dataset.slug === game.slug);
       card.setAttribute('aria-pressed', String(card.dataset.slug === game.slug));
@@ -271,12 +320,14 @@
 
   async function playGame(game) {
     if (!game) return;
+    enterPlayerView();
     selectGame(game, { scroll: false, quiet: true });
     state.current = game;
     emptyState.hidden = true;
     playerContainer.classList.add('is-loading');
     playerTitle.textContent = game.title.toUpperCase();
     playerMeta.textContent = `${game.genre.toUpperCase()} · ${game.year}`;
+    captionKicker.textContent = 'NOW PLAYING';
     closeButton.disabled = false;
     fullscreenButton.disabled = false;
     report(`Loading ${game.title}…`);
@@ -307,11 +358,13 @@
     showEmptyState();
     playerTitle.textContent = state.selected ? state.selected.title.toUpperCase() : 'SELECT A GAME';
     playerMeta.textContent = state.selected ? `${state.selected.genre.toUpperCase()} · ${state.selected.year}` : 'LOCAL · RUFFLE';
+    captionKicker.textContent = 'NOW SELECTED';
     closeButton.disabled = true;
     fullscreenButton.disabled = true;
     if (document.body.classList.contains('is-fullscreen') || document.fullscreenElement) {
       exitFullscreen();
     }
+    exitPlayerView();
     report('Player closed. Pick another game when you are ready.');
   }
 
@@ -357,6 +410,51 @@
     window.dispatchEvent(event);
   }
 
+  /* Analog option: drag the stick to press one or two arrow keys, with the
+     same dead zone and nub travel as the DOS cabinets. */
+  const stickState = { pointerId: null, keys: [] };
+
+  function stickDirections(event) {
+    if (!touchStick) return [];
+    const rect = touchStick.getBoundingClientRect();
+    const radius = Math.max(1, Math.min(rect.width, rect.height) / 2);
+    const dx = event.clientX - (rect.left + rect.width / 2);
+    const dy = event.clientY - (rect.top + rect.height / 2);
+    const distance = Math.hypot(dx, dy);
+    const travel = radius * 0.34;
+    const scale = distance > travel ? travel / distance : 1;
+    if (stickNub) {
+      stickNub.style.transform = `translate(calc(-50% + ${dx * scale}px), calc(-50% + ${dy * scale}px))`;
+    }
+    const nx = dx / radius;
+    const ny = dy / radius;
+    const keys = [];
+    if (distance / radius >= 0.2) {
+      if (nx > 0.38) keys.push('ArrowRight');
+      if (nx < -0.38) keys.push('ArrowLeft');
+      if (ny > 0.38) keys.push('ArrowDown');
+      if (ny < -0.38) keys.push('ArrowUp');
+    }
+    return keys;
+  }
+
+  function updateStickKeys(nextKeys) {
+    for (const key of stickState.keys) {
+      if (!nextKeys.includes(key)) sendKey('keyup', KEY_DEFS[key]);
+    }
+    for (const key of nextKeys) {
+      if (!stickState.keys.includes(key)) sendKey('keydown', KEY_DEFS[key]);
+    }
+    stickState.keys = nextKeys;
+  }
+
+  function resetStick() {
+    updateStickKeys([]);
+    if (touchStick) touchStick.classList.remove('is-active');
+    if (stickNub) stickNub.style.transform = 'translate(-50%, -50%)';
+    stickState.pointerId = null;
+  }
+
   function releaseHeldKeys(dispatch) {
     for (const button of heldPointers.values()) {
       button.classList.remove('is-down');
@@ -366,6 +464,7 @@
       }
     }
     heldPointers.clear();
+    resetStick();
     if (!dispatch) {
       for (const button of $$('.key', touchKeys)) button.classList.remove('is-down');
     }
@@ -379,7 +478,33 @@
     keysButton.setAttribute('aria-label', active ? 'Hide touch keys' : 'Show touch keys');
     keysButton.title = active ? 'Hide touch keys' : 'Show touch keys';
     touchKeys.hidden = !active;
+    if (padModeButton) {
+      padModeButton.hidden = !active;
+      padModeButton.disabled = !running;
+    }
+    applyPadMode();
     if (!active) releaseHeldKeys(running);
+  }
+
+  function applyPadMode() {
+    if (touchKeys) touchKeys.dataset.pad = state.pad;
+    if (padModeButton) {
+      const analog = state.pad === 'analog';
+      padModeButton.textContent = analog ? 'Analog' : 'D-Pad';
+      padModeButton.setAttribute('aria-pressed', String(analog));
+      padModeButton.setAttribute(
+        'aria-label',
+        analog ? 'Switch movement control to D-pad' : 'Switch movement control to analog stick',
+      );
+    }
+  }
+
+  function togglePadMode() {
+    if (!state.player) return;
+    writePad(state.pad === 'analog' ? 'dpad' : 'analog');
+    applyPadMode();
+    resetStick();
+    focusPlayer();
   }
 
   function toggleKeys() {
@@ -416,12 +541,125 @@
   touchKeys.addEventListener('pointerup', releasePointer);
   touchKeys.addEventListener('pointercancel', releasePointer);
   touchKeys.addEventListener('contextmenu', (event) => event.preventDefault());
+
+  if (touchStick) {
+    touchStick.addEventListener('pointerdown', (event) => {
+      if (event.pointerType === 'mouse' && event.button !== 0) return;
+      event.preventDefault();
+      focusPlayer();
+      stickState.pointerId = event.pointerId;
+      try { touchStick.setPointerCapture(event.pointerId); } catch (_) { /* optional */ }
+      touchStick.classList.add('is-active');
+      updateStickKeys(stickDirections(event));
+    });
+
+    touchStick.addEventListener('pointermove', (event) => {
+      if (event.pointerId !== stickState.pointerId) return;
+      event.preventDefault();
+      updateStickKeys(stickDirections(event));
+    });
+
+    const endStick = (event) => {
+      if (event.pointerId !== stickState.pointerId) return;
+      resetStick();
+    };
+    touchStick.addEventListener('pointerup', endStick);
+    touchStick.addEventListener('pointercancel', endStick);
+    touchStick.addEventListener('lostpointercapture', endStick);
+  }
+
   keysButton.addEventListener('click', toggleKeys);
+  if (padModeButton) padModeButton.addEventListener('click', togglePadMode);
   playerContainer.addEventListener('click', focusPlayer);
 
   /* ----------------------------------------------------------- fullscreen */
 
   const fsElement = () => document.fullscreenElement || document.webkitFullscreenElement;
+
+  function isFullscreenActive() {
+    return state.immersive || Boolean(fsElement());
+  }
+
+  function isToolbarOpen() {
+    return document.body.classList.contains('is-toolbar-open');
+  }
+
+  function hideToolbar() {
+    window.clearTimeout(toolbarTimer);
+    document.body.classList.remove('is-toolbar-open');
+    if (toolbarReveal) {
+      toolbarReveal.setAttribute('aria-expanded', 'false');
+      toolbarReveal.setAttribute('aria-label', 'Show player controls');
+      toolbarReveal.classList.remove('is-open');
+    }
+  }
+
+  function showToolbar(delay = 4200) {
+    if (!isFullscreenActive()) return;
+    document.body.classList.add('is-toolbar-open');
+    if (toolbarReveal) {
+      toolbarReveal.setAttribute('aria-expanded', 'true');
+      toolbarReveal.setAttribute('aria-label', 'Hide player controls');
+      toolbarReveal.classList.add('is-open');
+    }
+    window.clearTimeout(toolbarTimer);
+    if (delay > 0) toolbarTimer = window.setTimeout(hideToolbar, delay);
+  }
+
+  function toggleToolbar() {
+    if (isToolbarOpen()) hideToolbar();
+    else showToolbar();
+  }
+
+  if (toolbarReveal) {
+    toolbarReveal.addEventListener('click', (event) => {
+      event.preventDefault();
+      toggleToolbar();
+    });
+  }
+
+  if (playerToolbar) {
+    playerToolbar.addEventListener('pointerdown', () => {
+      if (isFullscreenActive() && isToolbarOpen()) showToolbar(5000);
+    });
+  }
+
+  /* Pull down from the very top edge to reveal the hidden fullscreen bar.
+     Swipe up on the bar itself to put it away again. */
+  let edgeSwipe = null;
+  let toolbarSwipe = null;
+
+  document.addEventListener('pointerdown', (event) => {
+    if (!isFullscreenActive() || !playerFrame) return;
+    if (playerToolbar && playerToolbar.contains(event.target)) {
+      toolbarSwipe = { id: event.pointerId, y: event.clientY };
+      return;
+    }
+    if (!playerFrame.contains(event.target)) return;
+    if (event.clientY <= 34) {
+      edgeSwipe = { id: event.pointerId, x: event.clientX, y: event.clientY };
+    }
+  }, true);
+
+  document.addEventListener('pointermove', (event) => {
+    if (edgeSwipe && event.pointerId === edgeSwipe.id) {
+      const dy = event.clientY - edgeSwipe.y;
+      const dx = Math.abs(event.clientX - edgeSwipe.x);
+      if (dy > 26 && dx < 100) {
+        edgeSwipe = null;
+        showToolbar();
+      }
+    }
+    if (toolbarSwipe && event.pointerId === toolbarSwipe.id) {
+      if (event.clientY - toolbarSwipe.y < -26) {
+        toolbarSwipe = null;
+        hideToolbar();
+      }
+    }
+  }, true);
+
+  document.addEventListener('pointerup', () => { edgeSwipe = null; toolbarSwipe = null; }, true);
+  document.addEventListener('pointercancel', () => { edgeSwipe = null; toolbarSwipe = null; }, true);
 
   function showRotateHint() {
     if ($('.rotate-hint')) return;
@@ -431,10 +669,13 @@
   }
 
   function setImmersive(on) {
+    const was = state.immersive;
     state.immersive = on;
     document.body.classList.toggle('is-fullscreen', on);
     fullscreenButton.setAttribute('aria-pressed', String(on));
     fullscreenButton.textContent = on ? 'Exit' : 'Fullscreen';
+    if (!on) hideToolbar();
+    else if (!was) showToolbar(2800);
     requestAnimationFrame(() => window.dispatchEvent(new Event('resize')));
   }
 
@@ -449,7 +690,15 @@
     try {
       await request.call(playerFrame, { navigationUI: 'hide' });
     } catch (_) {
-      await request.call(playerFrame);
+      try {
+        await request.call(playerFrame);
+      } catch (_) {
+        /* Fullscreen can be blocked (permissions, embedded frames). Fall back
+           to the immersive layout so the player still takes the viewport. */
+        setImmersive(true);
+        if (window.innerHeight > window.innerWidth) showRotateHint();
+        return;
+      }
     }
     try { await screen.orientation?.lock?.('landscape'); } catch (_) { /* optional */ }
     setImmersive(true);
@@ -473,9 +722,12 @@
   document.addEventListener('webkitfullscreenchange', () => setImmersive(Boolean(fsElement())));
 
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && state.immersive && !fsElement()) {
-      setImmersive(false);
+    if (event.key !== 'Escape') return;
+    if (isToolbarOpen()) {
+      hideToolbar();
+      return;
     }
+    if (state.immersive && !fsElement()) setImmersive(false);
   });
 
   /* ------------------------------------------------------------ keyboard */
@@ -511,6 +763,7 @@
   });
 
   randomButton.addEventListener('click', playRandom);
+  if (shelfRandom) shelfRandom.addEventListener('click', playRandom);
   closeButton.addEventListener('click', closePlayer);
 
   /* -------------------------------------------------------- bring your own */
@@ -535,6 +788,8 @@
       return;
     }
 
+    enterPlayerView();
+    touchKeys.classList.add('has-qwop');
     loadButton.disabled = true;
     playerContainer.classList.add('is-loading');
     playerTitle.textContent = file.name.toUpperCase();

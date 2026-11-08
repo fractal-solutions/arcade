@@ -263,23 +263,30 @@ dual analog movement and mouse-look.
 
 ### Flash Vault
 
-Open `games/flash/` from the **Flash** filter or any Flash card. Click a card to
-load that game, or press **Random** to pick one from the current filter. The
-search box matches titles, genres and descriptions; the genre menu narrows the
-grid. Each game keeps its own controls — the caption under the player shows the
-expected keys or mouse input for the selected title. The player takes keyboard
-focus when a game loads, and clicking the picture refocuses it.
+Open `games/flash/` from the **Flash** filter or any Flash card. The vault has
+two views: the game shelf, and a dedicated **Now Playing** view that opens as
+soon as you pick a card (or press **Surprise me**). The player never sits below
+the fold, and **Back** unloads the game and returns to the shelf at the scroll
+position you left. The search box matches titles, genres and descriptions; the
+genre menu narrows the grid. Each game keeps its own controls — the caption
+under the player shows the expected keys or mouse input for the selected title.
+The player takes keyboard focus when a game loads, and clicking the picture
+refocuses it.
 
 Most of these games expect a keyboard, so the player has an optional **Keys**
-pad: a d-pad, Space/Enter/Esc and Q/W/O/P buttons that send real key events to
-Ruffle. It appears automatically on touch devices and can be toggled from the
-toolbar; the preference is remembered. It works in fullscreen too, including
-short landscape layouts.
+pad: a d-pad or analog stick, Space/Enter/Esc, Shift/Ctrl/Alt and Q/W/O/P
+buttons that send real key events to Ruffle. It appears automatically on touch
+devices and can be toggled from the toolbar; the preference is remembered. The
+Q/W/O/P cluster only appears for games that use those keys. **D-Pad / Analog**
+switches the movement control; analog mode uses the same dead zone and nub
+travel as the DOS cabinets and remembers the choice.
 
 **Fullscreen** expands the player; on Android/Chrome it also tries to lock to
 landscape, while iOS Safari falls back to an immersive CSS layout with a rotate
-hint. **Close** unloads the game and returns to the picker. Deep links such as
-`games/flash/?game=portal-flash` open a game directly.
+hint. The toolbar hides by default in fullscreen — swipe down from the top edge,
+tap the top-left tab, or use the brief reveal shown on entry to bring it back.
+It auto-hides when idle, and swiping up on the bar dismisses it. Deep links such
+as `games/flash/?game=portal-flash` open a game directly.
 
 The **Load your own SWF** panel at the bottom of the page accepts any local
 `.swf`; the file is read into memory, checked for a valid `FWS`/`CWS`/`ZWS`
@@ -319,9 +326,11 @@ header and never uploaded or persisted.
   browser and device support vibration. Desktop keyboard and mouse controls
   remain unchanged.
 - **Flash Vault:** the Ruffle player takes keyboard focus when a game loads. The
-  optional **Keys** pad adds a d-pad, Space/Enter/Esc and Q/W/O/P, sends real key
-  events to the SWF, and stays available in fullscreen. It defaults on for touch
-  devices; the preference is remembered.
+  optional **Keys** pad adds a D-pad or analog stick, Space/Enter/Esc,
+  Shift/Ctrl/Alt and Q/W/O/P, sends real key events to the SWF, and floats over
+  the picture in fullscreen. It defaults on for touch devices; the key-pad and
+  D-pad/analog choices are remembered. In fullscreen the toolbar hides by
+  default and returns from the top edge, the top-left tab, or a swipe.
 - The mobile action cluster uses the familiar four-button diamond for primary
   actions, with secondary actions below it.
 - **Prince of Persia 2:** the data prompt is compact, scrolls inside the 4:3
@@ -348,6 +357,7 @@ Everything is local. Nothing is uploaded.
 | `arcade.quake.pad` | Quake | `1` / `0` — touch pad preference |
 | `arcade.flash.last.v1` | Flash Vault | Slug of the last game played |
 | `arcade.flash.keys.v1` | Flash Vault | `1` / `0` — touch key pad preference |
+| `arcade.flash.pad.v1` | Flash Vault | `dpad` / `analog` — movement control |
 | IndexedDB | Prince of Persia 2 | Cached `pop2-data.tar.gz` and saved games |
 | js-dos storage | Keen 4, Duke Nukem II, DOS Vault, DOS Cabinet | DOSBox saves, configs and bundle state |
 
