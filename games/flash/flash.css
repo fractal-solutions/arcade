@@ -401,9 +401,27 @@ ruffle-player,
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .touch-keys[hidden] { display: none; }
+
+/* Movement sits on the left; actions, modifiers and Q/W/O/P share a
+   right-hand cluster so the action keys never float over the picture. */
+.touch-move,
+.touch-right {
+  display: flex;
+  align-items: center;
+}
+
+.touch-move { flex: 0 0 auto; }
+
+.touch-right {
+  flex: 0 0 auto;
+  justify-content: flex-end;
+  gap: clamp(8px, 1.6vw, 18px);
+  margin-left: auto;
+}
 
 .touch-dpad {
   display: grid;
@@ -1044,15 +1062,17 @@ body.is-fullscreen .player-container {
 .player-frame:fullscreen .toolbar-reveal,
 .player-frame:-webkit-full-screen .toolbar-reveal,
 body.is-fullscreen .toolbar-reveal {
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 30;
-  width: 58px;
-  height: 30px;
-  padding: 0;
+  top: env(safe-area-inset-top, 0px);
+  left: env(safe-area-inset-left, 0px);
+  z-index: 60;
+  min-width: 58px;
+  height: 32px;
+  padding: 0 10px;
   border: 1px solid rgba(152, 190, 235, .22);
   border-top: 0;
   border-left: 0;
@@ -1060,10 +1080,18 @@ body.is-fullscreen .toolbar-reveal {
   background: rgba(4, 8, 14, .78);
   color: var(--cyan);
   font: 700 13px/1 var(--mono);
-  opacity: .58;
+  opacity: .72;
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
   backdrop-filter: blur(8px);
   transition: opacity .18s ease, background .18s ease;
+}
+
+.toolbar-reveal-text {
+  font: 700 8px/1 var(--mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
 }
 
 .player-frame:fullscreen .toolbar-reveal:hover,
@@ -1074,18 +1102,19 @@ body.is-fullscreen .toolbar-reveal:focus-visible {
   background: rgba(10, 22, 38, .9);
 }
 
-.toolbar-reveal span { transition: transform .2s ease; }
-.toolbar-reveal.is-open span { transform: rotate(180deg); }
+.toolbar-reveal-icon { transition: transform .2s ease; }
+.toolbar-reveal.is-open .toolbar-reveal-icon { transform: rotate(180deg); }
 
 .player-frame:fullscreen .player-toolbar,
 .player-frame:-webkit-full-screen .player-toolbar,
 body.is-fullscreen .player-toolbar {
   position: absolute;
-  top: 0;
+  top: env(safe-area-inset-top, 0px);
   left: 0;
   right: 0;
   z-index: 20;
-  padding-left: 68px;
+  padding-left: calc(112px + env(safe-area-inset-left, 0px));
+  padding-right: calc(10px + env(safe-area-inset-right, 0px));
   background: rgba(6, 10, 18, .92);
   backdrop-filter: blur(10px);
   transform: translateY(-100%);
@@ -1113,7 +1142,22 @@ body.is-fullscreen .touch-keys {
 }
 
 .player-frame:fullscreen .touch-keys .key,
-body.is-fullscreen .touch-keys .key { pointer-events: auto; }
+body.is-fullscreen .touch-keys .key,
+.player-frame:fullscreen .touch-stick,
+body.is-fullscreen .touch-stick { pointer-events: auto; }
+
+/* Give the right-hand cluster its own panel in fullscreen so Space/Enter/Esc
+   read as controller buttons, not as part of the game picture. */
+.player-frame:fullscreen .touch-right,
+.player-frame:-webkit-full-screen .touch-right,
+body.is-fullscreen .touch-right {
+  padding: 7px 9px;
+  border: 1px solid rgba(152, 190, 235, .14);
+  border-radius: 12px;
+  background: rgba(4, 8, 14, .5);
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+}
 
 .rotate-hint {
   position: fixed;
@@ -1171,8 +1215,10 @@ body.is-fullscreen .touch-keys .key { pointer-events: auto; }
   .touch-actions { gap: 4px; }
   .touch-actions .key { min-width: 44px; }
   .touch-actions .key-space { min-width: 68px; }
-  .touch-keys.has-qwop { flex-wrap: wrap; justify-content: center; row-gap: 7px; }
-  .touch-keys.has-qwop .touch-qwop { order: 3; }
+  /* Narrow screens: keep movement on the left and let the whole right-hand
+     cluster take its own row so the action keys never drift into the game. */
+  .touch-keys { flex-wrap: wrap; row-gap: 8px; }
+  .touch-right { flex: 1 1 100%; justify-content: flex-end; }
   .player-container { aspect-ratio: 4 / 3; min-height: 58vw; max-height: 58vh; }
   .player-caption { padding: 14px 5px 2px; }
   .caption-copy h2 { font-size: 21px; }

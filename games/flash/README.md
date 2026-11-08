@@ -63,9 +63,11 @@ failing silently.
 The pad dispatches `KeyboardEvent`s on `window` and focuses the Ruffle player
 first. Buttons use pointer capture, so a key stays down while you hold it and
 multiple keys can be held at once (needed for QWOP and most platformers). The
-Q/W/O/P cluster only appears for games whose catalog controls mention those
-keys. The pad is hidden until a game is running and can be toggled with the
-**Keys** button in the player toolbar.
+movement control sits on the left; Q/W/O/P, Shift/Ctrl/Alt and Space/Enter/Esc
+share a right-hand cluster, so the action keys never float over the middle of
+the picture. The Q/W/O/P cluster only appears for games whose catalog controls
+mention those keys. The pad is hidden until a game is running and can be
+toggled with the **Keys** button in the player toolbar.
 
 **D-Pad / Analog** in the toolbar switches the movement control. Analog mode
 uses a round stick with the same dead zone and nub travel as the DOS cabinets;
@@ -75,11 +77,13 @@ dragging it presses one or two arrow keys and the choice is remembered in
 ## Fullscreen
 
 In fullscreen the player toolbar hides by default so the game gets the whole
-viewport. Reveal it by swiping down from the top edge, tapping the small tab in
-the top-left corner, or waiting for the brief reveal shown when fullscreen
-starts. It hides again after a few idle seconds; swipe up on the bar to dismiss
-it immediately. The touch keys float over the bottom of the picture, and
-**Back** (or Escape) leaves fullscreen.
+viewport. Reveal it by swiping down from the top edge, tapping the **Controls**
+tab in the top-left corner, or waiting for the brief reveal shown when
+fullscreen starts. It hides again after a few idle seconds; swipe up on the bar
+to dismiss it immediately. On phones the touch pad keeps movement on the left
+and puts Q/W/O/P, modifiers and Space/Enter/Esc in a framed section on the
+right; in portrait the right-hand section wraps onto its own row. **Back** (or
+Escape) leaves fullscreen.
 
 ## Adding a game
 

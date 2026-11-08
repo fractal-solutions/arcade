@@ -29,7 +29,8 @@ arrow keys, swipes and on-screen arrows browse them. It falls back to the regula
 game shelf when WebGL is unavailable and retains the custom cursor on desktop.
 The library includes 64 entries: 59 local cabinets (including the 26-game Flash
 Vault) and five reference-only entries for Quake II, Quake III Arena, Capitalism
-II/Lab, and GTA 2. Reference entries do not navigate off-site. Optional
+II/Lab, and GTA 2. The format selector leads with **All**, **Flash** (marked
+New), **WASM** and **Emulated**, followed by **Your data** and **References**. Reference entries do not navigate off-site. Optional
 procedural interface sounds and an original
 ambient DnB loop—with a slow minor-key chord progression, soft synthesized reverb
 and understated breakbeat—are generated locally and start only after choosing

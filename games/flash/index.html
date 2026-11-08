@@ -54,7 +54,10 @@
       <div class="player-frame">
         <button class="toolbar-reveal" id="toolbar-reveal" type="button"
           aria-label="Show player controls" aria-expanded="false" aria-controls="player-toolbar"
-          title="Show player controls"><span aria-hidden="true">▾</span></button>
+          title="Show player controls">
+          <span class="toolbar-reveal-icon" aria-hidden="true">▾</span>
+          <span class="toolbar-reveal-text" aria-hidden="true">Controls</span>
+        </button>
         <div class="player-toolbar" id="player-toolbar">
           <span class="live-led" aria-hidden="true"></span>
           <span id="player-title">SELECT A GAME</span>
@@ -75,31 +78,35 @@
           </div>
         </div>
         <div class="touch-keys" id="touch-keys" hidden data-pad="dpad" aria-label="On-screen keyboard">
-          <div class="touch-dpad" role="group" aria-label="Direction keys">
-            <button type="button" class="key key-up" data-key="ArrowUp" aria-label="Up">▲</button>
-            <button type="button" class="key key-left" data-key="ArrowLeft" aria-label="Left">◀</button>
-            <button type="button" class="key key-down" data-key="ArrowDown" aria-label="Down">▼</button>
-            <button type="button" class="key key-right" data-key="ArrowRight" aria-label="Right">▶</button>
+          <div class="touch-move">
+            <div class="touch-dpad" role="group" aria-label="Direction keys">
+              <button type="button" class="key key-up" data-key="ArrowUp" aria-label="Up">▲</button>
+              <button type="button" class="key key-left" data-key="ArrowLeft" aria-label="Left">◀</button>
+              <button type="button" class="key key-down" data-key="ArrowDown" aria-label="Down">▼</button>
+              <button type="button" class="key key-right" data-key="ArrowRight" aria-label="Right">▶</button>
+            </div>
+            <div class="touch-stick" id="touch-stick" role="application" aria-label="Analog movement stick">
+              <span class="touch-stick-ring" aria-hidden="true"></span>
+              <span class="touch-stick-nub" aria-hidden="true"></span>
+            </div>
           </div>
-          <div class="touch-stick" id="touch-stick" role="application" aria-label="Analog movement stick">
-            <span class="touch-stick-ring" aria-hidden="true"></span>
-            <span class="touch-stick-nub" aria-hidden="true"></span>
-          </div>
-          <div class="touch-actions" role="group" aria-label="Action keys">
-            <button type="button" class="key key-space" data-key="Space" aria-label="Space">Space</button>
-            <button type="button" class="key" data-key="Enter" aria-label="Enter">Enter</button>
-            <button type="button" class="key" data-key="Escape" aria-label="Escape">Esc</button>
-          </div>
-          <div class="touch-mods" role="group" aria-label="Modifier keys">
-            <button type="button" class="key key-mod" data-key="ShiftLeft" aria-label="Shift">Shift</button>
-            <button type="button" class="key key-mod" data-key="ControlLeft" aria-label="Control">Ctrl</button>
-            <button type="button" class="key key-mod" data-key="AltLeft" aria-label="Alt">Alt</button>
-          </div>
-          <div class="touch-qwop" role="group" aria-label="QWOP keys">
-            <button type="button" class="key" data-key="KeyQ" aria-label="Q">Q</button>
-            <button type="button" class="key" data-key="KeyW" aria-label="W">W</button>
-            <button type="button" class="key" data-key="KeyO" aria-label="O">O</button>
-            <button type="button" class="key" data-key="KeyP" aria-label="P">P</button>
+          <div class="touch-right">
+            <div class="touch-qwop" role="group" aria-label="QWOP keys">
+              <button type="button" class="key" data-key="KeyQ" aria-label="Q">Q</button>
+              <button type="button" class="key" data-key="KeyW" aria-label="W">W</button>
+              <button type="button" class="key" data-key="KeyO" aria-label="O">O</button>
+              <button type="button" class="key" data-key="KeyP" aria-label="P">P</button>
+            </div>
+            <div class="touch-mods" role="group" aria-label="Modifier keys">
+              <button type="button" class="key key-mod" data-key="ShiftLeft" aria-label="Shift">Shift</button>
+              <button type="button" class="key key-mod" data-key="ControlLeft" aria-label="Control">Ctrl</button>
+              <button type="button" class="key key-mod" data-key="AltLeft" aria-label="Alt">Alt</button>
+            </div>
+            <div class="touch-actions" role="group" aria-label="Action keys">
+              <button type="button" class="key key-space" data-key="Space" aria-label="Space">Space</button>
+              <button type="button" class="key" data-key="Enter" aria-label="Enter">Enter</button>
+              <button type="button" class="key" data-key="Escape" aria-label="Escape">Esc</button>
+            </div>
           </div>
         </div>
       </div>
