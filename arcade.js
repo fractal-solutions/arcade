@@ -1,4 +1,4 @@
-/* WASM Arcade — landing page behaviour
+/* Arcade — landing page behaviour
    Plain ES2017, no dependencies. Everything degrades gracefully:
    with JS off the cabinets and dialogs are still usable. */
 
@@ -31,6 +31,7 @@
 
   const grid = $('#cabinet-grid');
   const cards = grid ? $$('.cabinet', grid) : [];
+  const cardByGame = new Map(cards.map((card) => [card.dataset.game, card]));
   const dividers = grid ? $$('.vault-divider[data-show-for]', grid) : [];
   const total = cards.length;
   const byKind = (kind) => kind === 'all' ? total : cards.filter((c) => c.dataset.kind === kind).length;
@@ -96,6 +97,19 @@
   const filterButtons = $$('.selector-btn');
   const statusEl = $('#selector-status');
   const emptyEl = $('#selector-empty');
+  const selectorTitle = $('.selector-title');
+  const titleList = $('#title-list');
+  const listCountEl = $('#list-count');
+  const listSearch = $('#list-search');
+  const listSearchClear = $('#list-search-clear');
+  const viewButtons = $$('.view-btn');
+  const listView = $('#list-view');
+  const titleRows = [];
+  const titleRowsByGame = new Map();
+  const viewKey = 'arcade.library.view.v1';
+  let activeKind = 'all';
+  let searchQuery = '';
+  let viewMode = 'list';
   const featured = {
     art: $('#featured-art'),
     index: $('#featured-index'),
@@ -113,7 +127,7 @@
   const coverflowLive = $('#coverflow-live');
   let coverflowRenderer = null;
   function renderCoverflow() {
-    if (coverflowRenderer) coverflowRenderer.render();
+    if (coverflowRenderer && viewMode === 'coverflow') coverflowRenderer.render();
   }
   const libraryStateKey = 'arcade.library.state.v1';
   let selectedCard = null;
@@ -137,10 +151,189 @@
         game: selectedCard.dataset.game,
         filter: filterButtons.find((button) => button.classList.contains('is-active'))?.dataset.filter || 'all',
         railLeft: grid.scrollLeft,
+        listTop: titleList ? titleList.scrollTop : 0,
         pageTop: window.scrollY,
       }));
     } catch (error) {
       console.warn('Unable to save library state:', error);
+    }
+  }
+
+  function readViewMode() {
+    try {
+      return localStorage.getItem(viewKey) === 'coverflow' ? 'coverflow' : 'list';
+    } catch (_) {
+      return 'list';
+    }
+  }
+
+  function saveViewMode(mode) {
+    try { localStorage.setItem(viewKey, mode); } catch (_) { /* ignore */ }
+  }
+
+  function titleForCard(card) {
+    const title = $('.body h2', card);
+    return title ? title.textContent.replace(/\s+/g, ' ').trim() : (card.dataset.game || 'Game');
+  }
+
+  function cardMatchesSearch(card) {
+    if (!searchQuery) return true;
+    const terms = searchQuery.toLowerCase().split(/\s+/).filter(Boolean);
+    if (!terms.length) return true;
+    const haystack = [
+      titleForCard(card),
+      card.dataset.game || '',
+      card.dataset.kind || '',
+      $('.art-tag', card)?.textContent || '',
+      $('.chip', card)?.textContent || '',
+      $('.body p', card)?.textContent || '',
+    ].join(' ').toLowerCase();
+    return terms.every((term) => haystack.includes(term));
+  }
+
+  function isVisibleCard(card, kind = activeKind) {
+    return (kind === 'all' || card.dataset.kind === kind) && cardMatchesSearch(card);
+  }
+
+  function buildTitleList() {
+    if (!titleList) return;
+    const fragment = document.createDocumentFragment();
+
+    cards.forEach((card, index) => {
+      const cabinetLink = $('.cabinet-link', card);
+      const isLink = cabinetLink && cabinetLink.tagName === 'A';
+      const row = document.createElement('a');
+      row.className = 'library-row';
+      row.href = isLink ? cabinetLink.href : '#';
+      if (isLink && cabinetLink.target) {
+        row.target = cabinetLink.target;
+        row.rel = cabinetLink.rel;
+      }
+      if (!isLink) row.dataset.reference = 'true';
+      row.dataset.game = card.dataset.game || String(index + 1);
+      row.dataset.kind = card.dataset.kind || '';
+      row.setAttribute('role', 'option');
+      row.setAttribute('aria-selected', 'false');
+      row.tabIndex = -1;
+      if (card.dataset.kind === 'flash' || card.dataset.kind === 'gba') row.dataset.new = 'true';
+
+      const number = document.createElement('span');
+      number.className = 'library-row-index';
+      number.setAttribute('aria-hidden', 'true');
+      number.textContent = $('.art-index', card)?.textContent.trim()
+        || String(index + 1).padStart(2, '0');
+
+      const art = document.createElement('span');
+      art.className = 'library-row-art';
+      const source = $('.art img', card);
+      if (source) {
+        const thumb = document.createElement('img');
+        thumb.src = source.currentSrc || source.src;
+        thumb.alt = '';
+        thumb.loading = 'lazy';
+        thumb.decoding = 'async';
+        art.append(thumb);
+      }
+
+      const copy = document.createElement('span');
+      copy.className = 'library-row-copy';
+      const title = document.createElement('span');
+      title.className = 'library-row-title';
+      title.textContent = titleForCard(card);
+      const meta = document.createElement('span');
+      meta.className = 'library-row-meta';
+      meta.textContent = $('.art-tag', card)?.textContent.replace(/\s+/g, ' ').trim() || '';
+      copy.append(title, meta);
+
+      const chip = document.createElement('span');
+      chip.className = 'library-row-chip';
+      chip.dataset.kind = card.dataset.kind || '';
+      chip.textContent = $('.chip', card)?.textContent.replace(/\s+/g, ' ').trim()
+        || (card.dataset.kind || '').toUpperCase();
+
+      const go = document.createElement('span');
+      go.className = 'library-row-go';
+      go.setAttribute('aria-hidden', 'true');
+      go.textContent = '▶';
+
+      row.append(number, art, copy, chip, go);
+      titleRows.push(row);
+      titleRowsByGame.set(row.dataset.game, row);
+
+      row.addEventListener('focus', () => selectCard(card));
+      row.addEventListener('click', (event) => {
+        selectCard(card);
+        if (!isLink) event.preventDefault();
+      });
+      if (finePointer) {
+        row.addEventListener('mouseenter', () => {
+          if (viewMode === 'list') selectCard(card);
+        });
+      }
+
+      fragment.append(row);
+    });
+
+    titleList.append(fragment);
+  }
+
+  function syncTitleList(card) {
+    const game = card ? card.dataset.game : null;
+    for (const row of titleRows) {
+      const active = row.dataset.game === game;
+      row.classList.toggle('is-selected', active);
+      row.setAttribute('aria-selected', String(active));
+      row.tabIndex = active ? 0 : -1;
+    }
+    if (card && viewMode === 'list' && !restoringLibrary) {
+      const row = titleRowsByGame.get(game);
+      if (row) row.scrollIntoView({ block: 'nearest', behavior: reduced ? 'auto' : 'smooth' });
+    }
+  }
+
+  function ensureCoverflow() {
+    if (coverflowRenderer || !coverflowCanvas) return coverflowRenderer;
+    coverflowRenderer = createCoverflowRenderer(coverflowCanvas);
+    if (!coverflowRenderer) coverflowCanvas.hidden = true;
+    return coverflowRenderer;
+  }
+
+  function setViewMode(mode, options = {}) {
+    viewMode = mode === 'coverflow' ? 'coverflow' : 'list';
+    document.body.classList.toggle('view-list', viewMode === 'list');
+    document.body.classList.toggle('view-coverflow', viewMode === 'coverflow');
+
+    for (const button of viewButtons) {
+      const active = button.dataset.view === viewMode;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-pressed', String(active));
+    }
+
+    if (viewMode === 'coverflow') {
+      const renderer = ensureCoverflow();
+      if (renderer) {
+        document.body.classList.add('has-coverflow');
+        coverflowCanvas.removeAttribute('aria-hidden');
+        renderer.render();
+      } else {
+        document.body.classList.remove('has-coverflow');
+        if (statusEl && !options.quiet) {
+          statusEl.textContent = '3D coverflow is unavailable in this browser — showing the game shelf.';
+        }
+      }
+    } else {
+      document.body.classList.remove('has-coverflow');
+    }
+
+    saveViewMode(viewMode);
+    if (selectedCard) syncTitleList(selectedCard);
+
+    if (options.focus) {
+      if (viewMode === 'coverflow') {
+        coverflowCanvas?.focus({ preventScroll: true });
+      } else {
+        titleRowsByGame.get(selectedCard?.dataset.game)?.focus({ preventScroll: true });
+      }
     }
   }
 
@@ -200,6 +393,7 @@
           : (card.dataset.kind === 'flash' ? 'Play Flash game' : 'Launch game'));
     }
     if (featured.prompt) featured.prompt.textContent = String(cards.indexOf(card) + 1).padStart(2, '0');
+    syncTitleList(card);
     renderCoverflow();
     if (!restoringLibrary) saveLibraryState();
   }
@@ -209,14 +403,22 @@
 
   function applyFilter(kind) {
     if (!KINDS.has(kind)) kind = 'all';
+    activeKind = kind;
     let visible = 0;
 
     for (const card of cards) {
-      const show = kind === 'all' || card.dataset.kind === kind;
+      const show = isVisibleCard(card, kind);
       card.classList.toggle('is-filtered-out', !show);
       if (show) visible++;
       if (!show) card.style.removeProperty('--rx'), card.style.removeProperty('--ry');
     }
+
+    for (const row of titleRows) {
+      const card = cardByGame.get(row.dataset.game);
+      const show = card ? isVisibleCard(card, kind) : false;
+      row.classList.toggle('is-filtered-out', !show);
+    }
+
     for (const divider of dividers) {
       const scopes = divider.dataset.showFor.split(/\s+/).filter(Boolean);
       divider.hidden = !scopes.includes(kind);
@@ -229,10 +431,26 @@
       btn.tabIndex = active ? 0 : -1;
     }
 
+    const labels = {
+      all: 'All games',
+      flash: 'Flash games',
+      wasm: 'WASM games',
+      dos: 'DOS games',
+      gba: 'Game Boy Advance',
+      data: 'Your data',
+      external: 'Reference entries',
+    };
+    if (selectorTitle) selectorTitle.textContent = labels[kind] || 'All games';
+    const listLabel = $('.title-list-label');
+    if (listLabel) listLabel.textContent = kind === 'all' ? 'ALL TITLES' : `${kind.toUpperCase()} TITLES`;
+    if (listCountEl) listCountEl.textContent = `${visible} TITLE${visible === 1 ? '' : 'S'}`;
+
     if (statusEl) {
-      statusEl.textContent = `Showing ${visible} of ${total} library entr${total === 1 ? 'y' : 'ies'}${kind === 'all' ? '' : ` · ${kind}`}`;
+      const suffix = searchQuery ? ` · “${searchQuery}”` : '';
+      statusEl.textContent = `Showing ${visible} of ${total} library entr${total === 1 ? 'y' : 'ies'}${kind === 'all' ? '' : ` · ${kind}`}${suffix}`;
     }
     if (emptyEl) emptyEl.hidden = visible !== 0;
+
     if (grid) {
       const restoredRailLeft = restoringLibrary && Number.isFinite(restoredState && restoredState.railLeft)
         ? restoredState.railLeft
@@ -241,6 +459,9 @@
         left: restoredRailLeft,
         behavior: reduced || restoringLibrary ? 'auto' : 'smooth',
       });
+    }
+    if (titleList && restoringLibrary && Number.isFinite(restoredState && restoredState.listTop)) {
+      titleList.scrollTop = restoredState.listTop;
     }
 
     if (selectedCard && selectedCard.classList.contains('is-filtered-out')) {
@@ -266,6 +487,7 @@
     });
   });
 
+  buildTitleList();
   applyFilter(restoredState && KINDS.has(restoredState.filter) ? restoredState.filter : 'all');
 
   const restoredCard = restoredState && cards.find((card) => card.dataset.game === restoredState.game);
@@ -273,12 +495,15 @@
     ? restoredCard
     : cards.find((card) => !card.classList.contains('is-filtered-out'));
   if (initialCard) selectCard(initialCard);
+  setViewMode(readViewMode(), { quiet: true });
   restoringLibrary = false;
 
   if (restoredState) {
     const restorePosition = () => {
-      if (!grid) return;
-      if (Number.isFinite(restoredState.railLeft)) grid.scrollLeft = restoredState.railLeft;
+      if (grid) {
+        if (Number.isFinite(restoredState.railLeft)) grid.scrollLeft = restoredState.railLeft;
+      }
+      if (titleList && Number.isFinite(restoredState.listTop)) titleList.scrollTop = restoredState.listTop;
       if (Number.isFinite(restoredState.pageTop)) window.scrollTo(0, restoredState.pageTop);
     };
     requestAnimationFrame(() => requestAnimationFrame(restorePosition));
@@ -597,7 +822,6 @@
       console.error('The WebGL coverflow context was lost; showing the standard game shelf.');
     });
 
-    document.body.classList.add('has-coverflow');
     canvas.removeAttribute('aria-hidden');
     render();
     return {
@@ -613,9 +837,14 @@
     };
   }
 
-  if (coverflowCanvas) {
-    coverflowRenderer = createCoverflowRenderer(coverflowCanvas);
-    if (!coverflowRenderer) coverflowCanvas.hidden = true;
+  for (const button of viewButtons) {
+    button.addEventListener('click', () => {
+      if (button.dataset.view === viewMode) return;
+      setViewMode(button.dataset.view, { focus: true });
+      if (statusEl && viewMode === 'coverflow' && coverflowRenderer) {
+        statusEl.textContent = `Showing ${cards.filter((card) => !card.classList.contains('is-filtered-out')).length} of ${total} library entries · coverflow`;
+      }
+    });
   }
 
   if (featured.launch) {
@@ -705,6 +934,121 @@
       nextLink.focus();
     });
   }
+
+  /* ------------------------------------------------------------ list navigation */
+
+  function visibleTitleRows() {
+    return titleRows.filter((row) => !row.classList.contains('is-filtered-out'));
+  }
+
+  function selectedTitleRow() {
+    const rows = visibleTitleRows();
+    return rows.find((row) => row.classList.contains('is-selected')) || rows[0] || null;
+  }
+
+  function focusTitleRow(row) {
+    if (!row) return;
+    const card = cardByGame.get(row.dataset.game);
+    if (card) selectCard(card);
+    row.focus({ preventScroll: true });
+    row.scrollIntoView({ block: 'nearest', behavior: reduced ? 'auto' : 'smooth' });
+  }
+
+  function moveTitleSelection(delta) {
+    const rows = visibleTitleRows();
+    if (!rows.length) return;
+    const current = selectedTitleRow();
+    const currentIndex = current ? rows.indexOf(current) : -1;
+    const nextIndex = Math.max(0, Math.min(rows.length - 1, currentIndex + delta));
+    focusTitleRow(rows[nextIndex]);
+  }
+
+  if (titleList) {
+    titleList.addEventListener('keydown', (event) => {
+      if (event.altKey || event.ctrlKey || event.metaKey) return;
+      const rows = visibleTitleRows();
+      if (!rows.length) return;
+
+      switch (event.key) {
+        case 'ArrowDown': event.preventDefault(); moveTitleSelection(1); return;
+        case 'ArrowUp': event.preventDefault(); moveTitleSelection(-1); return;
+        case 'PageDown': event.preventDefault(); moveTitleSelection(8); return;
+        case 'PageUp': event.preventDefault(); moveTitleSelection(-8); return;
+        case 'Home': event.preventDefault(); focusTitleRow(rows[0]); return;
+        case 'End': event.preventDefault(); focusTitleRow(rows[rows.length - 1]); return;
+        case 'Enter':
+          if (event.target === titleList) {
+            const row = selectedTitleRow();
+            if (row) {
+              event.preventDefault();
+              row.click();
+            }
+          }
+          return;
+        default: break;
+      }
+
+      if (event.key.length === 1 && /\S/.test(event.key)) {
+        const letter = event.key.toLowerCase();
+        const current = selectedTitleRow();
+        const start = current ? rows.indexOf(current) + 1 : 0;
+        const ordered = rows.slice(start).concat(rows.slice(0, start));
+        const match = ordered.find((row) => $('.library-row-title', row)?.textContent.trim().toLowerCase().startsWith(letter));
+        if (match) {
+          event.preventDefault();
+          focusTitleRow(match);
+        }
+      }
+    });
+  }
+
+  function setSearch(value) {
+    searchQuery = value.trim();
+    if (listSearchClear) listSearchClear.hidden = !searchQuery;
+    if (listSearch && listSearch.value !== value) listSearch.value = value;
+    applyFilter(activeKind);
+  }
+
+  if (listSearch) {
+    listSearch.addEventListener('input', () => setSearch(listSearch.value));
+    listSearch.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setSearch('');
+        listSearch.blur();
+        titleList?.focus();
+      } else if (event.key === 'Enter') {
+        const target = selectedCard && !selectedCard.classList.contains('is-filtered-out')
+          ? selectedCard
+          : cards.find((card) => !card.classList.contains('is-filtered-out'));
+        const link = target ? $('.cabinet-link', target) : null;
+        if (link) {
+          event.preventDefault();
+          link.click();
+        }
+      } else if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        titleList?.focus();
+      }
+    });
+  }
+
+  if (listSearchClear) {
+    listSearchClear.addEventListener('click', () => {
+      setSearch('');
+      listSearch?.focus();
+    });
+  }
+
+  document.addEventListener('keydown', (event) => {
+    if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
+    if (event.key !== '/' || viewMode !== 'list' || !listSearch) return;
+    const target = event.target;
+    if (target instanceof Element && target.closest('input, textarea, select, [contenteditable="true"]')) return;
+    event.preventDefault();
+    listSearch.focus();
+    listSearch.select();
+  });
 
   /* ------------------------------------------------------------ generated audio */
 

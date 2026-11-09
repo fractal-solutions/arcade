@@ -1,4 +1,4 @@
-# WASM Arcade
+# Arcade
 
 A static arcade of local classics, with a local vault of 26 classic Flash games
 running in Ruffle and a bring-your-own-ROM Game Boy Advance cabinet powered by
@@ -25,10 +25,13 @@ mGBA. Real game code, real pixels, no server-side component.
 | **Flash Vault (26 games)** | `games/flash/` | Locally hosted Ruffle 0.7.1 + bundled SWFs | Playable out of the box; bring-your-own-SWF still supported |
 | **Game Boy Advance** | `games/gba/` | EmulatorJS 4.2.3 + mGBA compiled to WebAssembly | Ships with 7 homebrew ROMs; also runs a `.gba` / `.gb` / `.gbc` you supply |
 
-The landing page (`index.html`) is a bespoke, responsive console menu with a
-game-first WebGL coverflow. The covers are textured 3D cards with live highlights;
-arrow keys, swipes and on-screen arrows browse them. It falls back to the regular
-game shelf when WebGL is unavailable and retains the custom cursor on desktop.
+The landing page (`index.html`) is a bespoke, responsive console menu built
+around a PS2/PS3-era title list: a fast, searchable index with a live preview
+card, D-pad/arrow navigation and type-ahead. A **List / Coverflow** switch in the
+masthead toggles the original game-first WebGL coverflow, where textured 3D
+covers respond to arrow keys, swipes and on-screen arrows. The coverflow falls
+back to the regular game shelf when WebGL is unavailable. Both views keep the
+custom cursor on desktop.
 The library includes 65 entries: 60 local cabinets (including the 26-game Flash
 Vault and the bring-your-own-ROM GBA cabinet) and five reference-only entries
 for Quake II, Quake III Arena, Capitalism II/Lab, and GTA 2. The format selector

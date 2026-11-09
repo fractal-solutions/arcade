@@ -1,6 +1,6 @@
 # Game Boy Advance Cabinet
 
-A handheld cabinet for `WASM Arcade`, built on
+A handheld cabinet for `Arcade`, built on
 [EmulatorJS](https://github.com/EmulatorJS/EmulatorJS) 4.2.3 and the **mGBA**
 core compiled to WebAssembly. Seven freely distributable homebrew ROMs are
 included, and you can load your own. No commercial ROMs are bundled or linked.
