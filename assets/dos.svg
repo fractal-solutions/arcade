@@ -17,7 +17,7 @@
     <path d="M126 92h548M126 108h548M126 124h548M126 140h548M126 156h548M126 172h548M126 188h548M126 204h548M126 220h548M126 236h548M126 252h548M126 268h548M126 284h548M126 300h548M126 316h548M126 332h548M126 348h548M126 364h548M126 380h548"/>
   </g>
   <g font-family="ui-monospace, Menlo, Consolas, monospace" font-weight="700">
-    <text x="150" y="122" font-size="24" fill="#8bd450">WASM ARCADE DOS CABINET</text>
+    <text x="150" y="122" font-size="24" fill="#8bd450">ARCADE DOS CABINET</text>
     <text x="150" y="176" font-size="26" fill="#b6ffae">C:\&gt; dir</text>
     <text x="150" y="214" font-size="20" fill="#6fae54">KEEN4      EXE    102,355</text>
     <text x="150" y="244" font-size="20" fill="#6fae54">DUKE2      EXE     58,852</text>

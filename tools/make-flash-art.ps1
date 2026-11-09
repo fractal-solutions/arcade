@@ -383,7 +383,7 @@ foreach ($game in $games) {
   <rect x="52" y="322" width="64" height="4" fill="$accent"/>
   <text x="52" y="382" fill="#edf4ff" font-family="Segoe UI, Arial, sans-serif" font-size="$fontSize" font-weight="700" letter-spacing="-1">$title</text>
   <text x="52" y="418" fill="$accent" font-family="Consolas, monospace" font-size="15" letter-spacing="2">$($genre.ToUpper()) · $year</text>
-  <text x="52" y="456" fill="#8fa3bb" font-family="Consolas, monospace" font-size="11" letter-spacing="2">WASM ARCADE · FLASH VAULT</text>
+  <text x="52" y="456" fill="#8fa3bb" font-family="Consolas, monospace" font-size="11" letter-spacing="2">ARCADE · FLASH VAULT</text>
   <text x="748" y="72" fill="$accent" fill-opacity=".55" text-anchor="end" font-family="Consolas, monospace" font-size="18" letter-spacing="2">$index</text>
   <rect x="1" y="1" width="798" height="498" fill="none" stroke="$accent" stroke-opacity=".18"/>
 </svg>

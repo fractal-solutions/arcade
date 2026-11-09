@@ -82,7 +82,7 @@ public_address() {
   fi
 }
 
-echo "WASM Arcade"
+echo "Arcade"
 echo "  Local:    http://127.0.0.1:${PORT}/"
 
 if [ "$BIND" = "127.0.0.1" ] || [ "$BIND" = "localhost" ]; then
