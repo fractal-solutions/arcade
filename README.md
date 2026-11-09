@@ -158,7 +158,9 @@ in this browser's storage.
 The arcade's own fullscreen button and touch rails remain authoritative:
 EmulatorJS's virtual gamepad and fullscreen buttons are disabled. The core is
 loaded locally from `vendor/emulatorjs/`, and `?rom=game.gba` can boot a
-same-origin ROM placed next to the cabinet.
+same-origin ROM placed next to the cabinet. A handful of freely distributable
+homebrew ROMs are bundled in `games/gba/roms/` for testing; see
+`games/gba/roms/README.md` for provenance and licenses.
 
 ---
 

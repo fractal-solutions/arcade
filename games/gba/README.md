@@ -11,6 +11,8 @@ core compiled to WebAssembly. No commercial ROMs are bundled or linked.
   fullscreen handling and lazy touch-control setup.
 - `gba-controls.js` — D-pad, A/B/L/R/Start/Select touch rails, haptics and direct
   `gameManager.simulateInput()` wiring.
+- `roms/` — a handful of freely distributable homebrew ROMs for testing; see
+  `roms/README.md` for provenance and licenses.
 - `../../vendor/emulatorjs/` — the vendored EmulatorJS 4.2.3 runtime and mGBA core.
 
 ## Supported files
@@ -34,7 +36,8 @@ Use only:
 - cartridges you dumped yourself.
 
 Commercial ROMs are not distributed by this arcade and should not be committed
-to the repository.
+to the repository. A few homebrew ROMs are bundled in `roms/` for testing; see
+`roms/README.md` for their sources and licenses.
 
 ## Controls
 
@@ -59,6 +62,18 @@ games/gba/?rom=homebrew.gba
 
 The URL is fetched with `cache: 'no-store'` and turned into a Blob. Cross-origin
 `?rom=` URLs are rejected so the cabinet cannot be used to fetch arbitrary files.
+
+Bundled test ROMs:
+
+```text
+games/gba/?rom=roms/pong.gba
+games/gba/?rom=roms/rkanoid.gba
+games/gba/?rom=roms/cebelix.gba
+games/gba/?rom=roms/dezgex.gba
+games/gba/?rom=roms/mystic_q.gba
+games/gba/?rom=roms/pik_roll.gba
+games/gba/?rom=roms/ucity.gbc
+```
 
 ## Fullscreen and layout
 
