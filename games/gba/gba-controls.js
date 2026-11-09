@@ -17,6 +17,9 @@
   controls.innerHTML = `
     <section class="touch-side touch-move" aria-label="D-pad">
       <span class="touch-label">D-PAD</span>
+      <button class="touch-key gba-shoulder-key gba-l" type="button" data-gba="l" aria-label="L shoulder">
+        <span class="touch-action-name">L</span><span class="touch-key-hint">Q</span>
+      </button>
       <div class="touch-dpad">
         <button class="touch-key key-up" type="button" data-gba="up" aria-label="Up">▲</button>
         <button class="touch-key key-left" type="button" data-gba="left" aria-label="Left">◀</button>
@@ -27,26 +30,26 @@
     </section>
     <section class="touch-side touch-actions" aria-label="Game Boy buttons">
       <span class="touch-label">BUTTONS</span>
-      <div class="touch-action-grid gba-grid">
-        <button class="touch-key touch-action-key gba-l" type="button" data-gba="l" aria-label="L shoulder">
-          <span class="touch-action-name">L</span><span class="touch-key-hint">Q</span>
-        </button>
-        <button class="touch-key touch-action-key gba-r" type="button" data-gba="r" aria-label="R shoulder">
+      <div class="gba-controls">
+        <button class="touch-key gba-shoulder-key gba-r" type="button" data-gba="r" aria-label="R shoulder">
           <span class="touch-action-name">R</span><span class="touch-key-hint">E</span>
         </button>
-        <button class="touch-key touch-action-key gba-b" type="button" data-gba="b" aria-label="B button">
-          <span class="touch-action-name">B</span><span class="touch-key-hint">X</span>
-        </button>
-        <button class="touch-key touch-action-key gba-a" type="button" data-gba="a" aria-label="A button">
-          <span class="touch-action-name">A</span><span class="touch-key-hint">Z</span>
-        </button>
-        <button class="touch-key touch-action-key gba-select" type="button" data-gba="select" aria-label="Select button">
-          <span class="touch-action-name">Select</span><span class="touch-key-hint">V</span>
-        </button>
-        <button class="touch-key touch-action-key gba-start" type="button" data-gba="start" aria-label="Start button">
-          <span class="touch-action-name">Start</span><span class="touch-key-hint">Enter</span>
-        </button>
-        <span class="gba-action-hub" aria-hidden="true"></span>
+        <div class="gba-face">
+          <button class="touch-key touch-action-key gba-b" type="button" data-gba="b" aria-label="B button">
+            <span class="touch-action-name">B</span><span class="touch-key-hint">X</span>
+          </button>
+          <button class="touch-key touch-action-key gba-a" type="button" data-gba="a" aria-label="A button">
+            <span class="touch-action-name">A</span><span class="touch-key-hint">Z</span>
+          </button>
+        </div>
+        <div class="gba-utility">
+          <button class="touch-key gba-select" type="button" data-gba="select" aria-label="Select button">
+            <span class="touch-action-name">Select</span><span class="touch-key-hint">V</span>
+          </button>
+          <button class="touch-key gba-start" type="button" data-gba="start" aria-label="Start button">
+            <span class="touch-action-name">Start</span><span class="touch-key-hint">Enter</span>
+          </button>
+        </div>
       </div>
     </section>`;
   frame.append(controls);

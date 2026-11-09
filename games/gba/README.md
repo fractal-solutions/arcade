@@ -52,9 +52,15 @@ to the repository. A few homebrew ROMs are bundled in `roms/` for testing; see
 | Action | Keyboard | Touch |
 | --- | --- | --- |
 | D-pad | Arrow keys | Left D-pad |
-| A / B | `Z` / `X` | Right face buttons |
-| L / R | `Q` / `E` | Right shoulder buttons |
-| Start / Select | `Enter` / `V` | Right utility buttons |
+| A / B | `Z` / `X` | Right face buttons, A above-right of B |
+| L / R | `Q` / `E` | Left / right shoulder rails |
+| Start / Select | `Enter` / `V` | Small pills under the face buttons |
+
+The touch layout mirrors the real hardware: the D-pad sits on the left, L and R
+are separate shoulder buttons at the top corners, A is diagonally above-right of
+B, and Select/Start are small pills beneath the face buttons. In fullscreen
+landscape the shoulders drop just below the top-left Controls tab so the two do
+not overlap.
 
 Touch buttons call EmulatorJS's `simulateInput` directly, so they work alongside
 a physical keyboard. Haptics are optional and remembered under

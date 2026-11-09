@@ -305,49 +305,99 @@
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, .6), 0 1px 0 rgba(255, 255, 255, .05);
     pointer-events: none;
   }
-  .gba-grid .gba-l { grid-area: 1 / 1; }
-  .gba-grid .gba-r { grid-area: 1 / 3; }
-  .gba-grid .gba-b { grid-area: 2 / 1; }
-  .gba-grid .gba-a { grid-area: 2 / 3; }
-  .gba-grid .gba-select { grid-area: 3 / 1; }
-  .gba-grid .gba-start { grid-area: 3 / 3; }
-  .gba-grid .gba-action-hub {
-    grid-area: 2 / 2;
-    align-self: center;
-    justify-self: center;
-    width: 26%;
-    height: 26%;
-    border: 1px solid rgba(155, 140, 255, .22);
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(155, 140, 255, .18), transparent 70%);
+
+  /* Real GBA arrangement: L on the left shoulder, R on the right, A above-right
+     of B, and Select/Start as small pills under the face buttons. */
+  .touch-controls[data-layout="gba"] {
+    --gba-key: clamp(38px, 11vh, 46px);
+    --gba-gap: 4px;
+  }
+  .gba-l,
+  .gba-r {
+    position: absolute;
+    top: max(10px, env(safe-area-inset-top));
+    z-index: 2;
+  }
+  .gba-l { left: max(10px, env(safe-area-inset-left)); }
+  .gba-r { right: max(10px, env(safe-area-inset-right)); }
+  @media (orientation: landscape) {
+    /* Clear the fixed top-left Controls tab in fullscreen. */
+    body.is-fullscreen .gba-l,
+    body.is-fullscreen .gba-r {
+      top: max(42px, calc(env(safe-area-inset-top) + 36px));
+    }
+  }
+  .gba-controls {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
     pointer-events: none;
   }
-  .gba-grid .gba-l,
-  .gba-grid .gba-r,
-  .gba-grid .gba-select,
-  .gba-grid .gba-start {
+  .gba-controls > * { pointer-events: auto; }
+  .gba-shoulder-key {
+    width: calc(var(--gba-key) * 1.18);
+    height: calc(var(--gba-key) * .56);
+    padding: 0 7px;
+    border-radius: 999px;
+    border-color: rgba(155, 140, 255, .4);
+    background: linear-gradient(160deg, rgba(39, 33, 66, .96), rgba(9, 9, 18, .96));
     font-size: 7px;
   }
-  .gba-grid .gba-l .touch-action-name,
-  .gba-grid .gba-r .touch-action-name,
-  .gba-grid .gba-select .touch-action-name,
-  .gba-grid .gba-start .touch-action-name {
-    font-size: clamp(5px, 1vw, 7px);
+  .gba-face {
+    display: grid;
+    grid-template-columns: repeat(2, var(--gba-key));
+    grid-template-rows: repeat(2, var(--gba-key));
+    gap: var(--gba-gap);
   }
-  .gba-grid .gba-a {
+  .gba-face .gba-a { grid-area: 1 / 2; }
+  .gba-face .gba-b { grid-area: 2 / 1; }
+  .gba-utility {
+    position: absolute;
+    left: 50%;
+    bottom: max(10px, env(safe-area-inset-bottom));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(6px, 1.8vw, 10px);
+    transform: translateX(-50%);
+  }
+  .gba-utility .touch-key {
+    width: auto;
+    height: calc(var(--gba-key) * .54);
+    min-height: 20px;
+    padding: 0 clamp(8px, 2vw, 12px);
+    border-radius: 999px;
+    font-size: 7px;
+  }
+  .gba-utility .touch-action-name { font-size: 6px; }
+  .gba-utility .touch-key-hint { font-size: 5px; }
+  .gba-a {
     border-color: rgba(89, 243, 255, .62);
     background:
       radial-gradient(circle at 34% 24%, rgba(255, 255, 255, .2), transparent 36%),
       radial-gradient(circle at 50% 30%, rgba(89, 243, 255, .34), #101b26 76%);
   }
-  .gba-grid .gba-b {
+  .gba-b {
     border-color: rgba(155, 140, 255, .58);
     background:
       radial-gradient(circle at 34% 24%, rgba(255, 255, 255, .18), transparent 36%),
       radial-gradient(circle at 50% 30%, rgba(155, 140, 255, .32), #171427 76%);
   }
-  .gba-grid .gba-a .touch-action-name { color: #d9ffff; }
-  .gba-grid .gba-b .touch-action-name { color: #e8e2ff; }
+  .gba-a .touch-action-name { color: #d9ffff; }
+  .gba-b .touch-action-name { color: #e8e2ff; }
+  @media (orientation: portrait) {
+    .touch-controls[data-layout="gba"] {
+      --gba-key: clamp(32px, 6vh, 40px);
+      --gba-gap: 3px;
+    }
+  }
+  @media (max-width: 760px) and (orientation: landscape) {
+    .touch-controls[data-layout="gba"] {
+      --gba-key: clamp(32px, 9vh, 38px);
+      --gba-gap: 3px;
+    }
+  }
 
   /* Fullscreen toolbar: hidden until the top-left tab or a top-edge swipe. */
   .toolbar-reveal {
@@ -517,6 +567,6 @@
 </div>
 
 <input type="file" id="rom-file" accept=".gba,.gb,.gbc,application/octet-stream" hidden>
-<script src="gba.js?v=20261109b"></script>
+<script src="gba.js?v=20261109d"></script>
 </body>
 </html>

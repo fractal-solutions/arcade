@@ -76,7 +76,7 @@
   function loadTouchControls() {
     if (document.querySelector('script[data-gba-controls]')) return;
     const script = document.createElement('script');
-    script.src = 'gba-controls.js?v=20261109b';
+    script.src = 'gba-controls.js?v=20261109d';
     script.dataset.gbaControls = '';
     script.onerror = () => console.warn('GBA touch controls failed to load.');
     document.body.appendChild(script);
