@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#05060a">
 <title>Game Boy Advance Cabinet — WASM Arcade</title>
 <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="../_shared/emu.css">
+<link rel="stylesheet" href="../_shared/emu.css?v=20261109b">
 <style>
   :root {
     --accent: #9b8cff;
@@ -73,6 +73,75 @@
     color: var(--gba-ink);
     font-family: var(--mono);
     font-size: .92em;
+  }
+  .rom-library { margin: 0 0 16px; }
+  .rom-library-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+    color: var(--gba-ink);
+    font: 700 10px/1.2 var(--mono);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+  .rom-library-head span:last-child {
+    color: var(--dim);
+    font-weight: 600;
+    letter-spacing: .05em;
+  }
+  .rom-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 8px;
+  }
+  .rom-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    align-items: flex-start;
+    min-height: 48px;
+    padding: 9px 11px;
+    border: 1px solid rgba(155, 140, 255, .24);
+    border-radius: 9px;
+    background: rgba(9, 14, 24, .72);
+    color: var(--ink);
+    text-align: left;
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease, transform .15s ease;
+  }
+  .rom-item:hover,
+  .rom-item:focus-visible {
+    border-color: var(--accent-2);
+    background: rgba(16, 24, 38, .92);
+    outline: none;
+    transform: translateY(-1px);
+  }
+  .rom-item:active { transform: translateY(0); }
+  .rom-name { font-size: 13px; font-weight: 700; letter-spacing: .01em; }
+  .rom-meta {
+    color: var(--dim);
+    font: 600 8.5px/1.2 var(--mono);
+    letter-spacing: .07em;
+    text-transform: uppercase;
+  }
+  .rom-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 14px 0;
+    color: var(--dim);
+    font: 600 8.5px/1 var(--mono);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+  .rom-divider::before,
+  .rom-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: rgba(155, 140, 255, .2);
   }
   .dropzone {
     display: grid;
@@ -371,10 +440,50 @@
         <span class="picker-kicker">// Bring your own ROM</span>
         <h2 id="picker-title">Load a <b>Game Boy</b> game</h2>
         <p class="picker-lede">
-          This cabinet ships with no commercial ROMs. Choose a <code>.gba</code>,
-          <code>.gb</code> or <code>.gbc</code> file you own, or a legal homebrew
-          release. The file is read in this tab and is never uploaded.
+          Seven freely distributable homebrew ROMs are included. Pick one below, or
+          load a <code>.gba</code>, <code>.gb</code> or <code>.gbc</code> file you own.
+          The file is read in this tab and is never uploaded.
         </p>
+
+        <div class="rom-library">
+          <div class="rom-library-head">
+            <span>Built-in homebrew</span>
+            <span>7 included</span>
+          </div>
+          <div class="rom-list" role="list">
+            <button type="button" class="rom-item" data-rom="roms/pong.gba" role="listitem">
+              <span class="rom-name">Pong</span>
+              <span class="rom-meta">GBA &middot; MIT</span>
+            </button>
+            <button type="button" class="rom-item" data-rom="roms/rkanoid.gba" role="listitem">
+              <span class="rom-name">@rkanoid</span>
+              <span class="rom-meta">GBA &middot; Public domain</span>
+            </button>
+            <button type="button" class="rom-item" data-rom="roms/cebelix.gba" role="listitem">
+              <span class="rom-name">Cebelix</span>
+              <span class="rom-meta">GBA &middot; Freeware</span>
+            </button>
+            <button type="button" class="rom-item" data-rom="roms/dezgex.gba" role="listitem">
+              <span class="rom-name">Dezgex</span>
+              <span class="rom-meta">GBA &middot; Freeware</span>
+            </button>
+            <button type="button" class="rom-item" data-rom="roms/mystic_q.gba" role="listitem">
+              <span class="rom-name">Mystic Quest</span>
+              <span class="rom-meta">GBA &middot; Freeware</span>
+            </button>
+            <button type="button" class="rom-item" data-rom="roms/pik_roll.gba" role="listitem">
+              <span class="rom-name">Pik Roll</span>
+              <span class="rom-meta">GBA &middot; Freeware</span>
+            </button>
+            <button type="button" class="rom-item" data-rom="roms/ucity.gbc" role="listitem">
+              <span class="rom-name">UCity</span>
+              <span class="rom-meta">GBC &middot; GPLv3</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="rom-divider" role="presentation"><span>or use your own ROM</span></div>
+
         <div class="dropzone" id="dropzone">
           <span class="dropzone-icon" aria-hidden="true">GBA</span>
           <b>Drop a ROM here</b>
@@ -408,6 +517,6 @@
 </div>
 
 <input type="file" id="rom-file" accept=".gba,.gb,.gbc,application/octet-stream" hidden>
-<script src="gba.js"></script>
+<script src="gba.js?v=20261109b"></script>
 </body>
 </html>

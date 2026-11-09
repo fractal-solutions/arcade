@@ -23,7 +23,7 @@ mGBA. Real game code, real pixels, no server-side component.
 | **DOS Cabinet** | `games/dos/` | js-dos 8.5.3 / DOSBox compiled to WebAssembly | Runs a `.jsdos` bundle you supply |
 | **DOS Vault (25 cabinets)** | `games/<slug>/` | js-dos 8.5.3 / DOSBox compiled to WebAssembly | Shareware, freeware and demos, all bundled and auto-starting |
 | **Flash Vault (26 games)** | `games/flash/` | Locally hosted Ruffle 0.7.1 + bundled SWFs | Playable out of the box; bring-your-own-SWF still supported |
-| **Game Boy Advance** | `games/gba/` | EmulatorJS 4.2.3 + mGBA compiled to WebAssembly | Runs a `.gba` / `.gb` / `.gbc` ROM you supply |
+| **Game Boy Advance** | `games/gba/` | EmulatorJS 4.2.3 + mGBA compiled to WebAssembly | Ships with 7 homebrew ROMs; also runs a `.gba` / `.gb` / `.gbc` you supply |
 
 The landing page (`index.html`) is a bespoke, responsive console menu with a
 game-first WebGL coverflow. The covers are textured 3D cards with live highlights;
@@ -32,8 +32,9 @@ game shelf when WebGL is unavailable and retains the custom cursor on desktop.
 The library includes 65 entries: 60 local cabinets (including the 26-game Flash
 Vault and the bring-your-own-ROM GBA cabinet) and five reference-only entries
 for Quake II, Quake III Arena, Capitalism II/Lab, and GTA 2. The format selector
-leads with **All**, **Flash** (marked
-New), **WASM** and **Emulated**, followed by **Your data** and **References**. Reference entries do not navigate off-site. Optional
+leads with **All**, **Flash** (New), **WASM**, **DOS** and **GBA** (New),
+followed by **Your data** and **References**. Reference entries do not navigate
+off-site. Optional
 procedural interface sounds and an original
 ambient DnB loop—with a slow minor-key chord progression, soft synthesized reverb
 and understated breakbeat—are generated locally and start only after choosing
@@ -147,13 +148,14 @@ Its MIT and Apache 2.0 license texts are included in `vendor/ruffle/`.
 
 ### Game Boy Advance
 
-The **Emulated** filter includes `games/gba/`, a handheld cabinet built on
+The **GBA** filter includes `games/gba/`, a handheld cabinet built on
 vendored **EmulatorJS 4.2.3** with the **mGBA** core compiled to WebAssembly.
-No commercial ROMs are bundled. Open the cabinet, then drop or choose a `.gba`,
-`.gb` or `.gbc` file you own (up to 64 MB); the file is read into a Blob URL in
-the current tab and is never uploaded. Legal homebrew, public-domain test ROMs
-and self-dumped cartridges are the intended sources. Saves and save states stay
-in this browser's storage.
+No commercial ROMs are bundled. Seven freely distributable homebrew ROMs ship
+with the cabinet and are listed in its picker, so you can play immediately.
+You can also drop or choose a `.gba`, `.gb` or `.gbc` file you own (up to 64 MB);
+the file is read into a Blob URL in the current tab and is never uploaded.
+Legal homebrew, public-domain test ROMs and self-dumped cartridges are the
+intended sources. Saves and save states stay in this browser's storage.
 
 The arcade's own fullscreen button and touch rails remain authoritative:
 EmulatorJS's virtual gamepad and fullscreen buttons are disabled. The core is
@@ -497,7 +499,8 @@ not distributed by this arcade.
 2. Add an `<article class="cabinet" data-game="<slug>" data-kind="...">` card in
    `index.html`. `data-kind` is one of:
    - `wasm` — a game compiled to WebAssembly that runs immediately
-   - `emu` — an emulated/DOS cabinet (may bundle a free episode or accept a bundle)
+   - `dos` — a DOSBox/js-dos cabinet (may bundle a free episode or accept a bundle)
+   - `gba` — the Game Boy Advance cabinet
    - `data` — an engine that needs data supplied by the player
    - `flash` — a card that opens the local Flash Vault (`games/flash/?game=<slug>`)
 3. Use an existing card as the template for the art, chips, progress line and

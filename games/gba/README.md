@@ -1,12 +1,14 @@
 # Game Boy Advance Cabinet
 
-A bring-your-own-ROM handheld cabinet for `WASM Arcade`, built on
+A handheld cabinet for `WASM Arcade`, built on
 [EmulatorJS](https://github.com/EmulatorJS/EmulatorJS) 4.2.3 and the **mGBA**
-core compiled to WebAssembly. No commercial ROMs are bundled or linked.
+core compiled to WebAssembly. Seven freely distributable homebrew ROMs are
+included, and you can load your own. No commercial ROMs are bundled or linked.
 
 ## What is included
 
-- `index.html` — cabinet shell, ROM picker, drag/drop, boot/error UI, fullscreen.
+- `index.html` — cabinet shell, built-in ROM library, drag/drop, boot/error UI,
+  fullscreen.
 - `gba.js` — ROM validation, Blob URL boot, `?rom=` support, EmulatorJS loading,
   fullscreen handling and lazy touch-control setup.
 - `gba-controls.js` — D-pad, A/B/L/R/Start/Select touch rails, haptics and direct
@@ -14,6 +16,12 @@ core compiled to WebAssembly. No commercial ROMs are bundled or linked.
 - `roms/` — a handful of freely distributable homebrew ROMs for testing; see
   `roms/README.md` for provenance and licenses.
 - `../../vendor/emulatorjs/` — the vendored EmulatorJS 4.2.3 runtime and mGBA core.
+
+## Bundled library
+
+The picker lists the seven bundled homebrew ROMs and boots one on tap. `UCity`
+is a Game Boy Color release and exercises the `.gbc` path. See `roms/README.md`
+for provenance and licenses.
 
 ## Supported files
 

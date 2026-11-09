@@ -76,7 +76,7 @@
   function loadTouchControls() {
     if (document.querySelector('script[data-gba-controls]')) return;
     const script = document.createElement('script');
-    script.src = 'gba-controls.js';
+    script.src = 'gba-controls.js?v=20261109b';
     script.dataset.gbaControls = '';
     script.onerror = () => console.warn('GBA touch controls failed to load.');
     document.body.appendChild(script);
@@ -182,6 +182,17 @@
   }
 
   /* ------------------------------------------------------------ file picker */
+
+  for (const button of document.querySelectorAll('[data-rom]')) {
+    button.addEventListener('click', () => {
+      const path = button.dataset.rom;
+      if (!path) return;
+      try {
+        history.replaceState(null, '', `?rom=${encodeURIComponent(path)}`);
+      } catch (_) { /* ignore */ }
+      bootFromQuery(path);
+    });
+  }
 
   for (const button of document.querySelectorAll('[data-choose-rom]')) {
     button.addEventListener('click', () => fileInput?.click());

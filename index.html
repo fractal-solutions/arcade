@@ -7,7 +7,7 @@
   <meta name="description" content="A browser arcade of DOS and PC classics, a local vault of 26 classic Flash games running in Ruffle, and a bring-your-own-ROM Game Boy Advance cabinet.">
   <title>WASM Arcade — authentic classics in the browser</title>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=20261109">
+  <link rel="stylesheet" href="style.css?v=20261109b">
 </head>
 <body>
   <canvas id="field" class="field" aria-hidden="true"></canvas>
@@ -59,13 +59,16 @@
             All <b data-count-for="all">65</b>
           </button>
           <button type="button" class="selector-btn" role="tab" aria-selected="false" data-filter="flash">
-            Flash <span class="selector-new">New</span> <b data-count-for="flash">27</b>
+            Flash <sup class="selector-new">New</sup> <b data-count-for="flash">27</b>
           </button>
           <button type="button" class="selector-btn" role="tab" aria-selected="false" data-filter="wasm">
             WASM <b data-count-for="wasm">3</b>
           </button>
-          <button type="button" class="selector-btn" role="tab" aria-selected="false" data-filter="emu">
-            Emulated <b data-count-for="emu">29</b>
+          <button type="button" class="selector-btn" role="tab" aria-selected="false" data-filter="dos">
+            DOS <b data-count-for="dos">28</b>
+          </button>
+          <button type="button" class="selector-btn" role="tab" aria-selected="false" data-filter="gba">
+            GBA <sup class="selector-new">New</sup> <b data-count-for="gba">1</b>
           </button>
           <button type="button" class="selector-btn" role="tab" aria-selected="false" data-filter="data">
             Your data <b data-count-for="data">1</b>
@@ -197,7 +200,7 @@
         </article>
 
         <!-- Commander Keen 4 -->
-        <article class="cabinet keen4" data-game="keen4" data-kind="emu" style="--i:3">
+        <article class="cabinet keen4" data-game="keen4" data-kind="dos" style="--i:3">
           <a class="cabinet-link" href="games/keen4/" aria-label="Play Commander Keen 4">
             <div class="art">
               <img src="assets/keen4.svg" alt="Commander Keen 4 poster with an alien planet and a pixel hero" width="800" height="500" loading="lazy">
@@ -222,7 +225,7 @@
         </article>
 
         <!-- Duke Nukem II -->
-        <article class="cabinet duke2" data-game="duke2" data-kind="emu" style="--i:4">
+        <article class="cabinet duke2" data-game="duke2" data-kind="dos" style="--i:4">
           <a class="cabinet-link" href="games/duke2/" aria-label="Play Duke Nukem II">
             <div class="art">
               <img src="assets/duke2.svg" alt="Duke Nukem II poster with a red alert skyline and an action hero" width="800" height="500" loading="lazy">
@@ -275,7 +278,7 @@
         </article>
 
         <!-- DOS cabinet -->
-        <article class="cabinet dos" data-game="dos" data-kind="emu" style="--i:6">
+        <article class="cabinet dos" data-game="dos" data-kind="dos" style="--i:6">
           <a class="cabinet-link" href="games/dos/" aria-label="Open the DOS cabinet">
             <div class="art">
               <img src="assets/dos.svg" alt="A DOS prompt on a CRT monitor" width="800" height="500" loading="lazy">
@@ -302,14 +305,14 @@
         </article>
 
 
-        <div class="vault-divider" data-show-for="all emu" role="presentation">
+        <div class="vault-divider" data-show-for="all dos" role="presentation">
           <span class="vault-kicker">// THE DOS VAULT</span>
           <h3>25 more games, already installed.</h3>
           <p>Shareware episodes, freeware releases and playable demos — each one bundled as a
             <code>.jsdos</code> image and booted by DOSBox in WebAssembly. No file picker, no setup.</p>
         </div>
 
-        <article class="cabinet wolf3d" data-game="wolf3d" data-kind="emu" style="--i:7; --accent:#ff5c5c">
+        <article class="cabinet wolf3d" data-game="wolf3d" data-kind="dos" style="--i:7; --accent:#ff5c5c">
           <a class="cabinet-link" href="games/wolf3d/" aria-label="Play Wolfenstein 3D">
             <div class="art">
               <img src="assets/shots/wolf3d.jpg" alt="Wolfenstein 3D running in the arcade" width="800" height="500" loading="lazy">
@@ -330,7 +333,7 @@
             </div>
           </a>
         </article>
-        <article class="cabinet doom" data-game="doom" data-kind="emu" style="--i:8; --accent:#ff7a3d">
+        <article class="cabinet doom" data-game="doom" data-kind="dos" style="--i:8; --accent:#ff7a3d">
           <a class="cabinet-link" href="games/doom/" aria-label="Play DOOM">
             <div class="art">
               <img src="assets/shots/doom.jpg" alt="DOOM running in the arcade" width="800" height="500" loading="lazy">
@@ -351,7 +354,7 @@
             </div>
           </a>
         </article>
-        <article class="cabinet heretic" data-game="heretic" data-kind="emu" style="--i:9; --accent:#8dff9e">
+        <article class="cabinet heretic" data-game="heretic" data-kind="dos" style="--i:9; --accent:#8dff9e">
           <a class="cabinet-link" href="games/heretic/" aria-label="Play Heretic">
             <div class="art">
               <img src="assets/shots/heretic.jpg" alt="Heretic running in the arcade" width="800" height="500" loading="lazy">
@@ -372,7 +375,7 @@
             </div>
           </a>
         </article>
-        <article class="cabinet jazz" data-game="jazz" data-kind="emu" style="--i:10; --accent:#59f36f">
+        <article class="cabinet jazz" data-game="jazz" data-kind="dos" style="--i:10; --accent:#59f36f">
           <a class="cabinet-link" href="games/jazz/" aria-label="Play Jazz Jackrabbit">
             <div class="art">
               <img src="assets/shots/jazz.jpg" alt="Jazz Jackrabbit running in the arcade" width="800" height="500" loading="lazy">
@@ -393,7 +396,7 @@
             </div>
           </a>
         </article>
-        <article class="cabinet cosmo" data-game="cosmo" data-kind="emu" style="--i:11; --accent:#62d6ff">
+        <article class="cabinet cosmo" data-game="cosmo" data-kind="dos" style="--i:11; --accent:#62d6ff">
           <a class="cabinet-link" href="games/cosmo/" aria-label="Play Cosmo's Cosmic Adventure">
             <div class="art">
               <img src="assets/shots/cosmo.jpg" alt="Cosmo's Cosmic Adventure running in the arcade" width="800" height="500" loading="lazy">
@@ -414,7 +417,7 @@
             </div>
           </a>
         </article>
-        <article class="cabinet crystal" data-game="crystal" data-kind="emu" style="--i:12; --accent:#63e6ff">
+        <article class="cabinet crystal" data-game="crystal" data-kind="dos" style="--i:12; --accent:#63e6ff">
           <a class="cabinet-link" href="games/crystal/" aria-label="Play Crystal Caves">
             <div class="art">
               <img src="assets/shots/crystal.jpg" alt="Crystal Caves running in the arcade" width="800" height="500" loading="lazy">
@@ -435,7 +438,7 @@
             </div>
           </a>
         </article>
-        <article class="cabinet biomenace" data-game="biomenace" data-kind="emu" style="--i:13; --accent:#8dff9e">
+        <article class="cabinet biomenace" data-game="biomenace" data-kind="dos" style="--i:13; --accent:#8dff9e">
           <a class="cabinet-link" href="games/biomenace/" aria-label="Play Bio Menace">
             <div class="art">
               <img src="assets/shots/biomenace.jpg" alt="Bio Menace running in the arcade" width="800" height="500" loading="lazy">
@@ -456,7 +459,7 @@
             </div>
           </a>
         </article>
-        <article class="cabinet jill" data-game="jill" data-kind="emu" style="--i:14; --accent:#59f36f">
+        <article class="cabinet jill" data-game="jill" data-kind="dos" style="--i:14; --accent:#59f36f">
           <a class="cabinet-link" href="games/jill/" aria-label="Play Jill of the Jungle">
             <div class="art">
               <img src="assets/shots/jill.jpg" alt="Jill of the Jungle running in the arcade" width="800" height="500" loading="lazy">
@@ -477,7 +480,7 @@
             </div>
           </a>
         </article>
-        <article class="cabinet xargon" data-game="xargon" data-kind="emu" style="--i:15; --accent:#c7a6ff">
+        <article class="cabinet xargon" data-game="xargon" data-kind="dos" style="--i:15; --accent:#c7a6ff">
           <a class="cabinet-link" href="games/xargon/" aria-label="Play Xargon">
             <div class="art">
               <img src="assets/shots/xargon.jpg" alt="Xargon running in the arcade" width="800" height="500" loading="lazy">
@@ -498,7 +501,7 @@
             </div>
           </a>
         </article>
-        <article class="cabinet raptor" data-game="raptor" data-kind="emu" style="--i:16; --accent:#ff7a3d">
+        <article class="cabinet raptor" data-game="raptor" data-kind="dos" style="--i:16; --accent:#ff7a3d">
           <a class="cabinet-link" href="games/raptor/" aria-label="Play Raptor: Call of the Shadows">
             <div class="art">
               <img src="assets/shots/raptor.jpg" alt="Raptor: Call of the Shadows running in the arcade" width="800" height="500" loading="lazy">
@@ -519,7 +522,7 @@
             </div>
           </a>
         </article>
-        <article class="cabinet blakestone" data-game="blakestone" data-kind="emu" style="--i:17; --accent:#62d6ff">
+        <article class="cabinet blakestone" data-game="blakestone" data-kind="dos" style="--i:17; --accent:#62d6ff">
           <a class="cabinet-link" href="games/blakestone/" aria-label="Play Blake Stone: Aliens of Gold">
             <div class="art">
               <img src="assets/shots/blakestone.jpg" alt="Blake Stone: Aliens of Gold running in the arcade" width="800" height="500" loading="lazy">
@@ -540,7 +543,7 @@
             </div>
           </a>
         </article>
-        <article class="cabinet kenslabyrinth" data-game="kenslabyrinth" data-kind="emu" style="--i:18; --accent:#ffd166">
+        <article class="cabinet kenslabyrinth" data-game="kenslabyrinth" data-kind="dos" style="--i:18; --accent:#ffd166">
           <a class="cabinet-link" href="games/kenslabyrinth/" aria-label="Play Ken's Labyrinth">
             <div class="art">
               <img src="assets/shots/kenslabyrinth.jpg" alt="Ken's Labyrinth running in the arcade" width="800" height="500" loading="lazy">
@@ -561,7 +564,7 @@
             </div>
           </a>
         </article>
-        <article class="cabinet supaplex" data-game="supaplex" data-kind="emu" style="--i:19; --accent:#63e6ff">
+        <article class="cabinet supaplex" data-game="supaplex" data-kind="dos" style="--i:19; --accent:#63e6ff">
           <a class="cabinet-link" href="games/supaplex/" aria-label="Play Supaplex">
             <div class="art">
               <img src="assets/shots/supaplex.jpg" alt="Supaplex running in the arcade" width="800" height="500" loading="lazy">
@@ -582,7 +585,7 @@
             </div>
           </a>
         </article>
-        <article class="cabinet zzt" data-game="zzt" data-kind="emu" style="--i:20; --accent:#c7a6ff">
+        <article class="cabinet zzt" data-game="zzt" data-kind="dos" style="--i:20; --accent:#c7a6ff">
           <a class="cabinet-link" href="games/zzt/" aria-label="Play ZZT">
             <div class="art">
               <img src="assets/shots/zzt.jpg" alt="ZZT running in the arcade" width="800" height="500" loading="lazy">
@@ -603,7 +606,7 @@
             </div>
           </a>
         </article>
-        <article class="cabinet scorched" data-game="scorched" data-kind="emu" style="--i:21; --accent:#ff9e3d">
+        <article class="cabinet scorched" data-game="scorched" data-kind="dos" style="--i:21; --accent:#ff9e3d">
           <a class="cabinet-link" href="games/scorched/" aria-label="Play Scorched Earth">
             <div class="art">
               <img src="assets/shots/scorched.jpg" alt="Scorched Earth running in the arcade" width="800" height="500" loading="lazy">
@@ -624,7 +627,7 @@
             </div>
           </a>
         </article>
-        <article class="cabinet sopwith" data-game="sopwith" data-kind="emu" style="--i:22; --accent:#8dff9e">
+        <article class="cabinet sopwith" data-game="sopwith" data-kind="dos" style="--i:22; --accent:#8dff9e">
           <a class="cabinet-link" href="games/sopwith/" aria-label="Play Sopwith">
             <div class="art">
               <img src="assets/shots/sopwith.jpg" alt="Sopwith running in the arcade" width="800" height="500" loading="lazy">
@@ -645,7 +648,7 @@
             </div>
           </a>
         </article>
-        <article class="cabinet harry" data-game="harry" data-kind="emu" style="--i:23; --accent:#ff7a3d">
+        <article class="cabinet harry" data-game="harry" data-kind="dos" style="--i:23; --accent:#ff7a3d">
           <a class="cabinet-link" href="games/harry/" aria-label="Play Halloween Harry">
             <div class="art">
               <img src="assets/shots/harry.jpg" alt="Halloween Harry running in the arcade" width="800" height="500" loading="lazy">
@@ -666,7 +669,7 @@
             </div>
           </a>
         </article>
-        <article class="cabinet solarwinds" data-game="solarwinds" data-kind="emu" style="--i:24; --accent:#63e6ff">
+        <article class="cabinet solarwinds" data-game="solarwinds" data-kind="dos" style="--i:24; --accent:#63e6ff">
           <a class="cabinet-link" href="games/solarwinds/" aria-label="Play Solar Winds">
             <div class="art">
               <img src="assets/shots/solarwinds.jpg" alt="Solar Winds running in the arcade" width="800" height="500" loading="lazy">
@@ -687,7 +690,7 @@
             </div>
           </a>
         </article>
-        <article class="cabinet tyrian" data-game="tyrian" data-kind="emu" style="--i:25; --accent:#c7a6ff">
+        <article class="cabinet tyrian" data-game="tyrian" data-kind="dos" style="--i:25; --accent:#c7a6ff">
           <a class="cabinet-link" href="games/tyrian/" aria-label="Play Tyrian 2000">
             <div class="art">
               <img src="assets/shots/tyrian.jpg" alt="Tyrian 2000 running in the arcade" width="800" height="500" loading="lazy">
@@ -708,7 +711,7 @@
             </div>
           </a>
         </article>
-        <article class="cabinet omf" data-game="omf" data-kind="emu" style="--i:26; --accent:#ff5c5c">
+        <article class="cabinet omf" data-game="omf" data-kind="dos" style="--i:26; --accent:#ff5c5c">
           <a class="cabinet-link" href="games/omf/" aria-label="Play One Must Fall: 2097">
             <div class="art">
               <img src="assets/shots/omf.jpg" alt="One Must Fall: 2097 running in the arcade" width="800" height="500" loading="lazy">
@@ -729,7 +732,7 @@
             </div>
           </a>
         </article>
-        <article class="cabinet epicpinball" data-game="epicpinball" data-kind="emu" style="--i:27; --accent:#ffd166">
+        <article class="cabinet epicpinball" data-game="epicpinball" data-kind="dos" style="--i:27; --accent:#ffd166">
           <a class="cabinet-link" href="games/epicpinball/" aria-label="Play Epic Pinball">
             <div class="art">
               <img src="assets/shots/epicpinball.jpg" alt="Epic Pinball running in the arcade" width="800" height="500" loading="lazy">
@@ -750,7 +753,7 @@
             </div>
           </a>
         </article>
-        <article class="cabinet hocus" data-game="hocus" data-kind="emu" style="--i:28; --accent:#c7a6ff">
+        <article class="cabinet hocus" data-game="hocus" data-kind="dos" style="--i:28; --accent:#c7a6ff">
           <a class="cabinet-link" href="games/hocus/" aria-label="Play Hocus Pocus">
             <div class="art">
               <img src="assets/shots/hocus.jpg" alt="Hocus Pocus running in the arcade" width="800" height="500" loading="lazy">
@@ -771,7 +774,7 @@
             </div>
           </a>
         </article>
-        <article class="cabinet majorstryker" data-game="majorstryker" data-kind="emu" style="--i:29; --accent:#ff5c5c">
+        <article class="cabinet majorstryker" data-game="majorstryker" data-kind="dos" style="--i:29; --accent:#ff5c5c">
           <a class="cabinet-link" href="games/majorstryker/" aria-label="Play Major Stryker">
             <div class="art">
               <img src="assets/shots/majorstryker.jpg" alt="Major Stryker running in the arcade" width="800" height="500" loading="lazy">
@@ -792,7 +795,7 @@
             </div>
           </a>
         </article>
-        <article class="cabinet capitalism" data-game="capitalism" data-kind="emu" style="--i:30; --accent:#ffd166">
+        <article class="cabinet capitalism" data-game="capitalism" data-kind="dos" style="--i:30; --accent:#ffd166">
           <a class="cabinet-link" href="games/capitalism/" aria-label="Play Capitalism">
             <div class="art">
               <img src="assets/shots/capitalism.jpg" alt="Capitalism running in the arcade" width="800" height="500" loading="lazy">
@@ -813,7 +816,7 @@
             </div>
           </a>
         </article>
-        <article class="cabinet pop2demo" data-game="pop2demo" data-kind="emu" style="--i:31; --accent:#ffd166">
+        <article class="cabinet pop2demo" data-game="pop2demo" data-kind="dos" style="--i:31; --accent:#ffd166">
           <a class="cabinet-link" href="games/pop2demo/" aria-label="Play Prince of Persia 2">
             <div class="art">
               <img src="assets/shots/pop2demo.jpg" alt="Prince of Persia 2 running in the arcade" width="800" height="500" loading="lazy">
@@ -1495,14 +1498,14 @@
           </a>
         </article>
 
-        <div class="vault-divider gba-divider" data-show-for="all emu" role="presentation">
+        <div class="vault-divider gba-divider" data-show-for="all gba" role="presentation">
           <span class="vault-kicker">// THE HANDHELD VAULT</span>
           <h3>Game Boy, in your browser.</h3>
           <p>mGBA compiled to WebAssembly. Load a <code>.gba</code>, <code>.gb</code>
             or <code>.gbc</code> ROM you own — no commercial ROMs are bundled.</p>
         </div>
 
-        <article class="cabinet gba" data-game="gba" data-kind="emu" style="--i:64; --accent:#9b8cff">
+        <article class="cabinet gba" data-game="gba" data-kind="gba" style="--i:64; --accent:#9b8cff">
           <a class="cabinet-link" href="games/gba/" aria-label="Open the Game Boy Advance cabinet">
             <div class="art">
               <img src="assets/gba.svg" alt="A Game Boy Advance with a glowing screen" width="800" height="500" loading="lazy">
@@ -1515,10 +1518,10 @@
                 <h2>Game Boy <b>Advance</b></h2>
                 <span class="chip emu">mGBA</span>
               </div>
-              <p>A handheld cabinet running mGBA in WebAssembly. Load a .gba, .gb
-                or .gbc ROM you own; the file stays in your browser.</p>
+              <p>A handheld cabinet running mGBA in WebAssembly. Seven homebrew
+                ROMs are included, and you can load a .gba, .gb or .gbc file you own.</p>
               <div class="card-foot">
-                <span class="progress">Bring your own ROM</span>
+                <span class="progress">7 homebrew ROMs + yours</span>
                 <span class="cta">Open <span aria-hidden="true">→</span></span>
               </div>
             </div>
@@ -1759,6 +1762,6 @@ GAME.EXE</code></pre>
     </div>
   </dialog>
 
-  <script src="arcade.js"></script>
+  <script src="arcade.js?v=20261109b"></script>
 </body>
 </html>

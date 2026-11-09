@@ -118,7 +118,7 @@
   const libraryStateKey = 'arcade.library.state.v1';
   let selectedCard = null;
   let restoringLibrary = false;
-  const KINDS = new Set(['all', 'wasm', 'emu', 'data', 'external', 'flash']);
+  const KINDS = new Set(['all', 'wasm', 'dos', 'gba', 'data', 'external', 'flash']);
 
   function readLibraryState() {
     try {
