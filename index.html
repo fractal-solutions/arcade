@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#05060a">
-  <meta name="description" content="A browser arcade of DOS and PC classics, plus a local vault of 26 classic Flash games running in Ruffle.">
+  <meta name="description" content="A browser arcade of DOS and PC classics, a local vault of 26 classic Flash games running in Ruffle, and a bring-your-own-ROM Game Boy Advance cabinet.">
   <title>WASM Arcade — authentic classics in the browser</title>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=20261108">
+  <link rel="stylesheet" href="style.css?v=20261109">
 </head>
 <body>
   <canvas id="field" class="field" aria-hidden="true"></canvas>
@@ -37,7 +37,7 @@
           aria-describedby="coverflow-live"></canvas>
         <div class="coverflow-heading" aria-hidden="true">
           <span>ARCADE <i>SELECT</i></span>
-          <span id="coverflow-index">01 <b>/</b> 64</span>
+          <span id="coverflow-index">01 <b>/</b> 65</span>
         </div>
         <span class="coverflow-live" id="coverflow-live" aria-live="polite"></span>
         <div class="library-controls">
@@ -56,7 +56,7 @@
         </div>
         <div class="selector" role="tablist" aria-label="Filter games">
           <button type="button" class="selector-btn is-active" role="tab" aria-selected="true" data-filter="all">
-            All <b data-count-for="all">64</b>
+            All <b data-count-for="all">65</b>
           </button>
           <button type="button" class="selector-btn" role="tab" aria-selected="false" data-filter="flash">
             Flash <span class="selector-new">New</span> <b data-count-for="flash">27</b>
@@ -65,7 +65,7 @@
             WASM <b data-count-for="wasm">3</b>
           </button>
           <button type="button" class="selector-btn" role="tab" aria-selected="false" data-filter="emu">
-            Emulated <b data-count-for="emu">28</b>
+            Emulated <b data-count-for="emu">29</b>
           </button>
           <button type="button" class="selector-btn" role="tab" aria-selected="false" data-filter="data">
             Your data <b data-count-for="data">1</b>
@@ -76,7 +76,7 @@
           <span class="selector-glint" aria-hidden="true"></span>
         </div>
       </div>
-      <p class="selector-status" id="selector-status" aria-live="polite">Showing 64 of 64 entries</p>
+      <p class="selector-status" id="selector-status" aria-live="polite">Showing 65 of 65 entries</p>
 
       <section class="featured-game" aria-label="Selected game" aria-live="polite">
         <div class="featured-copy">
@@ -302,7 +302,7 @@
         </article>
 
 
-        <div class="vault-divider" role="presentation">
+        <div class="vault-divider" data-show-for="all emu" role="presentation">
           <span class="vault-kicker">// THE DOS VAULT</span>
           <h3>25 more games, already installed.</h3>
           <p>Shareware episodes, freeware releases and playable demos — each one bundled as a
@@ -921,7 +921,7 @@
             </div>
           </div>
         </article>
-        <div class="vault-divider flash-divider" role="presentation">
+        <div class="vault-divider flash-divider" data-show-for="all flash" role="presentation">
           <span class="vault-kicker">// THE FLASH VAULT</span>
           <h3>26 games, already stashed.</h3>
           <p>Local SWF files running in Ruffle: cult platformers, puzzle boxes, tower defense,
@@ -1494,6 +1494,39 @@
             </div>
           </a>
         </article>
+
+        <div class="vault-divider gba-divider" data-show-for="all emu" role="presentation">
+          <span class="vault-kicker">// THE HANDHELD VAULT</span>
+          <h3>Game Boy, in your browser.</h3>
+          <p>mGBA compiled to WebAssembly. Load a <code>.gba</code>, <code>.gb</code>
+            or <code>.gbc</code> ROM you own — no commercial ROMs are bundled.</p>
+        </div>
+
+        <article class="cabinet gba" data-game="gba" data-kind="emu" style="--i:64; --accent:#9b8cff">
+          <a class="cabinet-link" href="games/gba/" aria-label="Open the Game Boy Advance cabinet">
+            <div class="art">
+              <img src="assets/gba.svg" alt="A Game Boy Advance with a glowing screen" width="800" height="500" loading="lazy">
+              <span class="art-index" aria-hidden="true">65</span>
+              <span class="art-tag">GBA &middot; 2001</span>
+              <span class="play-badge" aria-hidden="true">▶</span>
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>Game Boy <b>Advance</b></h2>
+                <span class="chip emu">mGBA</span>
+              </div>
+              <p>A handheld cabinet running mGBA in WebAssembly. Load a .gba, .gb
+                or .gbc ROM you own; the file stays in your browser.</p>
+              <div class="card-foot">
+                <span class="progress">Bring your own ROM</span>
+                <span class="cta">Open <span aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          </a>
+          <button type="button" class="data-help" data-open="gba-help">
+            How do I add a Game Boy game?
+          </button>
+        </article>
       </div>
       <p class="selector-empty" id="selector-empty" hidden>No cabinets in this class. Try another filter.</p>
     </section>
@@ -1681,6 +1714,48 @@ GAME.EXE</code></pre>
     </p>
     <div class="sheet-actions">
       <a class="button primary" href="games/quake/">Open Quake</a>
+    </div>
+  </dialog>
+
+  <!-- Game Boy Advance instructions -->
+  <dialog id="gba-help" class="sheet" aria-labelledby="gba-help-title">
+    <form method="dialog" class="sheet-close-form">
+      <button class="sheet-close" aria-label="Close">×</button>
+    </form>
+    <p class="eyebrow">Bring your own ROM</p>
+    <h2 id="gba-help-title">Add a Game Boy game</h2>
+    <p class="sheet-lede">
+      The cabinet ships with the <b>mGBA</b> core compiled to WebAssembly and no commercial
+      ROMs. Load a <code>.gba</code>, <code>.gb</code> or <code>.gbc</code> file you own, or a
+      freely distributable homebrew release. The file is read in this tab and never uploaded.
+    </p>
+    <ol class="steps">
+      <li>
+        <b>Choose a ROM</b>
+        <p>Open the cabinet and drop a ROM onto the picker, or press <em>Choose ROM</em>.
+          Files up to 64 MB are accepted.</p>
+      </li>
+      <li>
+        <b>Play with keys or touch</b>
+        <p>On a keyboard: arrows move, <code>Z</code> = A, <code>X</code> = B,
+          <code>Q</code> / <code>E</code> = L / R, <code>Enter</code> = Start and
+          <code>V</code> = Select. Touch devices get a D-pad and face buttons; the same
+          physical keys still work.</p>
+      </li>
+      <li>
+        <b>Go fullscreen</b>
+        <p>Use the cabinet's <em>Fullscreen</em> button. The touch controls stay on the dark
+          rails outside the game screen in landscape, and below it in portrait.</p>
+      </li>
+    </ol>
+    <p class="sheet-note">
+      Saves and save states stay in this browser's storage. Only homebrew, public-domain test
+      ROMs or cartridges you dumped yourself should be used; commercial ROMs are not
+      distributed by this arcade. Hosting a ROM next to the arcade? Append
+      <code>?rom=game.gba</code> to the cabinet URL.
+    </p>
+    <div class="sheet-actions">
+      <a class="button primary" href="games/gba/">Open the GBA cabinet</a>
     </div>
   </dialog>
 

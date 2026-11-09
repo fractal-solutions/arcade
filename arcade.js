@@ -31,7 +31,7 @@
 
   const grid = $('#cabinet-grid');
   const cards = grid ? $$('.cabinet', grid) : [];
-  const vaultDivider = grid && $('.vault-divider', grid);
+  const dividers = grid ? $$('.vault-divider[data-show-for]', grid) : [];
   const total = cards.length;
   const byKind = (kind) => kind === 'all' ? total : cards.filter((c) => c.dataset.kind === kind).length;
 
@@ -217,7 +217,10 @@
       if (show) visible++;
       if (!show) card.style.removeProperty('--rx'), card.style.removeProperty('--ry');
     }
-    if (vaultDivider) vaultDivider.hidden = kind !== 'all' && kind !== 'emu';
+    for (const divider of dividers) {
+      const scopes = divider.dataset.showFor.split(/\s+/).filter(Boolean);
+      divider.hidden = !scopes.includes(kind);
+    }
 
     for (const btn of filterButtons) {
       const active = btn.dataset.filter === kind;

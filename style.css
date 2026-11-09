@@ -852,6 +852,15 @@ footer {
 
 .flash-divider .vault-kicker { color: var(--cyan); }
 
+.gba-divider::before {
+  background: linear-gradient(90deg, #9b8cff, transparent);
+  box-shadow: 0 0 12px rgba(155, 140, 255, .55);
+}
+
+.gba-divider .vault-kicker { color: #b9afff; }
+
+.gba-divider code { color: #c9c1ff; }
+
 /* ---------- cabinets ---------- */
 
 .cabinets {

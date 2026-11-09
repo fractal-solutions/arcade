@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#05060a">
+<title>Game Boy Advance Cabinet — WASM Arcade</title>
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../_shared/emu.css">
+<style>
+  :root {
+    --accent: #9b8cff;
+    --accent-2: #59f3ff;
+    --gba-ink: #d9d2ff;
+  }
+  .frame {
+    background:
+      radial-gradient(ellipse at 16% 100%, rgba(155, 140, 255, .18), transparent 46%),
+      radial-gradient(ellipse at 84% 100%, rgba(89, 243, 255, .12), transparent 42%),
+      linear-gradient(180deg, #080b11, #111426);
+  }
+  #dos { background: #05060a; }
+  #dos:focus { outline: none; }
+
+  .gba-picker {
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+    display: grid;
+    place-items: center;
+    padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+    overflow: auto;
+    background:
+      radial-gradient(ellipse at 18% 10%, rgba(155, 140, 255, .16), transparent 52%),
+      radial-gradient(ellipse at 82% 90%, rgba(89, 243, 255, .1), transparent 48%),
+      linear-gradient(180deg, #070a10, #101326);
+  }
+  .gba-picker[hidden] { display: none; }
+  .picker-card {
+    width: min(580px, 100%);
+    margin: auto;
+    padding: clamp(20px, 4vw, 34px);
+    border: 1px solid rgba(155, 140, 255, .28);
+    background:
+      linear-gradient(160deg, rgba(17, 20, 38, .94), rgba(7, 9, 17, .97));
+    box-shadow:
+      0 0 0 1px rgba(5, 7, 12, .8),
+      0 24px 80px rgba(0, 0, 0, .55),
+      0 0 60px rgba(155, 140, 255, .1);
+  }
+  .picker-kicker {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--accent-2);
+    font: 700 10px/1.2 var(--mono);
+    letter-spacing: .22em;
+    text-transform: uppercase;
+  }
+  .picker-card h2 {
+    margin: 0 0 10px;
+    font-size: clamp(26px, 5vw, 38px);
+    letter-spacing: -.03em;
+    line-height: 1.05;
+  }
+  .picker-card h2 b { color: var(--accent); }
+  .picker-lede {
+    margin: 0 0 20px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.65;
+  }
+  .picker-lede code {
+    color: var(--gba-ink);
+    font-family: var(--mono);
+    font-size: .92em;
+  }
+  .dropzone {
+    display: grid;
+    gap: 10px;
+    justify-items: center;
+    padding: clamp(18px, 4vw, 30px) 16px;
+    border: 1px dashed rgba(155, 140, 255, .42);
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(155, 140, 255, .12), transparent 68%),
+      rgba(7, 10, 18, .66);
+    text-align: center;
+    transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
+  }
+  .dropzone.is-dragover {
+    border-color: var(--accent-2);
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(89, 243, 255, .16), transparent 68%),
+      rgba(9, 14, 24, .8);
+    box-shadow: inset 0 0 34px rgba(89, 243, 255, .1);
+  }
+  .dropzone-icon {
+    display: grid;
+    place-items: center;
+    width: 58px;
+    height: 40px;
+    border: 2px solid rgba(217, 210, 255, .6);
+    border-radius: 7px 7px 13px 13px;
+    color: var(--gba-ink);
+    font: 700 9px/1 var(--mono);
+    letter-spacing: .12em;
+    box-shadow: 0 0 24px rgba(155, 140, 255, .24);
+  }
+  .dropzone b {
+    display: block;
+    color: var(--ink);
+    font-size: 14px;
+    letter-spacing: .02em;
+  }
+  .dropzone span {
+    color: var(--dim);
+    font: 600 10px/1.5 var(--mono);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+  .button {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 38px;
+    padding: 9px 15px;
+    border: 1px solid rgba(155, 140, 255, .5);
+    border-radius: 2px;
+    background: linear-gradient(160deg, rgba(45, 38, 82, .96), rgba(13, 13, 26, .96));
+    color: var(--ink);
+    font: 700 10px/1 var(--mono);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color .15s ease, color .15s ease, box-shadow .15s ease;
+  }
+  .button:hover,
+  .button:focus-visible {
+    border-color: var(--accent-2);
+    color: var(--accent-2);
+    box-shadow: 0 0 22px rgba(89, 243, 255, .18);
+    outline: none;
+  }
+  .button.primary {
+    border-color: rgba(89, 243, 255, .62);
+    background: linear-gradient(160deg, rgba(28, 57, 70, .96), rgba(9, 18, 27, .96));
+    color: #d9ffff;
+  }
+  .picker-error {
+    margin: 14px 0 0;
+    padding: 9px 11px;
+    border: 1px solid rgba(255, 138, 122, .42);
+    background: rgba(50, 15, 18, .55);
+    color: #ffb4a8;
+    font: 600 10px/1.5 var(--mono);
+    letter-spacing: .04em;
+  }
+  .picker-error[hidden] { display: none; }
+  .picker-note {
+    margin: 16px 0 0;
+    color: var(--dim);
+    font: 600 9.5px/1.6 var(--mono);
+    letter-spacing: .04em;
+  }
+  .picker-note b { color: var(--muted); }
+
+  .boot-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 25;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background:
+      radial-gradient(ellipse at 50% 40%, rgba(155, 140, 255, .12), transparent 55%),
+      #05060a;
+    text-align: center;
+  }
+  .boot-overlay[hidden] { display: none; }
+  .boot-card { display: grid; justify-items: center; gap: 12px; max-width: 420px; }
+  .boot-spinner {
+    width: 34px;
+    height: 34px;
+    border: 2px solid rgba(155, 140, 255, .2);
+    border-top-color: var(--accent-2);
+    border-radius: 50%;
+    animation: gba-spin .85s linear infinite;
+  }
+  @keyframes gba-spin { to { transform: rotate(360deg); } }
+  .boot-status {
+    margin: 0;
+    color: var(--muted);
+    font: 600 11px/1.6 var(--mono);
+    letter-spacing: .06em;
+  }
+  .boot-note {
+    margin: 0;
+    color: var(--dim);
+    font: 600 9px/1.5 var(--mono);
+    letter-spacing: .05em;
+  }
+  .boot-error-panel {
+    position: absolute;
+    left: 50%;
+    bottom: max(18px, env(safe-area-inset-bottom));
+    z-index: 26;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: min(620px, calc(100% - 32px));
+    padding: 11px 13px;
+    border: 1px solid rgba(255, 138, 122, .42);
+    background: rgba(24, 9, 12, .95);
+    color: #ffb4a8;
+    font: 600 10px/1.5 var(--mono);
+    letter-spacing: .03em;
+    transform: translateX(-50%);
+    box-shadow: 0 12px 34px rgba(0, 0, 0, .55);
+  }
+  .boot-error-panel[hidden] { display: none; }
+  .boot-error-panel p { margin: 0; flex: 1; }
+  .boot-error-panel .button { flex: none; min-height: 32px; padding: 7px 10px; }
+
+  .gba-dpad-hub {
+    grid-area: 2 / 2;
+    align-self: center;
+    justify-self: center;
+    width: 30%;
+    height: 30%;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 40% 35%, rgba(255, 255, 255, .18), transparent 40%),
+      #1a2230;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, .6), 0 1px 0 rgba(255, 255, 255, .05);
+    pointer-events: none;
+  }
+  .gba-grid .gba-l { grid-area: 1 / 1; }
+  .gba-grid .gba-r { grid-area: 1 / 3; }
+  .gba-grid .gba-b { grid-area: 2 / 1; }
+  .gba-grid .gba-a { grid-area: 2 / 3; }
+  .gba-grid .gba-select { grid-area: 3 / 1; }
+  .gba-grid .gba-start { grid-area: 3 / 3; }
+  .gba-grid .gba-action-hub {
+    grid-area: 2 / 2;
+    align-self: center;
+    justify-self: center;
+    width: 26%;
+    height: 26%;
+    border: 1px solid rgba(155, 140, 255, .22);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(155, 140, 255, .18), transparent 70%);
+    pointer-events: none;
+  }
+  .gba-grid .gba-l,
+  .gba-grid .gba-r,
+  .gba-grid .gba-select,
+  .gba-grid .gba-start {
+    font-size: 7px;
+  }
+  .gba-grid .gba-l .touch-action-name,
+  .gba-grid .gba-r .touch-action-name,
+  .gba-grid .gba-select .touch-action-name,
+  .gba-grid .gba-start .touch-action-name {
+    font-size: clamp(5px, 1vw, 7px);
+  }
+  .gba-grid .gba-a {
+    border-color: rgba(89, 243, 255, .62);
+    background:
+      radial-gradient(circle at 34% 24%, rgba(255, 255, 255, .2), transparent 36%),
+      radial-gradient(circle at 50% 30%, rgba(89, 243, 255, .34), #101b26 76%);
+  }
+  .gba-grid .gba-b {
+    border-color: rgba(155, 140, 255, .58);
+    background:
+      radial-gradient(circle at 34% 24%, rgba(255, 255, 255, .18), transparent 36%),
+      radial-gradient(circle at 50% 30%, rgba(155, 140, 255, .32), #171427 76%);
+  }
+  .gba-grid .gba-a .touch-action-name { color: #d9ffff; }
+  .gba-grid .gba-b .touch-action-name { color: #e8e2ff; }
+
+  /* Fullscreen toolbar: hidden until the top-left tab or a top-edge swipe. */
+  .toolbar-reveal {
+    position: fixed;
+    top: max(6px, env(safe-area-inset-top));
+    left: max(6px, env(safe-area-inset-left));
+    z-index: 60;
+    display: none;
+    align-items: center;
+    gap: 5px;
+    min-height: 30px;
+    padding: 0 10px;
+    border: 1px solid rgba(155, 140, 255, .45);
+    border-radius: 0 0 8px 0;
+    background: rgba(6, 9, 15, .9);
+    color: var(--gba-ink);
+    font: 700 9px/1 var(--mono);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .45);
+    transition: opacity .18s ease;
+  }
+  body.is-fullscreen .toolbar-reveal { display: inline-flex; }
+  body.is-fullscreen.is-toolbar-open .toolbar-reveal {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .toolbar-reveal:focus-visible {
+    outline: 1px solid var(--accent-2);
+    outline-offset: 2px;
+  }
+
+  body.is-fullscreen .bar {
+    transform: translateY(-110%);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform .18s ease, opacity .18s ease;
+  }
+  body.is-fullscreen.is-toolbar-open .bar {
+    transform: none;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Keep the GBA pad and buttons centered on the same line, and never let the
+     shared portrait nudge push them over the game screen. */
+  .touch-controls[data-layout="gba"] .touch-side {
+    transform: none;
+  }
+  .touch-controls[data-layout="gba"] .touch-label {
+    display: none;
+  }
+
+  @media (max-width: 640px) {
+    .picker-card { padding: 18px; }
+    .picker-lede { font-size: 12px; }
+    .boot-error-panel { align-items: stretch; flex-direction: column; }
+    .boot-error-panel .button { width: 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .boot-spinner { animation: none; }
+  }
+</style>
+</head>
+<body>
+<button class="toolbar-reveal" id="toolbar-reveal" type="button"
+  aria-label="Show cabinet controls" aria-expanded="false">
+  <span aria-hidden="true">▤</span><span>Controls</span>
+</button>
+<div class="wrap">
+  <header class="bar">
+    <a class="back" href="../../" aria-label="Back to the arcade">← Arcade</a>
+    <h1 class="title">Game Boy <b>Advance</b></h1>
+    <p class="note">mGBA · WebAssembly · bring your own .gba / .gb / .gbc</p>
+    <span class="spacer" aria-hidden="true"></span>
+    <button class="fs-btn" id="change-rom" type="button" hidden>
+      <span aria-hidden="true">↺</span><span>Change ROM</span>
+    </button>
+    <button class="fs-btn" id="fs" type="button" aria-pressed="false" aria-label="Toggle fullscreen">
+      <span aria-hidden="true">⛶</span><span>Fullscreen</span>
+    </button>
+  </header>
+
+  <div class="frame" id="frame">
+    <div id="dos" aria-label="Game Boy Advance screen"></div>
+
+    <section class="gba-picker" id="picker" aria-labelledby="picker-title">
+      <div class="picker-card">
+        <span class="picker-kicker">// Bring your own ROM</span>
+        <h2 id="picker-title">Load a <b>Game Boy</b> game</h2>
+        <p class="picker-lede">
+          This cabinet ships with no commercial ROMs. Choose a <code>.gba</code>,
+          <code>.gb</code> or <code>.gbc</code> file you own, or a legal homebrew
+          release. The file is read in this tab and is never uploaded.
+        </p>
+        <div class="dropzone" id="dropzone">
+          <span class="dropzone-icon" aria-hidden="true">GBA</span>
+          <b>Drop a ROM here</b>
+          <span>.gba · .gb · .gbc · up to 64 MB</span>
+          <button class="button primary" type="button" data-choose-rom>
+            <span aria-hidden="true">▸</span><span>Choose ROM</span>
+          </button>
+        </div>
+        <p class="picker-error" id="picker-error" role="alert" hidden></p>
+        <p class="picker-note">
+          <b>Legal only.</b> Use homebrew, public-domain test ROMs or a cartridge
+          you have dumped yourself. Commercial ROMs are not distributed here.
+          Saves and save states stay in this browser.
+        </p>
+      </div>
+    </section>
+
+    <div class="boot-overlay" id="boot" hidden>
+      <div class="boot-card" role="status" aria-live="polite">
+        <span class="boot-spinner" aria-hidden="true"></span>
+        <p class="boot-status" id="boot-status">Preparing ROM…</p>
+        <p class="boot-note">Loading the mGBA core from the local cabinet.</p>
+      </div>
+    </div>
+
+    <div class="boot-error-panel" id="boot-error" role="alert" hidden>
+      <p id="boot-error-message">The ROM did not start.</p>
+      <button class="button" type="button" id="boot-reload">Reload cabinet</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="rom-file" accept=".gba,.gb,.gbc,application/octet-stream" hidden>
+<script src="gba.js"></script>
+</body>
+</html>

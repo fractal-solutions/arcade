@@ -1,9 +1,10 @@
 # WASM Arcade
 
 A static arcade of local classics, with a local vault of 26 classic Flash games
-running in Ruffle. Real game code, real pixels, no server-side component.
+running in Ruffle and a bring-your-own-ROM Game Boy Advance cabinet powered by
+mGBA. Real game code, real pixels, no server-side component.
 
-**Last updated: 2026-11-07**
+**Last updated: 2026-11-09**
 
 ---
 
@@ -22,14 +23,16 @@ running in Ruffle. Real game code, real pixels, no server-side component.
 | **DOS Cabinet** | `games/dos/` | js-dos 8.5.3 / DOSBox compiled to WebAssembly | Runs a `.jsdos` bundle you supply |
 | **DOS Vault (25 cabinets)** | `games/<slug>/` | js-dos 8.5.3 / DOSBox compiled to WebAssembly | Shareware, freeware and demos, all bundled and auto-starting |
 | **Flash Vault (26 games)** | `games/flash/` | Locally hosted Ruffle 0.7.1 + bundled SWFs | Playable out of the box; bring-your-own-SWF still supported |
+| **Game Boy Advance** | `games/gba/` | EmulatorJS 4.2.3 + mGBA compiled to WebAssembly | Runs a `.gba` / `.gb` / `.gbc` ROM you supply |
 
 The landing page (`index.html`) is a bespoke, responsive console menu with a
 game-first WebGL coverflow. The covers are textured 3D cards with live highlights;
 arrow keys, swipes and on-screen arrows browse them. It falls back to the regular
 game shelf when WebGL is unavailable and retains the custom cursor on desktop.
-The library includes 64 entries: 59 local cabinets (including the 26-game Flash
-Vault) and five reference-only entries for Quake II, Quake III Arena, Capitalism
-II/Lab, and GTA 2. The format selector leads with **All**, **Flash** (marked
+The library includes 65 entries: 60 local cabinets (including the 26-game Flash
+Vault and the bring-your-own-ROM GBA cabinet) and five reference-only entries
+for Quake II, Quake III Arena, Capitalism II/Lab, and GTA 2. The format selector
+leads with **All**, **Flash** (marked
 New), **WASM** and **Emulated**, followed by **Your data** and **References**. Reference entries do not navigate off-site. Optional
 procedural interface sounds and an original
 ambient DnB loop—with a slow minor-key chord progression, soft synthesized reverb
@@ -141,6 +144,21 @@ Its MIT and Apache 2.0 license texts are included in `vendor/ruffle/`.
 > **Glace:** `assets/glace-1.png` and `assets/glace-2.png` are kept in the repo,
 > but there is no Glace game data or WebAssembly port in this project, so Glace is
 > intentionally not listed in the selector. Nothing was deleted.
+
+### Game Boy Advance
+
+The **Emulated** filter includes `games/gba/`, a handheld cabinet built on
+vendored **EmulatorJS 4.2.3** with the **mGBA** core compiled to WebAssembly.
+No commercial ROMs are bundled. Open the cabinet, then drop or choose a `.gba`,
+`.gb` or `.gbc` file you own (up to 64 MB); the file is read into a Blob URL in
+the current tab and is never uploaded. Legal homebrew, public-domain test ROMs
+and self-dumped cartridges are the intended sources. Saves and save states stay
+in this browser's storage.
+
+The arcade's own fullscreen button and touch rails remain authoritative:
+EmulatorJS's virtual gamepad and fullscreen buttons are disabled. The core is
+loaded locally from `vendor/emulatorjs/`, and `?rom=game.gba` can boot a
+same-origin ROM placed next to the cabinet.
 
 ---
 
@@ -293,6 +311,23 @@ The **Load your own SWF** panel at the bottom of the page accepts any local
 `.swf`; the file is read into memory, checked for a valid `FWS`/`CWS`/`ZWS`
 header and never uploaded or persisted.
 
+### Game Boy Advance
+
+Load a ROM, then use a physical keyboard or the on-screen controls:
+
+| Action | Keys |
+| --- | --- |
+| D-pad | Arrow keys |
+| A / B | `Z` / `X` |
+| L / R | `Q` / `E` |
+| Start / Select | `Enter` / `V` |
+
+On touch devices the cabinet adds a D-pad on the left and A/B/L/R/Start/Select
+on the right. Buttons use EmulatorJS's direct input API, so they work alongside
+the keyboard. Haptics can be toggled from the controller settings and are
+remembered under `arcade.gba.haptics.v1`. **Change ROM** reloads the cabinet so
+the running core and Blob URL are disposed cleanly.
+
 ---
 
 ## Mobile, landscape and fullscreen
@@ -332,6 +367,12 @@ header and never uploaded or persisted.
   the picture in fullscreen. It defaults on for touch devices; the key-pad and
   D-pad/analog choices are remembered. In fullscreen the toolbar hides by
   default and returns from the top edge, the top-left tab, or a swipe.
+- **Game Boy Advance:** in fullscreen landscape the game sits centered between
+  dark left and right rails, with the D-pad on the left and A/B/L/R/Start/Select
+  on the right. In portrait the controls move to a dark rail below the screen.
+  Touch controls never overlap the game viewport. The cabinet toolbar hides by
+  default in fullscreen and returns from the top-left tab, a top-edge swipe, or
+  a tap near the top edge.
 - The mobile action cluster uses the familiar four-button diamond for primary
   actions, with secondary actions below it.
 - **Prince of Persia 2:** the data prompt is compact, scrolls inside the 4:3
@@ -359,8 +400,10 @@ Everything is local. Nothing is uploaded.
 | `arcade.flash.last.v1` | Flash Vault | Slug of the last game played |
 | `arcade.flash.keys.v1` | Flash Vault | `1` / `0` — touch key pad preference |
 | `arcade.flash.pad.v1` | Flash Vault | `dpad` / `analog` — movement control |
+| `arcade.gba.haptics.v1` | Game Boy Advance | `1` / `0` — touch haptics preference |
 | IndexedDB | Prince of Persia 2 | Cached `pop2-data.tar.gz` and saved games |
 | js-dos storage | Keen 4, Duke Nukem II, DOS Vault, DOS Cabinet | DOSBox saves, configs and bundle state |
+| EmulatorJS storage | Game Boy Advance | mGBA saves, save states and settings |
 
 Clearing site data resets the arcade.
 
@@ -429,6 +472,20 @@ game you own:
 `test-keen.html` is a minimal harness that boots `test/keen4.jsdos`; it is handy
 for checking that the vendored js-dos layer works.
 
+### Game Boy Advance
+
+The emulator is included; the ROMs are not. Open `games/gba/` and drop or choose
+a `.gba`, `.gb` or `.gbc` file you own, or point the cabinet at a same-origin ROM:
+
+```text
+games/gba/?rom=homebrew.gba
+```
+
+The `?rom=` file must be hosted on the same site. The ROM is fetched into a Blob
+URL, so nothing is uploaded and no path is stored. Only use homebrew,
+public-domain test ROMs or cartridges you dumped yourself; commercial ROMs are
+not distributed by this arcade.
+
 ---
 
 ## Adding a cabinet
@@ -474,10 +531,13 @@ arcade/
 │   ├── pop2demo/           Prince of Persia 2 DOS demo cabinet + bundle
 │   ├── dos/                js-dos cabinet
 │   ├── flash/              Flash Vault page, catalog, 26 bundled SWFs
+│   ├── gba/                Game Boy Advance cabinet (BYO ROM, EmulatorJS + mGBA)
 │   └── <slug>/             25 DOS Vault cabinets, each with its own .jsdos bundle
 ├── assets/flash/           generated SVG cover art for the Flash Vault
+├── assets/gba.svg          Game Boy Advance poster art
 ├── vendor/js-dos/          vendored js-dos 8.5.3 and emulator cores
 ├── vendor/ruffle/          vendored Ruffle 0.7.1 web runtime
+├── vendor/emulatorjs/      vendored EmulatorJS 4.2.3 runtime and mGBA core
 ├── test/                   sample .jsdos bundles for the test harness
 ├── test-keen.html          minimal js-dos smoke test
 └── tools/
@@ -520,13 +580,18 @@ arcade/
   project.
 - **Ruffle** — the Flash emulator used by the vault, by Ruffle contributors,
   distributed under MIT / Apache 2.0; see `vendor/ruffle/`.
+- **Game Boy Advance** — the cabinet runs **EmulatorJS 4.2.3** with the **mGBA**
+  core, both compiled to WebAssembly. EmulatorJS is distributed under GPL-3.0;
+  mGBA is distributed under MPL-2.0. No commercial ROMs are bundled or linked.
+  See `vendor/emulatorjs/LICENSE` and `games/gba/README.md`.
 - **js-dos** — by Tommy Visic and contributors, distributed under its own
   license; see `vendor/js-dos/`.
 - **Glace artwork** — retained in `assets/`; no engine or game data is included.
 
 Game names and artwork belong to their respective owners. This project hosts
 engines, freely distributable shareware/freeware releases, demos and open data.
-Prince of Persia 2 and the generic DOS cabinet run data you supply yourself.
+Prince of Persia 2, the generic DOS cabinet and the Game Boy Advance cabinet run
+data you supply yourself.
 *Capitalism Lab* is a Windows-only commercial game and does not run in this
 DOSBox arcade; the 1995 *Capitalism* DOS demo is the closest legal substitute.
 *Carmageddon* is commercial and its demo did not boot reliably here. Do not
