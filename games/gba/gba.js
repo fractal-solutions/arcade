@@ -19,15 +19,79 @@
   const toolbarReveal = document.getElementById('toolbar-reveal');
   const params = new URLSearchParams(location.search);
 
+  const romList = document.getElementById('rom-list');
+  const romSearch = document.getElementById('rom-search');
+  const romSearchClear = document.getElementById('rom-search-clear');
+  const romCount = document.getElementById('rom-count');
+  const romEmpty = document.getElementById('rom-empty');
+  const userLib = window.ArcadeUserLibrary || null;
+
   const ALLOWED = /\.(gba|gb|gbc)$/i;
   const MAX_BYTES = 64 * 1024 * 1024;
   const BOOT_TIMEOUT = 30000;
 
   let started = false;
   let bootTimer = 0;
+  let guardTimer = 0;
   let currentUrl = '';
+  let romQuery = '';
+  let selectedRom = null;
 
   if (!root) return;
+
+  /* EmulatorJS unmounts /data/saves while it tears the core down, then runs a
+     final IDBFS persist. That persist sees an empty local tree, and IDBFS's
+     reconcile deletes every remote entry that is missing locally - so every
+     save disappears from IndexedDB on reload. Refuse an empty-local -> remote
+     sync so stored saves survive shutdown. */
+  function guardSaveStorage() {
+    const fs = window.EJS_emulator?.gameManager?.FS;
+    const idbfs = fs?.filesystems?.IDBFS;
+    if (!idbfs || idbfs.__arcadeGuarded) return Boolean(idbfs);
+    idbfs.__arcadeGuarded = true;
+
+    const reconcile = idbfs.reconcile;
+    idbfs.reconcile = function (src, dst, callback) {
+      if (src?.type === 'local' && dst?.type === 'remote') {
+        const localCount = Object.keys(src.entries || {}).length;
+        const remoteCount = Object.keys(dst.entries || {}).length;
+        if (!localCount && remoteCount) {
+          console.warn('Skipped an empty GBA save sync so stored saves are kept.');
+          callback(null);
+          return;
+        }
+      }
+      return reconcile.call(this, src, dst, callback);
+    };
+    return true;
+  }
+
+  function watchSaveStorage() {
+    if (guardTimer || guardSaveStorage()) return;
+    guardTimer = setInterval(() => {
+      if (guardSaveStorage()) {
+        clearInterval(guardTimer);
+        guardTimer = 0;
+      }
+    }, 100);
+  }
+
+  /* Flush the battery save when the tab is hidden or closed. EmulatorJS also
+     writes on its own interval, but this catches the common "switch tabs and
+     come back later" case. */
+  function flushSaveFiles() {
+    if (!started) return;
+    try {
+      window.EJS_emulator?.gameManager?.saveSaveFiles?.();
+    } catch (error) {
+      console.warn('Unable to flush the GBA save file:', error);
+    }
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') flushSaveFiles();
+  });
+  window.addEventListener('pagehide', flushSaveFiles);
 
   function setBootStatus(text) {
     if (bootStatus) bootStatus.textContent = text;
@@ -82,6 +146,149 @@
     document.body.appendChild(script);
   }
 
+  /* ------------------------------------------------------------ ROM library */
+
+  function romRows() {
+    return romList ? Array.from(romList.querySelectorAll('.rom-item')) : [];
+  }
+
+  function visibleRomRows() {
+    return romRows().filter((row) => !row.classList.contains('is-filtered-out'));
+  }
+
+  function selectRom(row, options = {}) {
+    if (!row) return;
+    selectedRom = row;
+    for (const item of romRows()) {
+      const active = item === row;
+      item.classList.toggle('is-selected', active);
+      item.setAttribute('aria-selected', String(active));
+      item.tabIndex = active ? 0 : -1;
+    }
+    if (options.scroll) {
+      row.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }
+
+  function formatSize(bytes) {
+    if (!bytes || bytes < 1024) return `${bytes || 0} B`;
+    if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  }
+
+  function updateRomCount() {
+    if (!romCount) return;
+    const all = romRows();
+    const visible = visibleRomRows().length;
+    const saved = all.filter((row) => row.dataset.user).length;
+    romCount.textContent = romQuery
+      ? `${visible} of ${all.length}`
+      : `${all.length} ROM${all.length === 1 ? '' : 'S'}${saved ? ` · ${saved} saved` : ''}`;
+  }
+
+  function applyRomFilter() {
+    if (!romList) return;
+    const terms = romQuery.toLowerCase().split(/\s+/).filter(Boolean);
+    for (const row of romRows()) {
+      const haystack = (row.dataset.search || row.textContent || '').toLowerCase();
+      const show = !terms.length || terms.every((term) => haystack.includes(term));
+      row.classList.toggle('is-filtered-out', !show);
+    }
+    if (romEmpty) romEmpty.hidden = visibleRomRows().length !== 0;
+    if (selectedRom && selectedRom.classList.contains('is-filtered-out')) {
+      const first = visibleRomRows()[0];
+      if (first) selectRom(first, { scroll: false });
+    }
+    updateRomCount();
+  }
+
+  function makeUserRomRow(record) {
+    const row = document.createElement('button');
+    row.type = 'button';
+    row.className = 'rom-item';
+    row.dataset.user = record.id;
+    row.dataset.search = `${record.name} ${record.ext} saved your data`.toLowerCase();
+    row.setAttribute('role', 'option');
+    row.setAttribute('aria-selected', 'false');
+
+    const index = document.createElement('span');
+    index.className = 'rom-item-index';
+    index.setAttribute('aria-hidden', 'true');
+    index.textContent = '＋';
+
+    const art = document.createElement('span');
+    art.className = 'rom-item-art';
+    art.setAttribute('aria-hidden', 'true');
+    art.textContent = (record.ext || 'rom').toUpperCase();
+
+    const copy = document.createElement('span');
+    copy.className = 'rom-item-copy';
+    const title = document.createElement('span');
+    title.className = 'rom-item-title';
+    title.textContent = String(record.name || 'Saved ROM').replace(/\.[^.]+$/, '');
+    const meta = document.createElement('span');
+    meta.className = 'rom-item-meta';
+    meta.textContent = `${(record.ext || 'rom').toUpperCase()} · Saved · ${formatSize(record.size)}`;
+    copy.append(title, meta);
+
+    const chip = document.createElement('span');
+    chip.className = 'rom-item-chip';
+    chip.dataset.kind = 'data';
+    chip.textContent = 'Yours';
+
+    const go = document.createElement('span');
+    go.className = 'rom-item-go';
+    go.setAttribute('aria-hidden', 'true');
+    go.textContent = '▶';
+
+    row.append(index, art, copy, chip, go);
+    row.addEventListener('focus', () => selectRom(row));
+    row.addEventListener('mouseenter', () => selectRom(row));
+    row.addEventListener('click', () => activateRomItem(row));
+    return row;
+  }
+
+  function renderUserRoms() {
+    if (!romList) return;
+    for (const row of romList.querySelectorAll('[data-user]')) row.remove();
+    if (userLib) {
+      const records = userLib.listSync().filter((record) => record.kind === 'gba');
+      const fragment = document.createDocumentFragment();
+      for (const record of records) fragment.append(makeUserRomRow(record));
+      romList.prepend(fragment);
+    }
+    applyRomFilter();
+  }
+
+  function activateRomItem(row) {
+    if (!row) return;
+    selectRom(row);
+    if (row.dataset.user) {
+      bootFromUser(row.dataset.user);
+      return;
+    }
+    const path = row.dataset.rom;
+    if (!path) return;
+    try {
+      history.replaceState(null, '', `?rom=${encodeURIComponent(path)}`);
+    } catch (_) { /* ignore */ }
+    bootFromQuery(path);
+  }
+
+  function showToast(message) {
+    let toast = document.querySelector('.gba-toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.className = 'gba-toast';
+      toast.setAttribute('role', 'status');
+      document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.classList.add('is-visible');
+    clearTimeout(showToast.timer);
+    showToast.timer = setTimeout(() => toast.classList.remove('is-visible'), 3200);
+  }
+
   function validate(file) {
     if (!file) return 'Choose a ROM file first.';
     if (!ALLOWED.test(file.name)) return 'That is not a .gba, .gb or .gbc file.';
@@ -90,12 +297,27 @@
     return '';
   }
 
-  function bootRom(file) {
+  function bootRom(file, options = {}) {
     const problem = validate(file);
     if (problem) {
       showPickerError(problem);
       if (picker) picker.hidden = false;
       return;
+    }
+
+    if (options.persist !== false && userLib) {
+      userLib.remember(file, { kind: 'gba', handle: options.handle })
+        .then((record) => {
+          try {
+            history.replaceState(null, '', `?user=${encodeURIComponent(record.id)}`);
+          } catch (_) { /* ignore */ }
+          showToast('Saved to Your data');
+          renderUserRoms();
+        })
+        .catch((error) => {
+          console.warn('Unable to save the ROM to Your data:', error);
+          showToast('Could not save this ROM to Your data');
+        });
     }
 
     clearPickerError();
@@ -118,15 +340,23 @@
     window.EJS_startOnLoaded = true;
     window.EJS_language = 'en-US';
     window.EJS_disableAutoLang = true;
-    window.EJS_defaultOptions = { 'virtual-gamepad': 'disabled' };
+    window.EJS_defaultOptions = {
+      'virtual-gamepad': 'disabled',
+      // Keep save states in IndexedDB instead of downloading them, and flush
+      // battery saves to storage every 30 seconds so a closed tab loses less.
+      'save-state-location': 'browser',
+      'save-save-interval': '30',
+    };
     window.EJS_Buttons = { fullscreen: false };
 
     window.EJS_ready = () => {
       if (!started) setBootStatus(`Starting ${file.name}…`);
+      watchSaveStorage();
     };
 
     window.EJS_onGameStart = () => {
       started = true;
+      watchSaveStorage();
       clearTimeout(bootTimer);
       if (boot) boot.hidden = true;
       hideBootError();
@@ -172,7 +402,7 @@
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const blob = await response.blob();
       const name = decodeURIComponent(url.pathname.split('/').pop() || 'game.gba');
-      bootRom(new File([blob], name, { type: 'application/octet-stream' }));
+      bootRom(new File([blob], name, { type: 'application/octet-stream' }), { persist: false });
     } catch (error) {
       console.warn('GBA ROM fetch failed:', error);
       if (boot) boot.hidden = true;
@@ -181,21 +411,135 @@
     }
   }
 
+  async function bootFromUser(id) {
+    if (!userLib) {
+      showPickerError('Saved files are not available in this browser.');
+      return;
+    }
+    if (picker) picker.hidden = true;
+    if (boot) boot.hidden = false;
+    setBootStatus('Loading saved ROM…');
+    try {
+      const file = await userLib.getFile(id);
+      bootRom(file, { persist: false });
+    } catch (error) {
+      console.warn('Unable to load the saved ROM:', error);
+      if (boot) boot.hidden = true;
+      if (picker) picker.hidden = false;
+      showPickerError(error instanceof Error ? error.message : 'That saved ROM could not be loaded.');
+    }
+  }
+
+  /* -------------------------------------------------------- ROM list wiring */
+
+  for (const row of romRows()) {
+    row.addEventListener('click', () => activateRomItem(row));
+    row.addEventListener('focus', () => selectRom(row));
+    row.addEventListener('mouseenter', () => selectRom(row));
+  }
+
+  function focusRom(offset) {
+    const visible = visibleRomRows();
+    if (!visible.length) return;
+    const current = selectedRom && visible.includes(selectedRom)
+      ? visible.indexOf(selectedRom)
+      : 0;
+    const next = Math.min(visible.length - 1, Math.max(0, current + offset));
+    selectRom(visible[next], { scroll: true });
+    visible[next].focus({ preventScroll: true });
+  }
+
+  romList?.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
+      event.preventDefault();
+      focusRom(1);
+    } else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
+      event.preventDefault();
+      focusRom(-1);
+    } else if (event.key === 'Home') {
+      event.preventDefault();
+      const first = visibleRomRows()[0];
+      if (first) {
+        selectRom(first, { scroll: true });
+        first.focus({ preventScroll: true });
+      }
+    } else if (event.key === 'End') {
+      event.preventDefault();
+      const visible = visibleRomRows();
+      const last = visible[visible.length - 1];
+      if (last) {
+        selectRom(last, { scroll: true });
+        last.focus({ preventScroll: true });
+      }
+    }
+  });
+
+  function syncRomSearch() {
+    if (!romSearchClear) return;
+    romSearchClear.hidden = !romQuery;
+  }
+
+  romSearch?.addEventListener('input', () => {
+    romQuery = romSearch.value.trim();
+    syncRomSearch();
+    applyRomFilter();
+  });
+
+  romSearch?.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      romSearch.value = '';
+      romQuery = '';
+      syncRomSearch();
+      applyRomFilter();
+      return;
+    }
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      const first = visibleRomRows()[0];
+      if (first) {
+        selectRom(first, { scroll: true });
+        first.focus({ preventScroll: true });
+      }
+    }
+  });
+
+  romSearchClear?.addEventListener('click', () => {
+    if (romSearch) romSearch.value = '';
+    romQuery = '';
+    syncRomSearch();
+    applyRomFilter();
+    romSearch?.focus();
+  });
+
+  renderUserRoms();
+  const initial = visibleRomRows()[0];
+  if (initial) selectRom(initial);
+
   /* ------------------------------------------------------------ file picker */
 
-  for (const button of document.querySelectorAll('[data-rom]')) {
-    button.addEventListener('click', () => {
-      const path = button.dataset.rom;
-      if (!path) return;
+  async function chooseRom() {
+    if (userLib && userLib.canPick()) {
       try {
-        history.replaceState(null, '', `?rom=${encodeURIComponent(path)}`);
-      } catch (_) { /* ignore */ }
-      bootFromQuery(path);
-    });
+        const picked = await userLib.pick({
+          types: [{
+            description: 'Game Boy ROM',
+            accept: { 'application/octet-stream': ['.gba', '.gb', '.gbc'] },
+          }],
+        });
+        if (picked && picked.file) {
+          bootRom(picked.file, { handle: picked.handle });
+          return;
+        }
+        if (picked === null) return; // dialog dismissed or unsupported
+      } catch (error) {
+        console.warn('File picker unavailable; falling back to the input.', error);
+      }
+    }
+    fileInput?.click();
   }
 
   for (const button of document.querySelectorAll('[data-choose-rom]')) {
-    button.addEventListener('click', () => fileInput?.click());
+    button.addEventListener('click', chooseRom);
   }
 
   fileInput?.addEventListener('change', () => {
@@ -349,8 +693,11 @@
 
   /* ---------------------------------------------------------------- start up */
 
+  const savedId = params.get('user');
   const preset = params.get('rom');
-  if (preset) {
+  if (savedId) {
+    bootFromUser(savedId);
+  } else if (preset) {
     bootFromQuery(preset);
   } else {
     requestAnimationFrame(() => {

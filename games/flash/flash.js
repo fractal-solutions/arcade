@@ -54,6 +54,7 @@
   const padModeButton = $('#pad-mode-button');
   const touchStick = $('#touch-stick');
   const stickNub = touchStick ? $('.touch-stick-nub', touchStick) : null;
+  const userLib = window.ArcadeUserLibrary || null;
 
   const state = {
     games: [],
@@ -151,13 +152,40 @@
 
   /* ------------------------------------------------------------- catalog */
 
+  function userGameFromRecord(record) {
+    const title = String(record.name || 'Saved SWF').replace(/\.[^.]+$/, '');
+    return {
+      slug: `user-${record.id}`,
+      title,
+      genre: 'Your data',
+      year: 'Saved',
+      description: `${record.name} — saved from your device and remembered in this browser.`,
+      controls: 'Use the game’s own mouse and keyboard controls, plus the Keys pad on touch screens.',
+      poster: 'assets/user-data.svg',
+      accent: '#59f3ff',
+      file: '',
+      user: record,
+    };
+  }
+
+  function loadSavedUserGames() {
+    if (!userLib) return;
+    const records = userLib.listSync().filter((record) => record.kind === 'flash');
+    for (const record of records) {
+      const game = userGameFromRecord(record);
+      state.games.unshift(game);
+      state.bySlug.set(game.slug, game);
+    }
+  }
+
   async function loadCatalog() {
     const response = await fetch('catalog.json', { cache: 'no-store' });
     if (!response.ok) throw new Error(`Could not load the Flash catalog (HTTP ${response.status}).`);
     const games = await response.json();
     if (!Array.isArray(games) || !games.length) throw new Error('The Flash catalog is empty.');
     state.games = games;
-    state.bySlug = new Map(games.map((game) => [game.slug, game]));
+    loadSavedUserGames();
+    state.bySlug = new Map(state.games.map((game) => [game.slug, game]));
     renderGenres();
     renderGrid();
     applyFilters();
@@ -320,6 +348,20 @@
 
   async function playGame(game) {
     if (!game) return;
+    if (game.user) {
+      if (!userLib) {
+        report('Saved files are not available in this browser.', 'error');
+        return;
+      }
+      try {
+        const file = await userLib.getFile(game.user.id);
+        await loadSwfFile(file, { persist: false });
+      } catch (error) {
+        console.error('Unable to load the saved SWF:', error);
+        report(error instanceof Error ? error.message : 'That saved SWF could not be loaded.', 'error');
+      }
+      return;
+    }
     enterPlayerView();
     selectGame(game, { scroll: false, quiet: true });
     state.current = game;
@@ -773,12 +815,10 @@
     fileName.textContent = file ? file.name : 'Nothing selected';
     loadButton.disabled = !file;
     clearFileButton.disabled = !file;
-    if (file) report('Ready to load. Your SWF stays on this device.');
+    if (file) report('Ready to load. It will be saved to Your data in the arcade list.');
   });
 
-  form.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const file = fileInput.files && fileInput.files[0];
+  async function loadSwfFile(file, options = {}) {
     if (!file) {
       report('Choose an SWF file first.', 'error');
       return;
@@ -812,10 +852,23 @@
       playerContainer.classList.remove('is-loading');
       captionKicker.textContent = 'YOUR FILE';
       captionTitle.textContent = file.name;
-      captionDescription.textContent = 'Loaded from your device. The file stays in this tab and is never uploaded or saved.';
+      captionDescription.textContent = 'Loaded from your device. The file is remembered in this browser and never uploaded.';
       captionControls.textContent = 'Use the game’s own mouse and keyboard controls, plus the Keys pad on touch screens.';
       report(`Loaded ${file.name}. Use the Keys pad on touch screens, or your keyboard. If the screen stays blank, this game may need unsupported features or extra files.`, 'ok');
       focusPlayer();
+
+      if (options.persist !== false && userLib) {
+        try {
+          const record = await userLib.remember(file, { kind: 'flash', handle: options.handle });
+          try {
+            history.replaceState(null, '', `?user=${encodeURIComponent(record.id)}`);
+          } catch (_) { /* ignore */ }
+          report(`Loaded ${file.name}. Saved to Your data in the arcade list.`, 'ok');
+        } catch (error) {
+          console.warn('Unable to save the SWF to Your data:', error);
+          report(`Loaded ${file.name}. This browser could not remember the file.`, 'ok');
+        }
+      }
     } catch (error) {
       console.error('Unable to load the selected SWF:', error);
       playerContainer.classList.remove('is-loading');
@@ -827,6 +880,28 @@
     } finally {
       loadButton.disabled = !(fileInput.files && fileInput.files[0]);
     }
+  }
+
+  async function loadFromUser(id) {
+    if (!userLib) {
+      report('Saved files are not available in this browser.', 'error');
+      return;
+    }
+    try {
+      const file = await userLib.getFile(id);
+      fileName.textContent = file.name;
+      clearFileButton.disabled = false;
+      await loadSwfFile(file, { persist: false });
+    } catch (error) {
+      console.error('Unable to load the saved SWF:', error);
+      report(error instanceof Error ? error.message : 'That saved SWF could not be loaded.', 'error');
+    }
+  }
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const file = fileInput.files && fileInput.files[0];
+    await loadSwfFile(file, { persist: true });
   });
 
   clearFileButton.addEventListener('click', () => {
@@ -841,6 +916,11 @@
 
   function loadFromQuery() {
     const params = new URLSearchParams(window.location.search);
+    const userId = params.get('user');
+    if (userId) {
+      loadFromUser(userId);
+      return;
+    }
     const slug = params.get('game');
     if (!slug) return;
     const game = state.bySlug.get(slug);

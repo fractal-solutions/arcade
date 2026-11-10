@@ -174,6 +174,9 @@
     <h1 class="title">DOS <b>Cabinet</b></h1>
     <p class="note">DOSBox · WebAssembly · bring your own .jsdos bundle</p>
     <p class="harness"><a href="../../test-keen.html">Test harness ↗</a></p>
+    <button class="fs-btn" id="open-bundle" type="button">
+      <span aria-hidden="true">＋</span><span>Open .jsdos</span>
+    </button>
     <button class="fs-btn" id="fs" type="button" aria-pressed="false" aria-label="Toggle fullscreen">
       <span aria-hidden="true">⛶</span><span>Fullscreen</span>
     </button>
@@ -191,7 +194,9 @@
   </div>
 </div>
 
+<input type="file" id="jsdos-file" accept=".jsdos,.zip,application/zip" hidden>
 <script src="../../vendor/js-dos/js-dos.js"></script>
+<script src="../_shared/user-library.js?v=20261110a"></script>
 <script>
   (() => {
     'use strict';
@@ -200,6 +205,10 @@
     const err = document.getElementById('boot-error');
     const params = new URLSearchParams(location.search);
     const preset = params.get('url');
+    const savedId = params.get('user');
+    const userLib = window.ArcadeUserLibrary || null;
+    const openBtn = document.getElementById('open-bundle');
+    const bundleInput = document.getElementById('jsdos-file');
 
     function fail(message) {
       if (!err) return;
@@ -215,25 +224,89 @@
       return;
     }
 
-    try {
-      window.dos = window.Dos(el, {
-        pathPrefix: '../../vendor/js-dos/emulators/',
-        theme: 'dark',
-        renderBackend: 'canvas',
-        workerThread: false,
-        autoSave: true,
-        kiosk: false,
-        ...(preset ? { url: preset } : {}),
-        onEvent: (name, data) => {
-          if (name === 'ws-err' || name === 'emu-error') {
-            console.error('js-dos', name, data);
-          }
-        },
-      });
-    } catch (e) {
-      console.error(e);
-      fail(String(e && e.message ? e.message : e));
+    async function resolveUrl() {
+      if (savedId) {
+        if (!userLib) throw new Error('Saved files are not available in this browser.');
+        const file = await userLib.getFile(savedId);
+        return URL.createObjectURL(file);
+      }
+      return preset || null;
     }
+
+    async function start() {
+      try {
+        const url = await resolveUrl();
+        window.dos = window.Dos(el, {
+          pathPrefix: '../../vendor/js-dos/emulators/',
+          theme: 'dark',
+          renderBackend: 'canvas',
+          workerThread: false,
+          autoSave: true,
+          kiosk: false,
+          ...(url ? { url } : {}),
+          onEvent: (name, data) => {
+            if (name === 'ws-err' || name === 'emu-error') {
+              console.error('js-dos', name, data);
+            }
+          },
+        });
+      } catch (e) {
+        console.error(e);
+        fail(String(e && e.message ? e.message : e));
+      }
+    }
+
+    start();
+
+    /* ------------------------------------------------------- bring your own */
+
+    async function rememberAndOpen(file, handle) {
+      if (!file) return;
+      if (!/\.(jsdos|zip)$/i.test(file.name)) {
+        fail('Choose a .jsdos or .zip bundle.');
+        return;
+      }
+      if (!userLib) {
+        fail('This browser cannot remember local files.');
+        return;
+      }
+      try {
+        const record = await userLib.remember(file, { kind: 'dos', handle });
+        // Reloading gives js-dos a clean instance and keeps the bundle in IndexedDB.
+        location.href = `?user=${encodeURIComponent(record.id)}`;
+      } catch (e) {
+        console.error('Unable to save the DOS bundle:', e);
+        fail('That bundle could not be saved in this browser.');
+      }
+    }
+
+    async function chooseBundle() {
+      if (userLib && userLib.canPick()) {
+        try {
+          const picked = await userLib.pick({
+            types: [{
+              description: 'js-dos bundle',
+              accept: { 'application/zip': ['.jsdos', '.zip'] },
+            }],
+          });
+          if (picked && picked.file) {
+            rememberAndOpen(picked.file, picked.handle);
+            return;
+          }
+          if (picked === null) return;
+        } catch (e) {
+          console.warn('File picker unavailable; falling back to the input.', e);
+        }
+      }
+      bundleInput?.click();
+    }
+
+    openBtn?.addEventListener('click', chooseBundle);
+    bundleInput?.addEventListener('change', () => {
+      const file = bundleInput.files && bundleInput.files[0];
+      bundleInput.value = '';
+      if (file) rememberAndOpen(file);
+    });
 
     /* ---------------------------------------------------------- fullscreen */
     const fsBtn = document.getElementById('fs');

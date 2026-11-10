@@ -4,7 +4,7 @@ A static arcade of local classics, with a local vault of 26 classic Flash games
 running in Ruffle and a bring-your-own-ROM Game Boy Advance cabinet powered by
 mGBA. Real game code, real pixels, no server-side component.
 
-**Last updated: 2026-11-09**
+**Last updated: 2026-11-10**
 
 ---
 
@@ -156,9 +156,14 @@ vendored **EmulatorJS 4.2.3** with the **mGBA** core compiled to WebAssembly.
 No commercial ROMs are bundled. Seven freely distributable homebrew ROMs ship
 with the cabinet and are listed in its picker, so you can play immediately.
 You can also drop or choose a `.gba`, `.gb` or `.gbc` file you own (up to 64 MB);
-the file is read into a Blob URL in the current tab and is never uploaded.
-Legal homebrew, public-domain test ROMs and self-dumped cartridges are the
-intended sources. Saves and save states stay in this browser's storage.
+the file is read into a Blob URL in the current tab and is never uploaded. Picked
+ROMs are remembered in this browser and added to the main arcade list under
+**Your data**; the ROM library in the cabinet also lists them with search and
+keyboard navigation. Legal homebrew, public-domain test ROMs and self-dumped
+cartridges are the intended sources. Saves and save states stay in this browser's
+storage, which is tied to the exact URL (scheme, host and port) you open the
+arcade from. Battery saves flush every 30 seconds and save states are kept in the
+browser by default; the emulator menu can also download and load them.
 
 The arcade's own fullscreen button and touch rails remain authoritative:
 EmulatorJS's virtual gamepad and fullscreen buttons are disabled. The core is
@@ -316,7 +321,9 @@ as `games/flash/?game=portal-flash` open a game directly.
 
 The **Load your own SWF** panel at the bottom of the page accepts any local
 `.swf`; the file is read into memory, checked for a valid `FWS`/`CWS`/`ZWS`
-header and never uploaded or persisted.
+header, and never uploaded. Loaded SWFs are remembered in this browser, appear
+in the main arcade list under **Your data**, and are added to the vault shelf on
+the next visit.
 
 ### Game Boy Advance
 
@@ -399,6 +406,14 @@ automatically under `prefers-reduced-motion: reduce`.
 
 Everything is local. Nothing is uploaded.
 
+Browser storage is scoped to the **exact origin** — scheme, host and port. Opening
+the arcade at `http://127.0.0.1:8000/`, `http://localhost:8000/` or
+`http://192.168.1.20:8000/` gives each URL its own separate saves and **Your data**
+entries, even though they serve the same folder. Pick one URL and keep using it
+(for example the `Local:` address printed by `tools/serve.sh`). Restarting the
+server on the same host and port keeps everything; changing either makes the old
+storage invisible.
+
 | Key | Used by | Contents |
 | --- | --- | --- |
 | `arcade.dave.progress.v1` | Dangerous Dave | `{ highestLevel, bestScore, updated }` |
@@ -408,7 +423,9 @@ Everything is local. Nothing is uploaded.
 | `arcade.flash.keys.v1` | Flash Vault | `1` / `0` — touch key pad preference |
 | `arcade.flash.pad.v1` | Flash Vault | `dpad` / `analog` — movement control |
 | `arcade.gba.haptics.v1` | Game Boy Advance | `1` / `0` — touch haptics preference |
+| `arcade.user.index.v1` | Your data | Synchronous index of files picked from disk |
 | IndexedDB | Prince of Persia 2 | Cached `pop2-data.tar.gz` and saved games |
+| IndexedDB | Your data | `arcade-user-data` / `files` — bytes of picked ROMs, SWFs and DOS bundles |
 | js-dos storage | Keen 4, Duke Nukem II, DOS Vault, DOS Cabinet | DOSBox saves, configs and bundle state |
 | EmulatorJS storage | Game Boy Advance | mGBA saves, save states and settings |
 
@@ -417,6 +434,21 @@ Clearing site data resets the arcade.
 ---
 
 ## Bring your own game data
+
+### Your data (GBA, Flash and DOS)
+
+When you pick a ROM or game from disk in the GBA, Flash or DOS cabinet, the file
+is stored in this browser and added to the main arcade list under **Your data**.
+The file bytes live in IndexedDB (`arcade-user-data`, object store `files`), while
+a small synchronous index in `localStorage` (`arcade.user.index.v1`) lets the home
+page list saved entries before the rest of the arcade boots. Chromium browsers
+also keep a File System Access handle when one is available; other browsers use
+the cached copy.
+
+Saved entries open with `?user=<id>` (for example `games/gba/?user=...`), and the
+**Forget this file** button on a saved card removes both the index entry and the
+stored bytes. Nothing is uploaded. DOS bundles use the same flow and reload the
+cabinet once the bundle is saved so js-dos starts from a clean instance.
 
 ### Prince of Persia 2
 
@@ -534,7 +566,7 @@ arcade/
 │   ├── quake/              Quake (Qwasm) + bundled LibreQuake data
 │   ├── keen4/              Commander Keen 4 js-dos cabinet + bundle
 │   ├── duke2/              Duke Nukem II js-dos cabinet + bundle
-│   ├── _shared/            shared js-dos shell (emu.css, emu.js)
+│   ├── _shared/            shared js-dos shell (emu.css, emu.js) + user-library
 │   ├── pop2/               Prince of Persia 2 cabinet + self-hosting docs
 │   ├── pop2demo/           Prince of Persia 2 DOS demo cabinet + bundle
 │   ├── dos/                js-dos cabinet

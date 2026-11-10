@@ -9,19 +9,24 @@ included, and you can load your own. No commercial ROMs are bundled or linked.
 
 - `index.html` — cabinet shell, built-in ROM library, drag/drop, boot/error UI,
   fullscreen.
-- `gba.js` — ROM validation, Blob URL boot, `?rom=` support, EmulatorJS loading,
-  fullscreen handling and lazy touch-control setup.
+- `gba.js` — ROM validation, Blob URL boot, `?rom=` and `?user=` support,
+  EmulatorJS loading, fullscreen handling and lazy touch-control setup.
 - `gba-controls.js` — D-pad, A/B/L/R/Start/Select touch rails, haptics and direct
   `gameManager.simulateInput()` wiring.
 - `roms/` — a handful of freely distributable homebrew ROMs for testing; see
   `roms/README.md` for provenance and licenses.
 - `../../vendor/emulatorjs/` — the vendored EmulatorJS 4.2.3 runtime and mGBA core.
+- `../_shared/user-library.js` — shared “Your data” storage for files picked from
+  disk.
 
 ## Bundled library
 
-The picker lists the seven bundled homebrew ROMs and boots one on tap. `UCity`
+The picker lists the seven bundled homebrew ROMs and boots one on tap. The list
+matches the main arcade's visual language: index, art tile, title/meta, format
+chip and launch arrow, with search and arrow/Home/End keyboard navigation. `UCity`
 is a Game Boy Color release and exercises the `.gbc` path. See `roms/README.md`
-for provenance and licenses.
+for provenance and licenses. ROMs you pick from disk are added above the bundled
+list and are remembered across reloads.
 
 ## Supported files
 
@@ -32,8 +37,10 @@ for provenance and licenses.
 | `.gbc` | mGBA | Game Boy Color |
 
 Files up to 64 MB are accepted. The ROM is read into a Blob URL in the current
-tab and is never uploaded. Reloading the cabinet or pressing **Change ROM**
-disposes the running core and the Blob URL.
+tab and is never uploaded. Picked files are also stored in this browser through
+the shared user library, so they survive reloads and appear in the main arcade
+list under **Your data**. Reloading the cabinet or pressing **Change ROM**
+disposes the running core and the Blob URL; the saved copy stays available.
 
 ## Legal sources
 
@@ -77,6 +84,15 @@ games/gba/?rom=homebrew.gba
 The URL is fetched with `cache: 'no-store'` and turned into a Blob. Cross-origin
 `?rom=` URLs are rejected so the cabinet cannot be used to fetch arbitrary files.
 
+A ROM previously picked from disk can be reopened by its saved id:
+
+```text
+games/gba/?user=<id>
+```
+
+The id comes from the `arcade.user.index.v1` index and the bytes are read back
+from IndexedDB.
+
 Bundled test ROMs:
 
 ```text
@@ -101,8 +117,20 @@ game viewport.
 
 - EmulatorJS keeps mGBA saves, save states and settings in browser storage.
 - `arcade.gba.haptics.v1` stores the touch haptics preference.
+- `arcade.user.index.v1` stores the synchronous “Your data” index.
+- IndexedDB `arcade-user-data` / `files` stores the bytes of ROMs picked from disk.
+- Battery saves are flushed every 30 seconds by default, and save states are kept
+  in the browser (`Save State Location → Keep in Browser` in the emulator menu).
+- `gba.js` also guards EmulatorJS's shutdown sync: the runtime unmounts
+  `/data/saves` before its last persist, which would otherwise push an empty
+  filesystem and delete every stored save. An empty local set never removes
+  remote saves, so progress survives a reload or server restart.
+- Storage is tied to the **exact origin** (scheme + host + port). A different port
+  or hostname gets a fresh, empty storage area, so use the same URL each time.
+  To move progress between URLs, use the emulator menu's save-state download and
+  load buttons, or copy the `.srm` save file with the save-file buttons.
 
-Clearing site data resets the cabinet.
+Clearing site data resets the cabinet and removes saved ROMs.
 
 ## Credits
 

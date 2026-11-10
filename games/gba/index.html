@@ -74,6 +74,8 @@
     font-family: var(--mono);
     font-size: .92em;
   }
+  /* ROM library, styled like the main arcade list: index, thumbnail,
+     title/meta, format chip and a launch arrow. */
   .rom-library { margin: 0 0 16px; }
   .rom-library-head {
     display: flex;
@@ -83,48 +85,245 @@
     margin-bottom: 8px;
     color: var(--gba-ink);
     font: 700 10px/1.2 var(--mono);
-    letter-spacing: .1em;
+    letter-spacing: .12em;
     text-transform: uppercase;
   }
   .rom-library-head span:last-child {
     color: var(--dim);
     font-weight: 600;
-    letter-spacing: .05em;
+    letter-spacing: .06em;
   }
-  .rom-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 8px;
-  }
-  .rom-item {
+  .rom-search {
     display: flex;
-    flex-direction: column;
-    gap: 3px;
-    align-items: flex-start;
-    min-height: 48px;
-    padding: 9px 11px;
+    align-items: center;
+    gap: 8px;
+    height: 34px;
+    margin-bottom: 8px;
+    padding: 0 10px;
     border: 1px solid rgba(155, 140, 255, .24);
-    border-radius: 9px;
-    background: rgba(9, 14, 24, .72);
+    border-radius: 6px;
+    background: rgba(7, 10, 18, .82);
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  .rom-search:focus-within {
+    border-color: rgba(89, 243, 255, .55);
+    box-shadow: 0 0 0 1px rgba(89, 243, 255, .15);
+  }
+  .rom-search svg {
+    width: 14px;
+    height: 14px;
+    flex: none;
+    fill: none;
+    stroke: var(--dim);
+    stroke-width: 1.6;
+  }
+  .rom-search input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    background: transparent;
     color: var(--ink);
+    font: 600 11px/1 var(--mono);
+    letter-spacing: .04em;
+    outline: none;
+  }
+  .rom-search input::placeholder { color: var(--dim); }
+  .rom-search input::-webkit-search-cancel-button { display: none; }
+  .rom-search-clear {
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: 1px solid rgba(155, 140, 255, .3);
+    border-radius: 50%;
+    background: rgba(155, 140, 255, .1);
+    color: var(--gba-ink);
+    font: 700 11px/1 var(--mono);
+    cursor: pointer;
+  }
+  .rom-search-clear[hidden] { display: none; }
+
+  .rom-list {
+    position: relative;
+    max-height: clamp(230px, 42vh, 360px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    border: 1px solid rgba(155, 140, 255, .22);
+    border-radius: 8px;
+    background:
+      repeating-linear-gradient(0deg, transparent 0 43px, rgba(155, 140, 255, .03) 44px),
+      linear-gradient(180deg, rgba(11, 15, 29, .9), rgba(7, 10, 18, .96));
+    scrollbar-width: thin;
+    scrollbar-color: rgba(155, 140, 255, .45) transparent;
+  }
+  .rom-list::-webkit-scrollbar { width: 8px; }
+  .rom-list::-webkit-scrollbar-track { background: rgba(5, 8, 15, .6); }
+  .rom-list::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(89, 243, 255, .65), rgba(155, 140, 255, .5)) padding-box;
+  }
+  .rom-list:focus-visible { outline: 1px solid rgba(89, 243, 255, .5); outline-offset: -1px; }
+
+  .rom-item {
+    position: relative;
+    display: grid;
+    grid-template-columns: 26px 42px minmax(0, 1fr) auto 18px;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 50px;
+    padding: 7px 12px 7px 8px;
+    border: 0;
+    border-bottom: 1px solid rgba(155, 140, 255, .09);
+    background: transparent;
+    color: #b7c9de;
     text-align: left;
     cursor: pointer;
-    transition: border-color .15s ease, background .15s ease, transform .15s ease;
+    isolation: isolate;
+    transition: background .15s ease, color .15s ease, transform .15s ease;
   }
-  .rom-item:hover,
-  .rom-item:focus-visible {
-    border-color: var(--accent-2);
-    background: rgba(16, 24, 38, .92);
-    outline: none;
-    transform: translateY(-1px);
+  .rom-item::before {
+    position: absolute;
+    top: 6px;
+    bottom: 6px;
+    left: 0;
+    width: 2px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, #59f3ff, #9b8cff 60%, #5b4bd6);
+    box-shadow: 0 0 12px rgba(89, 243, 255, .8), 0 0 24px rgba(155, 140, 255, .4);
+    content: "";
+    opacity: 0;
+    transform: scaleY(.4);
+    transition: opacity .15s ease, transform .15s ease;
   }
-  .rom-item:active { transform: translateY(0); }
-  .rom-name { font-size: 13px; font-weight: 700; letter-spacing: .01em; }
-  .rom-meta {
-    color: var(--dim);
-    font: 600 8.5px/1.2 var(--mono);
-    letter-spacing: .07em;
+  .rom-item::after {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(90deg, rgba(89, 243, 255, .16), rgba(155, 140, 255, .08) 55%, transparent 85%);
+    content: "";
+    opacity: 0;
+    transition: opacity .15s ease;
+  }
+  .rom-item:hover { color: #eaf7ff; background: rgba(89, 243, 255, .05); }
+  .rom-item:hover::after { opacity: .5; }
+  .rom-item.is-selected {
+    color: #f4faff;
+    background: linear-gradient(90deg, rgba(89, 243, 255, .14), rgba(155, 140, 255, .06) 65%, transparent);
+    box-shadow: inset 0 1px 0 rgba(174, 224, 255, .12), inset 0 -1px 0 rgba(174, 224, 255, .08);
+    transform: translateX(3px);
+  }
+  .rom-item.is-selected::before { opacity: 1; transform: scaleY(1); }
+  .rom-item.is-selected::after { opacity: 1; }
+  .rom-item.is-filtered-out { display: none; }
+  .rom-item:focus-visible { outline: 1px solid rgba(131, 211, 255, .6); outline-offset: -2px; }
+
+  .rom-item-index {
+    color: #5b7ea5;
+    font: 600 9px/1 var(--mono);
+    letter-spacing: .06em;
+    text-align: right;
+  }
+  .rom-item.is-selected .rom-item-index {
+    color: #9fe6ff;
+    text-shadow: 0 0 10px rgba(89, 193, 255, .4);
+  }
+  .rom-item-art {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 30px;
+    border: 1px solid rgba(150, 199, 242, .2);
+    border-radius: 4px;
+    background: linear-gradient(135deg, #101b36, #070d18);
+    color: var(--accent-2);
+    font: 700 8px/1 var(--mono);
+    letter-spacing: .06em;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06);
+  }
+  .rom-item.is-selected .rom-item-art {
+    border-color: rgba(89, 243, 255, .55);
+    box-shadow: 0 0 14px rgba(89, 243, 255, .22), inset 0 1px 0 rgba(255, 255, 255, .12);
+  }
+  .rom-item-copy { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .rom-item-title {
+    overflow: hidden;
+    color: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .rom-item.is-selected .rom-item-title { text-shadow: 0 0 16px rgba(137, 213, 255, .25); }
+  .rom-item-meta {
+    overflow: hidden;
+    color: #6c819b;
+    font: 600 7px/1 var(--mono);
+    letter-spacing: .12em;
     text-transform: uppercase;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .rom-item.is-selected .rom-item-meta { color: #9cb9d8; }
+  .rom-item-chip {
+    display: inline-flex;
+    align-items: center;
+    height: 17px;
+    padding: 0 6px;
+    border: 1px solid rgba(255, 177, 59, .24);
+    border-radius: 999px;
+    background: rgba(160, 110, 25, .14);
+    color: #ffd479;
+    font: 700 6.5px/1 var(--mono);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .rom-item-chip[data-kind="gbc"] {
+    border-color: rgba(124, 247, 196, .24);
+    background: rgba(30, 120, 90, .14);
+    color: #7cf7c4;
+  }
+  .rom-item-chip[data-kind="data"] {
+    border-color: rgba(255, 106, 90, .22);
+    background: rgba(150, 55, 45, .14);
+    color: #ffb1a8;
+  }
+  .rom-item-go {
+    display: grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    color: #5d8fc2;
+    font-size: 7px;
+  }
+  .rom-item.is-selected .rom-item-go {
+    color: #9fe6ff;
+    text-shadow: 0 0 10px rgba(89, 193, 255, .7);
+  }
+  .rom-empty {
+    margin: 10px 0 0;
+    color: var(--dim);
+    font: 600 9px/1.5 var(--mono);
+    letter-spacing: .06em;
+    text-align: center;
+  }
+  .rom-empty[hidden] { display: none; }
+
+  @media (max-width: 520px) {
+    .rom-item {
+      grid-template-columns: 22px 34px minmax(0, 1fr) auto 14px;
+      gap: 8px;
+      min-height: 46px;
+      padding: 6px 8px 6px 6px;
+    }
+    .rom-item-art { width: 34px; height: 26px; font-size: 7px; }
+    .rom-item-title { font-size: 12px; }
+    .rom-item-chip { height: 16px; padding: 0 5px; font-size: 6px; }
   }
   .rom-divider {
     display: flex;
@@ -234,6 +433,27 @@
     letter-spacing: .04em;
   }
   .picker-note b { color: var(--muted); }
+
+  .gba-toast {
+    position: fixed;
+    left: 50%;
+    bottom: max(20px, env(safe-area-inset-bottom));
+    z-index: 60;
+    padding: 9px 14px;
+    border: 1px solid rgba(89, 243, 255, .38);
+    border-radius: 999px;
+    background: rgba(7, 12, 22, .94);
+    color: #bff3ff;
+    font: 700 10px/1 var(--mono);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, 10px);
+    transition: opacity .18s ease, transform .18s ease;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .5), 0 0 24px rgba(89, 243, 255, .12);
+  }
+  .gba-toast.is-visible { opacity: 1; transform: translate(-50%, 0); }
 
   .boot-overlay {
     position: absolute;
@@ -492,44 +712,93 @@
         <p class="picker-lede">
           Seven freely distributable homebrew ROMs are included. Pick one below, or
           load a <code>.gba</code>, <code>.gb</code> or <code>.gbc</code> file you own.
-          The file is read in this tab and is never uploaded.
+          Files you pick are remembered in this browser and added to the arcade list.
+          Nothing is uploaded.
         </p>
 
         <div class="rom-library">
           <div class="rom-library-head">
-            <span>Built-in homebrew</span>
-            <span>7 included</span>
+            <span>ROM library</span>
+            <span id="rom-count">7 included</span>
           </div>
-          <div class="rom-list" role="list">
-            <button type="button" class="rom-item" data-rom="roms/pong.gba" role="listitem">
-              <span class="rom-name">Pong</span>
-              <span class="rom-meta">GBA &middot; MIT</span>
+          <div class="rom-search">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.2"/><path d="m10.2 10.2 3.3 3.3"/></svg>
+            <input id="rom-search" type="search" placeholder="Search ROMs" autocomplete="off" spellcheck="false" aria-label="Search ROMs">
+            <button type="button" class="rom-search-clear" id="rom-search-clear" aria-label="Clear search" hidden>×</button>
+          </div>
+          <div class="rom-list" id="rom-list" role="listbox" aria-label="ROM library" tabindex="0">
+            <button type="button" class="rom-item" data-rom="roms/pong.gba" role="option" aria-selected="false" data-search="pong gba mit homebrew built-in">
+              <span class="rom-item-index" aria-hidden="true">01</span>
+              <span class="rom-item-art" aria-hidden="true">GBA</span>
+              <span class="rom-item-copy">
+                <span class="rom-item-title">Pong</span>
+                <span class="rom-item-meta">GBA · MIT · Homebrew</span>
+              </span>
+              <span class="rom-item-chip" data-kind="gba">GBA</span>
+              <span class="rom-item-go" aria-hidden="true">▶</span>
             </button>
-            <button type="button" class="rom-item" data-rom="roms/rkanoid.gba" role="listitem">
-              <span class="rom-name">@rkanoid</span>
-              <span class="rom-meta">GBA &middot; Public domain</span>
+            <button type="button" class="rom-item" data-rom="roms/rkanoid.gba" role="option" aria-selected="false" data-search="rkanoid arkanoid gba public domain homebrew built-in">
+              <span class="rom-item-index" aria-hidden="true">02</span>
+              <span class="rom-item-art" aria-hidden="true">GBA</span>
+              <span class="rom-item-copy">
+                <span class="rom-item-title">@rkanoid</span>
+                <span class="rom-item-meta">GBA · Public domain · Homebrew</span>
+              </span>
+              <span class="rom-item-chip" data-kind="gba">GBA</span>
+              <span class="rom-item-go" aria-hidden="true">▶</span>
             </button>
-            <button type="button" class="rom-item" data-rom="roms/cebelix.gba" role="listitem">
-              <span class="rom-name">Cebelix</span>
-              <span class="rom-meta">GBA &middot; Freeware</span>
+            <button type="button" class="rom-item" data-rom="roms/cebelix.gba" role="option" aria-selected="false" data-search="cebelix gba freeware homebrew built-in">
+              <span class="rom-item-index" aria-hidden="true">03</span>
+              <span class="rom-item-art" aria-hidden="true">GBA</span>
+              <span class="rom-item-copy">
+                <span class="rom-item-title">Cebelix</span>
+                <span class="rom-item-meta">GBA · Freeware · Homebrew</span>
+              </span>
+              <span class="rom-item-chip" data-kind="gba">GBA</span>
+              <span class="rom-item-go" aria-hidden="true">▶</span>
             </button>
-            <button type="button" class="rom-item" data-rom="roms/dezgex.gba" role="listitem">
-              <span class="rom-name">Dezgex</span>
-              <span class="rom-meta">GBA &middot; Freeware</span>
+            <button type="button" class="rom-item" data-rom="roms/dezgex.gba" role="option" aria-selected="false" data-search="dezgex gba freeware homebrew built-in">
+              <span class="rom-item-index" aria-hidden="true">04</span>
+              <span class="rom-item-art" aria-hidden="true">GBA</span>
+              <span class="rom-item-copy">
+                <span class="rom-item-title">Dezgex</span>
+                <span class="rom-item-meta">GBA · Freeware · Homebrew</span>
+              </span>
+              <span class="rom-item-chip" data-kind="gba">GBA</span>
+              <span class="rom-item-go" aria-hidden="true">▶</span>
             </button>
-            <button type="button" class="rom-item" data-rom="roms/mystic_q.gba" role="listitem">
-              <span class="rom-name">Mystic Quest</span>
-              <span class="rom-meta">GBA &middot; Freeware</span>
+            <button type="button" class="rom-item" data-rom="roms/mystic_q.gba" role="option" aria-selected="false" data-search="mystic quest gba freeware homebrew built-in">
+              <span class="rom-item-index" aria-hidden="true">05</span>
+              <span class="rom-item-art" aria-hidden="true">GBA</span>
+              <span class="rom-item-copy">
+                <span class="rom-item-title">Mystic Quest</span>
+                <span class="rom-item-meta">GBA · Freeware · Homebrew</span>
+              </span>
+              <span class="rom-item-chip" data-kind="gba">GBA</span>
+              <span class="rom-item-go" aria-hidden="true">▶</span>
             </button>
-            <button type="button" class="rom-item" data-rom="roms/pik_roll.gba" role="listitem">
-              <span class="rom-name">Pik Roll</span>
-              <span class="rom-meta">GBA &middot; Freeware</span>
+            <button type="button" class="rom-item" data-rom="roms/pik_roll.gba" role="option" aria-selected="false" data-search="pik roll gba freeware homebrew built-in">
+              <span class="rom-item-index" aria-hidden="true">06</span>
+              <span class="rom-item-art" aria-hidden="true">GBA</span>
+              <span class="rom-item-copy">
+                <span class="rom-item-title">Pik Roll</span>
+                <span class="rom-item-meta">GBA · Freeware · Homebrew</span>
+              </span>
+              <span class="rom-item-chip" data-kind="gba">GBA</span>
+              <span class="rom-item-go" aria-hidden="true">▶</span>
             </button>
-            <button type="button" class="rom-item" data-rom="roms/ucity.gbc" role="listitem">
-              <span class="rom-name">UCity</span>
-              <span class="rom-meta">GBC &middot; GPLv3</span>
+            <button type="button" class="rom-item" data-rom="roms/ucity.gbc" role="option" aria-selected="false" data-search="ucity gbc gplv3 homebrew built-in">
+              <span class="rom-item-index" aria-hidden="true">07</span>
+              <span class="rom-item-art" aria-hidden="true">GBC</span>
+              <span class="rom-item-copy">
+                <span class="rom-item-title">UCity</span>
+                <span class="rom-item-meta">GBC · GPLv3 · Homebrew</span>
+              </span>
+              <span class="rom-item-chip" data-kind="gbc">GBC</span>
+              <span class="rom-item-go" aria-hidden="true">▶</span>
             </button>
           </div>
+          <p class="rom-empty" id="rom-empty" hidden>No ROMs match that search.</p>
         </div>
 
         <div class="rom-divider" role="presentation"><span>or use your own ROM</span></div>
@@ -546,7 +815,8 @@
         <p class="picker-note">
           <b>Legal only.</b> Use homebrew, public-domain test ROMs or a cartridge
           you have dumped yourself. Commercial ROMs are not distributed here.
-          Saves and save states stay in this browser.
+          Saves, save states and remembered ROMs live in this browser and are tied
+          to this exact URL, so open the arcade from the same host and port each time.
         </p>
       </div>
     </section>
@@ -567,6 +837,7 @@
 </div>
 
 <input type="file" id="rom-file" accept=".gba,.gb,.gbc,application/octet-stream" hidden>
-<script src="gba.js?v=20261109d"></script>
+<script src="../_shared/user-library.js?v=20261110a"></script>
+<script src="gba.js?v=20261110d"></script>
 </body>
 </html>

@@ -42,7 +42,10 @@ request once the page is loaded.
    `arcade.flash.pad.v1` (`dpad` / `analog`).
 6. The **Load your own SWF** panel reads a local file into an `ArrayBuffer`,
    verifies the `FWS` / `CWS` / `ZWS` header and calls `load({ data })`. The file
-   is never uploaded or persisted.
+   is never uploaded. It is remembered in this browser through the shared user
+   library, appears in the main arcade list under **Your data**, and is added to
+   the vault shelf on the next visit. Saved files open with
+   `games/flash/?user=<id>`.
 
 Ruffle can run most, but not all, SWFs. A title may have missing audio, video or
 AVM2 edge cases; the player reports load failures in the status line instead of
